@@ -5,4 +5,4 @@ FindFiles:
 	$(GHC) $(GHCFLAGS) src/FindFiles.hs
 
 clean: 
-	rm -rf FindFiles.hi FindFiles.o
+	rm -rf build/* src/FindFiles.hi src/FindFiles.o
