@@ -2,7 +2,7 @@ GHC=ghc
 GHCFLAGS=
 
 FindFiles: 
-	$(GHC) $(GHCFLAGS) FindFiles.hs
+	$(GHC) $(GHCFLAGS) src/FindFiles.hs
 
 clean: 
 	rm -rf FindFiles.hi FindFiles.o
