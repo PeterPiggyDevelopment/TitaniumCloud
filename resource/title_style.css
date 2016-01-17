@@ -1,6 +1,65 @@
-body {
-    color : #0000ff
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+} 
+
+html, body, div, p, img { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
 }
-pre {
-    margin : 1px
+
+html, body { 
+    height: 100%; 
+    background-color:black;
+}
+
+#first_slide { 
+    width: 100%; 
+    height: 80%; 
+    background-image: url('wallp.jpg');
+    opacity:0.5
+    background: linear-gradient(to right, rgba(4, 176, 237, 0.45), rgba(90, 94, 171, 0.45));
+}
+
+#second_slide { 
+    width: 100%; 
+    height: 40%; 
+    background-color: #5a5eab; 
+}
+
+#third_slide { 
+    width: 100%;
+    height: 36%;
+    background-image: url('ban-img.png');
+    background-repeat: no-repeat;
+    background-size: 100%;
+}
+
+.title {
+    text-align: left;
+    font-family: 'Poiret One', cursive;
+    color: white;
+    font-size: 60px;
+    text-decoration: none;
+}
+
+.main_text {
+    font-size: 150%;
+    text-align: center;
+    font-family: 'Raleway', serif;
+    color: white;
+}
+
+.sign {
+    color: white;
+    bottom:0;
+    left: 0;
+    right: 0;
+    text-align: center;
+    position: fixed;
+    font-size: 130%;
+    font-family: 'Indie Flower', cursive;
+    margin-bottom:0.2%;
 }
