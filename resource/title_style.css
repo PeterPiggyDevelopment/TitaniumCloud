@@ -16,7 +16,7 @@ html, body {
 }
 
 #first_slide { 
-    height: 80%; 
+    height: 40vw;
     text-align:center;
     background-image: url('wallp.jpg');
     width: 100%; 
@@ -25,7 +25,7 @@ html, body {
 #gradient_container {
     text-align: center;
     width: 100%;
-    height: 80%;
+    height: 40vw;
     position: relative;
 }
 
@@ -44,7 +44,7 @@ html, body {
 
 #second_slide { 
     width: 50%; 
-    height: 300px; 
+    height: 15vw; 
     background-color: #04b0ed; 
     text-align:center;
     float:left;
@@ -52,7 +52,7 @@ html, body {
 
 #third_slide { 
     width: 50%; 
-    height: 300px; 
+    height: 15vw; 
     background-color: #5a5eab; 
     text-align:center;
     float:left;
@@ -60,15 +60,15 @@ html, body {
 
 #two_slides { 
     width: 100%; 
-    height: 50%; 
+    height: 15vw; 
     background-color: #000000; 
     float:left;
 }
 
 #fourth_slide { 
-    margin-top: 300px;
+    margin-top: 15vw;
     width: 100%;
-    height: 39%;
+    height: 14vw;
     background-image: url('ban-img.png');
     background-repeat: no-repeat;
     background-size: 100% 100%;
@@ -88,14 +88,14 @@ html, body {
     text-align: left;
     font-family: 'Poiret One', cursive;
     color: white;
-    font-size: 60px;
+    font-size: 4vw;
     text-decoration: none;
     margin-left: 0.4%;
     margin-top: 0.4%;
 }
 
 .main_title_text {
-    font-size: 250%;
+    font-size: 2.1vw;
     text-align: center;
     font-family: 'Raleway', serif;
     color: white;
@@ -105,7 +105,7 @@ html, body {
 }
 
 .main_text {
-    font-size: 150%;
+    font-size: 1.7vw;
     text-align: center;
     font-family: 'Raleway', serif;
     color: white;
@@ -115,13 +115,15 @@ html, body {
 }
 
 .sign {
+    background: rgba(00, 00, 00, 0.2);
     color: white;
     bottom:0;
     left: 0;
     right: 0;
     text-align: center;
     position: fixed;
-    font-size: 130%;
+    font-size: 1.2vw;
     font-family: 'Indie Flower', cursive;
-    margin-bottom:0.2%;
+    margin-left: 36vw;
+    margin-right: 36vw;
 }
