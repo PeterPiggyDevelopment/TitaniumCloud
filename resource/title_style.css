@@ -15,32 +15,69 @@ html, body {
     background-color:black;
 }
 
+#first_slide:after { 
+    background: transparent; 
+    background: -moz-linear-gradient(top, rgba(255, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 100%); 
+    background: -webkit-gradient(left top, left bottom, color-stop(0%, rgba(255, 0, 0, 0.8)), color-stop(100%, rgba(0, 0, 0, 0.1))); 
+    background: -webkit-linear-gradient(top, rgba(255, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 100%); 
+    background: -o-linear-gradient(top, rgba(255, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 100%); 
+    background: -ms-linear-gradient(top, rgba(255, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 100%); 
+    background: linear-gradient(to bottom, rgba(255, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0.1) 100%); 
+    content: ""; 
+    display: block; 
+    height: 100%; 
+    left: 0; 
+    position: absolute; 
+    top: 0; 
+    width: 100%; 
+}
+
 #first_slide { 
     width: 100%; 
     height: 80%; 
+    text-align:center;
     background-image: url('wallp.jpg');
-    opacity:0.5
-    background: linear-gradient(to right, rgba(4, 176, 237, 0.45), rgba(90, 94, 171, 0.45));
 }
 
 #second_slide { 
-    width: 100%; 
-    height: 40%; 
-    background-color: #5a5eab; 
+    width: 50%; 
+    height: 300px; 
+    background-color: #04b0ed; 
+    text-align:center;
+    float:left;
 }
 
 #third_slide { 
-    width: 100%; 
-    height: 40%; 
+    width: 50%; 
+    height: 300px; 
     background-color: #5a5eab; 
+    text-align:center;
+    float:left;
+}
+
+#two_slides { 
+    width: 100%; 
+    height: 50%; 
+    background-color: #000000; 
+    float:left;
 }
 
 #fourth_slide { 
+    margin-top: 300px;
     width: 100%;
-    height: 36%;
+    height: 39%;
     background-image: url('ban-img.png');
     background-repeat: no-repeat;
-    background-size: 100%;
+    background-size: 100% 100%;
+}
+
+#crutch {
+    display: -moz-inline-box;
+    display: inline-block;
+    height: 100%;
+    width: 0px;
+    vertical-align: middle;
+    zoom: 1;
 }
 
 .title {
@@ -51,11 +88,24 @@ html, body {
     text-decoration: none;
 }
 
+.main_title_text {
+    font-size: 250%;
+    text-align: center;
+    font-family: 'Raleway', serif;
+    color: white;
+    display: -moz-inline-box;
+    display: inline-block;
+    vertical-align: middle;
+}
+
 .main_text {
     font-size: 150%;
     text-align: center;
     font-family: 'Raleway', serif;
     color: white;
+    display: -moz-inline-box;
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .sign {
