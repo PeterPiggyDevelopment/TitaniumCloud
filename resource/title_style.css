@@ -74,7 +74,7 @@ html, body {
     background-size: 100% 100%;
 }
 
-#crutch {
+.crutch {
     display: -moz-inline-box;
     display: inline-block;
     height: 100%;
@@ -89,6 +89,8 @@ html, body {
     color: white;
     font-size: 60px;
     text-decoration: none;
+    margin-left: 0.4%;
+    margin-top: 0.4%;
 }
 
 .main_title_text {
