@@ -7,6 +7,13 @@
         <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One">
     <head>
     <body>
+    <ul>
+        <li>one</li>
+        <li>two</li>
+        <li>three</li>
+        <li>four</li>
+        <li>five</li>
+    </ul>
         <div id='gradient_container'>
             <div id='first_slide'> </div> 
             <div id='gradient'>
@@ -54,4 +61,23 @@
             This site is written for you in VIM by Kirill Yartsev<br>
         </div>
     </body>
+
+    <script type="text/javascript">
+            var ul=document.getElementsByTagName('ul')[0],
+                li=document.getElementsByTagName('li');
+                for (var i=0; i<li.length; i++) li[i].style.display='none';
+                
+                window.onscroll = function() {
+                var scrolled = window.pageYOffset;
+                    if (scrolled>300) {
+                        for (var i=0; i<li.length; i++) li[i].style.display='inline';
+                            ul.style.backgroundColor='black';
+                        }
+                    else {
+                        for (var i=0; i<li.length; i++) li[i].style.display='none';
+                            ul.style.backgroundColor='transparent';
+                    }
+            };
+
+    </script>
 </html>

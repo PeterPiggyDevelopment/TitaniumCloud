@@ -18,7 +18,7 @@ html, body {
 #first_slide { 
     height: 40vw;
     text-align:center;
-    background-image: url('wallpaper.jpg');
+    background-image: url('wallpaper2.jpg');
     background-size: 100% 100%;
     width: 100%; 
 }
@@ -150,4 +150,18 @@ html, body {
     font-family: 'Indie Flower', cursive;
     margin-left: 36vw;
     margin-right: 36vw;
+}
+
+ul {
+    position: fixed;
+    z-index: 999;
+    /*background-color: black;*/
+    width: 100%;
+    word-spacing: 3em;
+    padding: 1% 0% 1% 1%;
+}
+
+li {
+    display: inline;
+    color: white;
 }
