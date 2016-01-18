@@ -17,10 +17,11 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".html" -> sendRequest Prelude.readFile 
                 (\stat str -> sendHtml stat (primHtml str)) url
             ".js" -> sendRequest Prelude.readFile sendScript url
+            ".css" -> sendRequest Prelude.readFile sendCss url
             ".png" -> sendRequest Bin.readFile sendPng url
             ".jpg" -> sendRequest Bin.readFile sendJpg url
             ".jpeg" -> sendRequest Bin.readFile sendJpg url
-            ".css" -> sendRequest Prelude.readFile sendCss url
+            ".ico" -> sendRequest Bin.readFile sendIco url
             _ -> return $ sendHtml NotFound $
                         thehtml $ concatHtml
                           [ thead noHtml, body $ concatHtml
@@ -77,3 +78,6 @@ sendPng s v  = insertHeader HdrContentType "image/png" $ sendBinary s v
 
 sendJpg     :: StatusCode -> ByteString -> Response String
 sendJpg s v  = insertHeader HdrContentType "image/jpg" $ sendBinary s v
+
+sendIco     :: StatusCode -> ByteString -> Response String
+sendIco s v  = insertHeader HdrContentType "image/ico" $ sendBinary s v
