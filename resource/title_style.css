@@ -4,7 +4,7 @@
     box-sizing: border-box; 
 } 
 
-html, body, div, p, img { 
+html, body, div, p, img, ul, li, span, section, footer{
     margin: 0; 
     padding: 0; 
     box-sizing: border-box; 
@@ -18,7 +18,7 @@ html, body {
 #first_slide { 
     height: 40vw;
     text-align:center;
-    background-image: url('wallpaper2.jpg');
+    background-image: url('wallpaper.jpg');
     background-size: 100% 100%;
     width: 100%; 
 }
@@ -155,7 +155,6 @@ html, body {
 ul {
     position: fixed;
     z-index: 999;
-    /*background-color: black;*/
     width: 100%;
     word-spacing: 3em;
     padding: 1% 0% 1% 1%;

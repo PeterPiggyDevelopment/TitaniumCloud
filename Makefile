@@ -1,11 +1,10 @@
-GHC=ghc
-GHCFLAGS=
+COMPILER=cabal
+
+run: server
+	dist/build/TitaniumCloud/TitaniumCloud
 
 server:
-	$(GHC) $(GHCFLAGS) src/server.hs -o build/server
-
-FindFiles: 
-	$(GHC) $(GHCFLAGS) src/FindFiles.hs
+	$(COMPILER) build
 
 clean: 
-	rm -rf build/* src/FindFiles.hi src/FindFiles.o
+	rm -rf build/*
