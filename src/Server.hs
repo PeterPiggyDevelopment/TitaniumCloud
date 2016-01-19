@@ -8,6 +8,10 @@ import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
 import System.FilePath(takeExtension)
 import System.Directory
+import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
+import Text.JSON.Types
+import Text.JSON.String(runGetJSON)
+import Data.List(isPrefixOf)
 
 main :: IO ()
 main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
@@ -25,7 +29,24 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".ico" -> sendRequest Bin.readFile sendIco url
             _ -> sendRequest Bin.readFile sendFile url
 
-        POST -> return $ httpSendText OK "Super"
+        POST ->
+          return $ case findHeader HdrContentType request of
+            Just ty 
+                | "application/json" `Data.List.isPrefixOf` ty ->
+                  case runGetJSON readJSValue txt of
+                    Right val -> sendJson OK $
+                      JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
+                    Left err -> sendJson BadRequest $
+                      JSObject $ toJSObject [("error", JSString $ toJSString err)]
+
+            x -> sendHtml BadRequest $
+                 toHtml $ "I don't know how to deal with POSTed content" ++
+                          " of type " ++ show x
+            where txt = decodeString (rqBody request)
+
+
+
+
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
 sendRequest ::  (String -> IO a) -> 
@@ -53,6 +74,10 @@ sendCss s v    = insertHeader HdrContentType "text/css" $ httpSendText s (render
 
 sendScript     :: StatusCode -> String -> Response String
 sendScript s v  = insertHeader HdrContentType "application/x-javascript" $ httpSendText s v
+
+sendJson       :: StatusCode -> JSValue -> Response String
+sendJson s v    = insertHeader HdrContentType "application/json"
+                $ httpSendText s (showJSValue v "")
 
 sendPng     :: StatusCode -> ByteString -> Response String
 sendPng s v  = insertHeader HdrContentType "image/png" $ httpSendBinary s v
