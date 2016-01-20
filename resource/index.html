@@ -63,4 +63,24 @@
         </div>
     </body>
     <script src="title_script.js"></script>
+    <script src='jquery.js'></script>
+    <script type="text/javascript">
+
+        function showMenu(ul, position) {
+                var li=ul.children();
+                ul.css('display', 'none');
+                window.onscroll = function() {
+                var scrolled = window.pageYOffset;
+                    if (scrolled>position) {
+                            ul.fadeIn();
+                        }
+                    else {
+                            ul.fadeOut();
+                    }
+            };
+        }
+
+        showMenu($('ul').eq(0), 300);
+
+    </script>
 </html>
