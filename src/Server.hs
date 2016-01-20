@@ -29,25 +29,28 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".ico" -> sendRequest Bin.readFile sendIco url
             _ -> sendRequest Bin.readFile sendFile url
 
-        POST ->
-          return $ case findHeader HdrContentType request of
-            Just ty 
-                | "application/json" `Data.List.isPrefixOf` ty ->
-                  case runGetJSON readJSValue txt of
-                    Right val -> sendJson OK $
-                      JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
-                    Left err -> sendJson BadRequest $
-                      JSObject $ toJSObject [("error", JSString $ toJSString err)]
+        POST -> do
+            Prelude.putStrLn ("Json is coming!" ++ (url_path url) ++ (rqBody request))
+            return $ case findHeader HdrContentType request of
+                Just ty 
+                    | "application/json" `Data.List.isPrefixOf` ty ->
+                      case runGetJSON readJSValue txt of
+                        Right val -> sendJson OK $
+                          JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
+                        Left err -> sendJson BadRequest $
+                          JSObject $ toJSObject [("error", JSString $ toJSString err)]
 
-            x -> sendHtml BadRequest $
-                 toHtml $ "I don't know how to deal with POSTed content" ++
-                          " of type " ++ show x
-            where txt = decodeString (rqBody request)
+                x -> sendHtml BadRequest $
+                     toHtml $ "I don't know how to deal with POSTed content" ++
+                              " of type " ++ show x
+                where txt = decodeString (rqBody request)
 
 
 
 
-        _ -> return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
+        _ -> do 
+            Prelude.putStrLn ("Something is coming!" ++ (url_path url) ++ (rqBody request))
+            return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
 sendRequest ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 

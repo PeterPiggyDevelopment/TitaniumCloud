@@ -5,6 +5,3 @@ run: server
 
 server:
 	$(COMPILER) build
-
-clean: 
-	rm -rf build/*

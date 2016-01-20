@@ -37,11 +37,13 @@
             </div> 
 
             <div id='third_slide'> 
-                <div class="main_text">
-                    It has a very beautiful interface!
-                </div>
+                <p class="main_text">
+                    It has a very beautiful interface!<br>
+                    Asdfasdfasdf.
+                </p>
+                <button type='button' onclick='loadDoc()'>adfadsfa</button> 
                 <div class='crutch'></div>
-            </div> 
+            </div>
         </div>
 
         <div id='fourth_slide'>
@@ -61,23 +63,5 @@
             This site is written for you in VIM by Kirill Yartsev<br>
         </div>
     </body>
-
-    <script type="text/javascript">
-            var ul=document.getElementsByTagName('ul')[0],
-                li=document.getElementsByTagName('li');
-                for (var i=0; i<li.length; i++) li[i].style.display='none';
-                
-                window.onscroll = function() {
-                var scrolled = window.pageYOffset;
-                    if (scrolled>300) {
-                        for (var i=0; i<li.length; i++) li[i].style.display='inline';
-                            ul.style.backgroundColor='black';
-                        }
-                    else {
-                        for (var i=0; i<li.length; i++) li[i].style.display='none';
-                            ul.style.backgroundColor='transparent';
-                    }
-            };
-
-    </script>
+    <script src="title_script.js"></script>
 </html>
