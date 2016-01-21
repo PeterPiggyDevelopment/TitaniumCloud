@@ -44,7 +44,8 @@
     }    
 
     .child_img {
-      width: 3%;
+      width: 2.5%;
+      /*height: 3%;*/
       display:flex;
       justify-content: flex-start;  
       /*background-color: red;*/
@@ -65,7 +66,7 @@
     /*border: 1px solid #4682B4;
     border-radius: 7px;
     padding-right: 5px;
-    padding-left: 5px; */
+    padding-left: 5px;*/
     width: 96.5%;
     display:flex;
     justify-content: flex-end;
@@ -92,128 +93,18 @@
         </style>
     <head>
     <body>
-        <button type='button' onclick='loadDoc()'>load links from server</button>
-        <ul>
-            <li>one.jpg</li>
-            <li>two.gh.png</li>
-            <li>three.mp3</li>
-            <li>four.exe</li>
-            <li>five.fb2</li>
-        </ul>
 
         <section id='listFile'></section>
     </body>
 
-    <script src='jquery.js'></script>
+    <script src='js/jquery.js'></script>
+    <script src='js/functions.js'></script>
     <script type="text/javascript">
 
-        $('ul').eq(0).css('display', 'none');
-
-        function draw(ul) { //отрисовка полосочек
-            var li=ul.split('\n'),
-                length=li.length,
-                listFile=$('#listFile');
-
-            for (var i=0; i<length; i++) {
-                listFile.prepend('<p class="listFileText"></p>');
-            }
-
-            for (var i=0; i<length; i++) {
-                var text=li[i];
-                $('.listFileText').eq(i).text(text);
-            }
-
-            for (var i=0; i<length; i++) {
-                $('.listFileText').eq(i).wrap('<div class="child"></div');
-                $('.child').eq(i).wrap('<div class="parent"></div>');
-            }
-
-            for (var i=0; i<length; i++) {
-                $('.child').eq(i).before('<img class="child_img">');
-                src=typeDocument(li[i]);
-                $('.child_img').eq(i).attr('src', src);
-            }
-
-            $('.parent').eq(length-1).css('border-bottom-width', '1px');
-            $('.parent').eq(length-1).css('border-bottom-style', 'solid');
-            $('.parent').eq(length-1).css('border-bottom-color', '#87CEEB');
-
-        };
-
-
-
-
-
-
-
-
-
-
-
-
-        function loadDoc() {
-            var xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "/.", true);
-            xhttp.onreadystatechange = function() {
-                if (xhttp.readyState == 4 && xhttp.status == 200) {
-                    draw(xhttp.responseText);
-                }
-            };
-            xhttp.send();
-        }
-
-
-
-        function typeDocument(string) {
-            var pos=string.lastIndexOf('.'), //последнее вхождение точки
-                len=pos.length, //длина строки
-                type=string.substring(pos+1, len), //расширение файла
-                src; //src иконки
-                
-                if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
-                    src='image.png';
-                }
-                else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
-                    src='document.png';
-                }
-                else if (type=='fb2' || type=='epub' || type=='mobi') {
-                    src='book.png';
-                }
-                else if (type=='exe') {
-                    src='program.png';
-                }
-                else if (type=='mp3' || type=='amr') {
-                    src='music.png';
-                }
-                else if(type=='mp4' || type=='3gp' || type=='avi') {
-                    src='video.png';
-                }
-                else {
-                    src='other.png';
-                }
-
-        return src;
-        }
-
-
-        draw('pic.png\nfile.exe\nvideo.3gp\nsadfasdfaa');
-
-        $('.parent').on('mouseover', function() {
-            var child=$(this).children().eq(1),
-                text=child.children().eq(0);
-
-            text.after('<p class="download"><span class="share_text">Поделиться</span></p>');
-
-            console.log(text.text());
-
-        });
-
-        $('.parent').on('mouseout', function() {
-            $('.download').detach();
-        });
-
-        $()
-
+    var string='lol\nlel.png//\ndir//\nlol.txt\nderrr//\npog.mpe\nbook.fb2\nfiles//'; //передаваемая строчка
+    var folder=sort(string);
+	draw(folder); //отрисовали структуру
+	createShare(); //создание кнопки "Поделиться"
 
     </script>
 </html>

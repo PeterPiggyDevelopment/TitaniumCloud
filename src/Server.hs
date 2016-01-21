@@ -6,6 +6,7 @@ import Network.URL as URL
 import Text.XHtml
 import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
+import Control.Monad(sequence)
 import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
@@ -30,10 +31,9 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".ico" -> sendResponse Bin.readFile sendIco url
             _ -> sendResponse Bin.readFile sendFile url
 
-        POST -> do 
-                --print $ url_path url
+        POST -> do
                 --print $ rqBody request
-                --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
+                Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
                 getFiles ("./" ++ url_path url) True >>= (sendFiles . Data.List.unlines)
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
@@ -84,6 +84,11 @@ sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 sendIco     :: StatusCode -> ByteString -> Response String
 sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
 
+sendAuth :: String -> String -> Response String
+sendAuth name pass = insertHeader HdrSetCookie ("name=" ++ name)
+                $ insertHeader HdrSetCookie ("pass=" ++ pass)
+                (respond OK)
+
 sendFile     :: StatusCode -> ByteString -> Response String
 sendFile s v  = insertHeader HdrContentType "application/octet-stream" 
                   $ insertHeader (HdrCustom "Content-Disposition") "attachment"
@@ -104,9 +109,14 @@ httpSendBinary s v    = insertHeader HdrContentLength (show (Bin.length v))
 getFiles :: FilePath -> Bool -> IO [FilePath]
 getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then
         if isFilter then
-            filterHidden <$> getDirectoryContents dir
-        else getDirectoryContents dir
+            filterHidden <$> getDirectoryContents dir >>= \files -> mapM slashDirectory files
+        else getDirectoryContents dir >>= \files -> mapM slashDirectory files
     else return []
+
+slashDirectory :: FilePath -> IO FilePath
+slashDirectory file = doesDirectoryExist file >>= \e -> if e then 
+        return $ file ++ "//"
+        else return file
 
 filterHidden :: [FilePath] -> [FilePath]
 filterHidden = Prelude.filter dotFilter
