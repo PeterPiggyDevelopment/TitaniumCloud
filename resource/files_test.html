@@ -109,7 +109,7 @@
         $('ul').eq(0).css('display', 'none');
 
         function draw(ul) { //отрисовка полосочек
-            var li=ul.split('\n'),
+            var li=ul.split('//'),
                 length=li.length,
                 listFile=$('#listFile');
 
@@ -184,7 +184,7 @@
         }
 
 
-        draw('pic.fb2\nfile.exe\nvideo.3gp');
+        draw('pic.png//file.exe//video.3gp');
 
         $('.parent').on('mouseover', function() {
             var child=$(this).children().eq(1),
@@ -200,6 +200,7 @@
             $('.download').detach();
         });
 
+        $()
 
 
     </script>

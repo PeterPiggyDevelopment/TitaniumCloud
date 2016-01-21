@@ -14,3 +14,34 @@ var scrolled = window.pageYOffset;
             ul.style.backgroundColor='transparent';
     }
 };
+
+function loadDoc() {
+    var xhttp = new XMLHttpRequest();
+    var params = "lorem=ipsum&name=binny";
+    xhttp.open("POST", "ajax_info.txt", true);
+    http.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+    http.setRequestHeader("Content-length", params.length);
+    http.setRequestHeader("Connection", "close");
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            document.getElementById("super").innerHTML = xhttp.responseText;
+        }
+    };
+    xhttp.send(params);
+}
+
+function showMenu(ul, position) {
+    var li=ul.children();
+    ul.css('display', 'none');
+    window.onscroll = function() {
+    var scrolled = window.pageYOffset;
+        if (scrolled>position) {
+            ul.fadeIn();
+        }
+         else {
+            ul.fadeOut();
+         }
+     };
+}
+
+showMenu($('ul').eq(0), 300);
