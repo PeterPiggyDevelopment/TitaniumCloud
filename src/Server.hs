@@ -11,7 +11,7 @@ import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.JSON.String(runGetJSON)
-import Data.List(isPrefixOf)
+import Data.List(isPrefixOf, unlines)
 
 main :: IO ()
 main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
@@ -19,44 +19,33 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
-            ".html" -> sendRequest Prelude.readFile 
+            ".html" -> sendResponse Prelude.readFile 
                 (\stat str -> sendHtml stat (primHtml str)) url
-            ".js" -> sendRequest Prelude.readFile sendScript url
-            ".css" -> sendRequest Prelude.readFile sendCss url
-            ".png" -> sendRequest Bin.readFile sendPng url
-            ".jpg" -> sendRequest Bin.readFile sendJpg url
-            ".jpeg" -> sendRequest Bin.readFile sendJpg url
-            ".ico" -> sendRequest Bin.readFile sendIco url
-            _ -> sendRequest Bin.readFile sendFile url
+            ".js" -> sendResponse Prelude.readFile sendScript url
+            ".css" -> sendResponse Prelude.readFile sendCss url
+            ".png" -> sendResponse Bin.readFile sendPng url
+            ".jpg" -> sendResponse Bin.readFile sendJpg url
+            ".jpeg" -> sendResponse Bin.readFile sendJpg url
+            ".ico" -> sendResponse Bin.readFile sendIco url
+            _ -> sendResponse Bin.readFile sendFile url
 
-        POST -> do
-            Prelude.putStrLn ("Json is coming!" ++ (url_path url) ++ (rqBody request))
-            return $ case findHeader HdrContentType request of
-                Just ty 
-                    | "application/json" `Data.List.isPrefixOf` ty ->
-                      case runGetJSON readJSValue txt of
-                        Right val -> sendJson OK $
-                          JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
-                        Left err -> sendJson BadRequest $
-                          JSObject $ toJSObject [("error", JSString $ toJSString err)]
-
-                x -> sendHtml BadRequest $
-                     toHtml $ "I don't know how to deal with POSTed content" ++
-                              " of type " ++ show x
-                where txt = decodeString (rqBody request)
-
-
-
-
+        POST -> getFiles ("./" ++ url_path url) True >>= (sendFiles . Data.List.unlines)
         _ -> do 
-            Prelude.putStrLn ("Something is coming!" ++ (url_path url) ++ (rqBody request))
+            Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
-sendRequest ::  (String -> IO a) -> 
+fromMaybe :: String -> Maybe String -> String
+fromMaybe no (Just str) = str
+fromMaybe no Nothing = no
+
+sendFiles :: String -> IO (Response String)
+sendFiles s = return $ httpSendText OK s
+
+sendResponse ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 
                 URL.URL -> 
                 IO (Response String)
-sendRequest readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
+sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
     Right a -> return $ send OK a
     Left e -> return $ sendHtml NotFound $
         thehtml $ concatHtml
