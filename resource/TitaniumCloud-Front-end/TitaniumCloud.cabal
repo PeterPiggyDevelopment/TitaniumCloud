@@ -20,6 +20,6 @@ executable TitaniumCloud
   main-is:             Server.hs
   -- other-modules:       
   -- other-extensions:    
-  build-depends:       MissingH>=1.3.0.1, base >=4.8, json>=0.9.1, directory >=1.2, bytestring >=0.10, http-server >=1.0, url >=2.1, xhtml >=3000.2, utf8-string >=1.0, filepath >=1.4
+  build-depends:       base >=4.8, json>=0.9.1, directory >=1.2, bytestring >=0.10, http-server >=1.0, url >=2.1, xhtml >=3000.2, utf8-string >=1.0, filepath >=1.4
   hs-source-dirs:      src
   default-language:    Haskell2010

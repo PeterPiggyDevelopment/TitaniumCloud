@@ -11,8 +11,7 @@ import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.JSON.String(runGetJSON)
-import Data.List(isPrefixOf, unlines)
-import Data.List.Utils(strFromAL)
+import Data.List(isPrefixOf)
 
 main :: IO ()
 main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
@@ -20,36 +19,44 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
-            ".html" -> sendResponse Prelude.readFile 
+            ".html" -> sendRequest Prelude.readFile 
                 (\stat str -> sendHtml stat (primHtml str)) url
-            ".js" -> sendResponse Prelude.readFile sendScript url
-            ".css" -> sendResponse Prelude.readFile sendCss url
-            ".png" -> sendResponse Bin.readFile sendPng url
-            ".jpg" -> sendResponse Bin.readFile sendJpg url
-            ".jpeg" -> sendResponse Bin.readFile sendJpg url
-            ".ico" -> sendResponse Bin.readFile sendIco url
-            _ -> sendResponse Bin.readFile sendFile url
+            ".js" -> sendRequest Prelude.readFile sendScript url
+            ".css" -> sendRequest Prelude.readFile sendCss url
+            ".png" -> sendRequest Bin.readFile sendPng url
+            ".jpg" -> sendRequest Bin.readFile sendJpg url
+            ".jpeg" -> sendRequest Bin.readFile sendJpg url
+            ".ico" -> sendRequest Bin.readFile sendIco url
+            _ -> sendRequest Bin.readFile sendFile url
 
-        POST -> do 
-                print $ url_path url
-                print $ rqBody request
-                Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
-                getFiles ("./" ++ url_path url) True >>= (sendFiles . Data.List.unlines)
+        POST -> do
+            Prelude.putStrLn ("Json is coming!" ++ (url_path url) ++ (rqBody request))
+            return $ case findHeader HdrContentType request of
+                Just ty 
+                    | "application/json" `Data.List.isPrefixOf` ty ->
+                      case runGetJSON readJSValue txt of
+                        Right val -> sendJson OK $
+                          JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
+                        Left err -> sendJson BadRequest $
+                          JSObject $ toJSObject [("error", JSString $ toJSString err)]
+
+                x -> sendHtml BadRequest $
+                     toHtml $ "I don't know how to deal with POSTed content" ++
+                              " of type " ++ show x
+                where txt = decodeString (rqBody request)
+
+
+
+
         _ -> do 
-            Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
+            Prelude.putStrLn ("Something is coming!" ++ (url_path url) ++ (rqBody request))
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
-sendFiles :: String -> IO (Response String)
-sendFiles s = return $ httpSendText OK s
-
-headerToAssociation :: Header -> (String, String)
-headerToAssociation (Header n s) = (show n, s)
-
-sendResponse ::  (String -> IO a) -> 
+sendRequest ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 
                 URL.URL -> 
                 IO (Response String)
-sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
+sendRequest readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
     Right a -> return $ send OK a
     Left e -> return $ sendHtml NotFound $
         thehtml $ concatHtml
@@ -82,7 +89,7 @@ sendJpg     :: StatusCode -> ByteString -> Response String
 sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 
 sendIco     :: StatusCode -> ByteString -> Response String
-sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
+sendIco s v  = insertHeader HdrContentType "image/ico" $ httpSendBinary s v
 
 sendFile     :: StatusCode -> ByteString -> Response String
 sendFile s v  = insertHeader HdrContentType "application/octet-stream" 
