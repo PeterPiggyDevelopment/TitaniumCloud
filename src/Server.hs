@@ -33,8 +33,8 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
 
         POST -> do
                 --print $ rqBody request
-                Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
-                getFiles ("./" ++ url_path url) True >>= (sendFiles . Data.List.unlines)
+                --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
+                getFiles ("./" ++ url_path url) True >>= (sendFiles . Prelude.init . Data.List.unlines)
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
