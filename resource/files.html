@@ -92,6 +92,8 @@
         </style>
     <head>
     <body>
+        <button type='button' onclick='loadDoc()'>load links from server</button>
+        <!--
         <ul>
             <li>one.jpg</li>
             <li>two.gh.png</li>
@@ -99,6 +101,7 @@
             <li>four.exe</li>
             <li>five.fb2</li>
         </ul>
+        -->
 
         <section id='listFile'></section>
     </body>
@@ -150,6 +153,17 @@
 
 
 
+        function loadDoc() {
+            var xhttp = new XMLHttpRequest();
+            xhttp.open("POST", "/.", true);
+            xhttp.onreadystatechange = function() {
+                if (xhttp.readyState == 4 && xhttp.status == 200) {
+                    draw(xhttp.responseText);
+                }
+            };
+            xhttp.send();
+        }
+
 
 
         function typeDocument(string) {
@@ -184,7 +198,7 @@
         }
 
 
-        draw('pic.fb2\nfile.exe\nvideo.3gp');
+        draw('pic.png\nfile.exe\nvideo.3gp\nsadfasdfaa');
 
         $('.parent').on('mouseover', function() {
             var child=$(this).children().eq(1),
@@ -200,6 +214,7 @@
             $('.download').detach();
         });
 
+        $()
 
 
     </script>

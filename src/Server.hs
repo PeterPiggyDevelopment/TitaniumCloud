@@ -31,9 +31,9 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             _ -> sendResponse Bin.readFile sendFile url
 
         POST -> do 
-                print $ url_path url
-                print $ rqBody request
-                Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
+                --print $ url_path url
+                --print $ rqBody request
+                --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
                 getFiles ("./" ++ url_path url) True >>= (sendFiles . Data.List.unlines)
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
