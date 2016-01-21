@@ -44,7 +44,8 @@
     }    
 
     .child_img {
-      width: 3%;
+      width: 2.5%;
+      /*height: 3%;*/
       display:flex;
       justify-content: flex-start;  
       /*background-color: red;*/
@@ -65,7 +66,7 @@
     /*border: 1px solid #4682B4;
     border-radius: 7px;
     padding-right: 5px;
-    padding-left: 5px; */
+    padding-left: 5px;*/
     width: 96.5%;
     display:flex;
     justify-content: flex-end;
@@ -109,6 +110,10 @@
         $('ul').eq(0).css('display', 'none');
 
         function draw(ul) { //отрисовка полосочек
+
+        	var trash=$('.parent');
+        	for (var i=0; i<trash.length; i++) trash.eq(i).detach();
+
             var li=ul.split('\n'),
                 length=li.length,
                 listFile=$('#listFile');
@@ -138,19 +143,6 @@
             $('.parent').eq(length-1).css('border-bottom-color', '#87CEEB');
 
         };
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         function typeDocument(string) {
             var pos=string.lastIndexOf('.'), //последнее вхождение точки
@@ -192,6 +184,7 @@
 
             text.after('<p class="download"><span class="share_text">Поделиться</span></p>');
 
+            
             console.log(text.text());
 
         });
