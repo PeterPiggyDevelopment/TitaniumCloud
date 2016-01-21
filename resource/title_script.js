@@ -28,3 +28,19 @@ function loadDoc() {
     };
     xhttp.send(params);
 }
+
+function showMenu(ul, position) {
+    var li=ul.children();
+    ul.css('display', 'none');
+    window.onscroll = function() {
+    var scrolled = window.pageYOffset;
+        if (scrolled>position) {
+            ul.fadeIn();
+        }
+         else {
+            ul.fadeOut();
+         }
+     };
+}
+
+showMenu($('ul').eq(0), 300);

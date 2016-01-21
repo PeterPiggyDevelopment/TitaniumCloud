@@ -2,11 +2,197 @@
 <html>
     <head>
         <title> Game </title>
+        <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
         <meta charset="UTF-8">
         <link rel="stylesheet" type="text/css" href="title_style.css"/>
+
+        <style type="text/css">
+
+        section {
+        	width: 50%;
+        	position: relative;
+        	margin: 0 auto;
+        }
+
+        .listFileText {
+        	font-family: 'Open Sans Light';
+        	/*padding-top: 0.7%;
+        	padding-bottom: 0.7%;*/
+        	/*margin-left: 5%;*/
+        	font-size: 1em;
+    /*text-align: left;
+    display: block;
+    width: 50%;
+    float: left;*/
+
+        }
+
+
+    .parent {
+      width: 100%;
+      height: 30px;
+      border-top: 1px solid #87CEEB;
+      display: flex;
+      justify-content: left;
+      align-items: center;
+    }
+    
+    .child {
+      width: 100%;
+      display:flex;
+      justify-content: space-between;
+    }    
+
+    .child_img {
+      width: 3.5%;
+      display:flex;
+      justify-content: flex-end;	
+      background-color: red;
+    }
+
+
+		.parent:hover {
+			background-color: #F0FFF0;
+			cursor: pointer;
+		}
+
+
+
+.download {
+	font-family: 'Open Sans Light';
+    font-size: 0.8em;
+    border: 1px solid #4682B4;
+    border-radius: 7px;
+    padding-right: 5px;
+    padding-left: 5px; 
+    background-color: #B0E0E6;
+}
+
+.download:link {
+	zoom: 0.7;
+}
+
+
+
+	  @font-face {
+		
+	font-family: Dewberry;
+	src: url('Dewberry.otf') format('opentype');
+   }
+        </style>
     <head>
     <body>
-        <span class="user">Hello, hello, my friends!!</span>
+        <ul>
+        	<li>one.jpg</li>
+        	<li>two.gh.png</li>
+        	<li>three.mp3</li>
+        	<li>four.exe</li>
+        	<li>five.fb2</li>
+        </ul>
+
+        <section id='listFile'></section>
     </body>
+
+    <script src='jquery.js'></script>
+    <script type="text/javascript">
+
+    	$('ul').eq(0).css('display', 'none');
+
+    	function draw(ul) { //отрисовка полосочек
+    		var li=ul.children(),
+    			length=li.length,
+    			listFile=$('#listFile');
+
+    		for (var i=0; i<length; i++) {
+    			listFile.prepend('<p class="listFileText"></p>');
+    		}
+
+    		for (var i=0; i<length; i++) {
+    			var text=li.eq(i).text();
+    			$('.listFileText').eq(i).text(text);
+    		}
+
+    		for (var i=0; i<length; i++) {
+    			$('.listFileText').eq(i).wrap('<div class="child"></div');
+    			$('.child').eq(i).wrap('<div class="parent"></div>');
+    		}
+
+    		// for (var i=0; i<length; i++) {
+    		// 	$('.listFileText').eq(i).after('<img class="child_img">');
+    		// 	src=typeDocument(li.eq(i).text());
+    		// 	$('.icon').eq(i).attr('src', src);
+    		// }
+
+    		$('.parent').eq(length-1).css('border-bottom-width', '1px');
+    		$('.parent').eq(length-1).css('border-bottom-style', 'solid');
+    		$('.parent').eq(length-1).css('border-bottom-color', '#87CEEB');
+
+    	};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    	function typeDocument(string) {
+    		var pos=string.lastIndexOf('.'), //последнее вхождение точки
+    			len=pos.length, //длина строки
+    			type=string.substring(pos+1, len), //расширение файла
+    			src; //src иконки
+    			
+    			if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
+    				src='image.png';
+    			}
+    			else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
+    				src='document.png';
+    			}
+    			else if (type=='fb2' || type=='epub' || type=='mobi') {
+    				src='book.png';
+    			}
+    			else if (type=='exe') {
+    				src='program.png';
+    			}
+    			else if (type=='mp3' || type=='amr') {
+    				src='music.png';
+    			}
+    			else if(type=='mp4' || type=='3gp' || type=='avi') {
+    				src='video.avi';
+    			}
+    			else {
+    				src='other.png';
+    			}
+
+    	return src;
+    	}
+
+
+    	draw($('ul').eq(0));
+
+    	$('.parent').on('mouseover', function() {
+    		var child=$(this).children().eq(0),
+    			text=child.children().eq(0);
+
+    		text.after('<p class="download">Поделиться</p>');
+
+    		console.log(text.text());
+
+       	});
+
+    	$('.parent').on('mouseout', function() {
+    		$('.download').detach();
+    	});
+
+    	$()
+
+
+    </script>
 </html>
 
