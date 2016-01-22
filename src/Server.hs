@@ -6,7 +6,7 @@ import Network.URL as URL
 import Text.XHtml
 import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
-import Control.Monad(sequence)
+import Control.Monad(sequence, liftM)
 import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
@@ -31,16 +31,37 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".ico" -> sendResponse Bin.readFile sendIco url
             _ -> sendResponse Bin.readFile sendFile url
 
-        POST -> do
-                --print $ rqBody request
-                --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
-                getFiles ("./" ++ url_path url) True >>= (sendFiles . Prelude.init . Data.List.unlines)
+        POST -> case Prelude.length (url_params url) of
+            1 -> case Prelude.head (url_params url) of
+                ("dir", d) ->
+                    --print $ rqBody request
+                    --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
+                    liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
+                        (getFiles ("./" ++ url_path url) True)
+                (p, a) -> do 
+                    Prelude.putStrLn $ 
+                        ":ALERT: Invalid params in url " ++ url_path url ++ 
+                        " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                        " fst param: " ++ p ++ ", " ++ a
+                    return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
+
+            2 -> case Prelude.head (url_params url) of
+                ("file", f) -> sendUsrFile (snd (url_params url !! 1) ++ "/" ++ f)
+                (p, a) -> do
+                    Prelude.putStrLn $ 
+                        ":ALERT: Invalid params in url " ++ url_path url ++ 
+                        " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                        " fst param: " ++ p ++ ", " ++ a
+                    return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
+
+            n -> do 
+                Prelude.putStrLn $ 
+                    ":ALERT: Invalid params in url " ++ url_path url ++ 
+                    " params nu: " ++ show n
+                return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
-
-sendFiles :: String -> IO (Response String)
-sendFiles s = return $ httpSendText OK s
 
 headerToAssociation :: Header -> (String, String)
 headerToAssociation (Header n s) = (show n, s)
@@ -55,6 +76,20 @@ sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_
         thehtml $ concatHtml
           [ thead noHtml, body $ concatHtml
              [ toHtml "I could not find " , toHtml $ exportURL url { url_type = HostRelative }
+             , toHtml ", so I made this with XHTML combinators. "
+             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
+             ]
+          ]
+          where _hack :: SomeException
+                _hack = e
+
+sendUsrFile ::  String -> IO (Response String)
+sendUsrFile s = try (Bin.readFile s) >>= \mb_txt -> case mb_txt of
+    Right a -> return $ sendFile OK a
+    Left e -> return $ sendHtml NotFound $
+        thehtml $ concatHtml
+          [ thead noHtml, body $ concatHtml
+             [ toHtml "I could not find " , toHtml s
              , toHtml ", so I made this with XHTML combinators. "
              , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
              ]

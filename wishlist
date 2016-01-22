@@ -1,7 +1,12 @@
+file download
+file upload
+
 registration form
 authentication form
 cookie
-file download
-file upload
+
+snake if 404
+Карта будет состаять из двумерного массива. Змея будет списком таплов, каждый ход последний тапл будет уничтожаться, первый будет добавляться такой, куда пользователь нажал. Если змея на предыдущем ходу съела фрукт, то последний элемент не уничтожается. Выигрыш, когда змея заполняет 30% карты.
+
 ssl (optionaly)
 rename image to images
