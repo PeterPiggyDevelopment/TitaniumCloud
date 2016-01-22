@@ -14,6 +14,7 @@ var scrolled = window.pageYOffset;
             ul.style.backgroundColor='transparent';
     }
 };
+
 function loadDoc() {
     var xhttp = new XMLHttpRequest();
     var params = "lorem=ipsum&name=binny";

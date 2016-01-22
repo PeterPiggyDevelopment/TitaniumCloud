@@ -6,12 +6,18 @@ import Network.URL as URL
 import Text.XHtml
 import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
+import Control.Monad(sequence, liftM)
 import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
+import Text.Parsec hiding (try)
+import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
-import Data.List(isPrefixOf)
+import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
+import Data.List.Utils(strFromAL, strToAL)
+import Data.List.Split(splitOneOf)
+import Numeric(readHex)
 
 main :: IO ()
 main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
@@ -19,49 +25,153 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
-            ".html" -> sendRequest Prelude.readFile 
-                (\stat str -> sendHtml stat (primHtml str)) url
-            ".js" -> sendRequest Prelude.readFile sendScript url
-            ".css" -> sendRequest Prelude.readFile sendCss url
-            ".png" -> sendRequest Bin.readFile sendPng url
-            ".jpg" -> sendRequest Bin.readFile sendJpg url
-            ".jpeg" -> sendRequest Bin.readFile sendJpg url
-            ".ico" -> sendRequest Bin.readFile sendIco url
-            _ -> sendRequest Bin.readFile sendFile url
+            ".html" | hasAuthCookie request ->
+                       sendResponse Prelude.readFile 
+                        (\stat str -> sendHtml stat (primHtml str)) url
+                    | "files.html" `Data.List.isInfixOf` url_path url -> do
+                        Prelude.putStrLn $ debugHeaders request
+                        return $ sendHtml NotFound $
+                            thehtml $ concatHtml
+                            [ thead noHtml, body $ concatHtml
+                               [ toHtml "You don't authorized! If you want to load this page "
+                               , toHtml $ exportURL url { url_type = HostRelative }
+                               , toHtml ", you must be authorized." 
+                               , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
+                               ]
+                            ]
+                    | otherwise -> sendResponse Prelude.readFile 
+                        (\stat str -> sendHtml stat (primHtml str)) url
+            ".js" -> sendResponse Prelude.readFile sendScript url
+            ".css" -> sendResponse Prelude.readFile sendCss url
+            ".png" -> sendResponse Bin.readFile sendPng url
+            ".jpg" -> sendResponse Bin.readFile sendJpg url
+            ".jpeg" -> sendResponse Bin.readFile sendJpg url
+            ".ico" -> sendResponse Bin.readFile sendIco url
+            _ -> sendResponse Bin.readFile sendFile url
 
-        POST -> do
-            Prelude.putStrLn ("Json is coming!" ++ (url_path url) ++ (rqBody request))
-            return $ case findHeader HdrContentType request of
-                Just ty 
-                    | "application/json" `Data.List.isPrefixOf` ty ->
-                      case runGetJSON readJSValue txt of
-                        Right val -> sendJson OK $
-                          JSObject $ toJSObject [("success", JSString $ toJSString "hello")]
-                        Left err -> sendJson BadRequest $
-                          JSObject $ toJSObject [("error", JSString $ toJSString err)]
+        POST -> case url_path url of 
+            "resource/register" -> 
+             case parse pQuery "" $ rqBody request of 
+                 Left e -> return $ sendHtml OK 
+                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show e
+                 Right a -> case Prelude.length a of 
+                    2 ->
+                     return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
+                     $ toHtml $ "hello hello!!!" ++ show a
+                    _ -> return $ sendHtml OK 
+                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show a
+            _ -> case Prelude.length (url_params url) of
+                1 -> case Prelude.head (url_params url) of
+                    ("dir", d) -> --print $ rqBody request -- Prelude.putStr 
+                        liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
+                            (getFiles ("./" ++ d) True)
+                    (p, a) -> do 
+                        Prelude.putStrLn $ 
+                            ":ALERT: Invalid params in url " ++ url_path url ++ 
+                            " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                            " fst param: " ++ p ++ ", " ++ a
+                        return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
 
-                x -> sendHtml BadRequest $
-                     toHtml $ "I don't know how to deal with POSTed content" ++
-                              " of type " ++ show x
-                where txt = decodeString (rqBody request)
+                2 -> case Prelude.head (url_params url) of
+                    ("file", f) -> sendUsrFile (snd (url_params url !! 1) ++ "/" ++ f)
+                    (p, a) -> return $ sendHtml BadRequest 
+                        $ toHtml $ "Sorry, invalid url parameters" ++ 
+                            ":ALERT: Invalid params in url " ++ url_path url ++ 
+                            " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                            " fst param: " ++ p ++ ", " ++ a
 
-
-
-
+                n -> do 
+                    Prelude.putStrLn $ 
+                        ":ALERT: Invalid params in url " ++ url_path url ++ 
+                        " params nu: " ++ show n
+                    return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
         _ -> do 
-            Prelude.putStrLn ("Something is coming!" ++ (url_path url) ++ (rqBody request))
+            Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
-sendRequest ::  (String -> IO a) -> 
+hasAuthCookie :: Request String -> Bool -- TODO: when created database, add a feature that will verificate cookie password
+hasAuthCookie rq = Prelude.any (Data.List.isInfixOf "name=") 
+                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) &&
+                      Prelude.any (Data.List.isInfixOf "pass=")
+                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+
+debugHeaders :: Request String -> String
+debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
+
+getAuthCookies :: Request String -> (String, String)
+getAuthCookies rq = (first, second)
+        where 
+          first = if Prelude.any (Data.List.isPrefixOf "name=") 
+              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then 
+                  Prelude.drop 5 $ Prelude.head $ 
+                  Prelude.filter (Data.List.isPrefixOf "name=") 
+                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+              else []
+          second = if Prelude.any (Data.List.isPrefixOf "pass=") 
+              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then
+                  Prelude.drop 5 $ Prelude.head $ 
+                  Prelude.filter (Data.List.isPrefixOf "pass=")
+                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+              else []
+
+headerToAssociation :: Header -> (String, String)
+headerToAssociation (Header n s) = (show n, s)
+
+parseBodyParams :: Request String -> [(String, String)]
+parseBodyParams rq =   strToAL $ Data.List.unwords (splitOneOf "=" 
+                         (Data.List.unlines (splitOneOf "&" (rqBody rq))))
+
+pQuery :: CharParser () [(String, String)]
+pQuery = pPair `sepBy` char '&'
+
+pPair :: CharParser () (String, String)
+pPair = many1 pChar >>= 
+        \name -> optionMaybe (char '=' >> many pChar) >>=
+        \value -> return (name, fromMaybe value)
+
+fromMaybe :: Maybe String -> String
+fromMaybe (Just a) = a
+fromMaybe Nothing = ""
+
+pChar :: CharParser () Char
+pChar = oneOf urlBaseChars
+     <|> (char '+' >> return ' ')
+          <|> pHex
+
+urlBaseChars = ['a'..'z']++['A'..'Z']++['0'..'9']++"$-_.!*'(),"
+
+pHex :: CharParser () Char
+pHex = do
+          char '%'
+          a <- hexDigit
+          b <- hexDigit
+          let ((d, _):_) = readHex [a,b]
+          return . toEnum $ d
+
+sendResponse ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 
                 URL.URL -> 
                 IO (Response String)
-sendRequest readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
+sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
     Right a -> return $ send OK a
     Left e -> return $ sendHtml NotFound $
         thehtml $ concatHtml
           [ thead noHtml, body $ concatHtml
              [ toHtml "I could not find " , toHtml $ exportURL url { url_type = HostRelative }
+             , toHtml ", so I made this with XHTML combinators. "
+             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
+             ]
+          ]
+          where _hack :: SomeException
+                _hack = e
+
+sendUsrFile ::  String -> IO (Response String)
+sendUsrFile s = try (Bin.readFile s) >>= \mb_txt -> case mb_txt of
+    Right a -> return $ sendFile OK a
+    Left e -> return $ sendHtml NotFound $
+        thehtml $ concatHtml
+          [ thead noHtml, body $ concatHtml
+             [ toHtml "I could not find " , toHtml s
              , toHtml ", so I made this with XHTML combinators. "
              , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
              ]
@@ -89,7 +199,14 @@ sendJpg     :: StatusCode -> ByteString -> Response String
 sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 
 sendIco     :: StatusCode -> ByteString -> Response String
-sendIco s v  = insertHeader HdrContentType "image/ico" $ httpSendBinary s v
+sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
+
+sendAuth :: String -> String -> Html -> Response String
+sendAuth name pass html = insertHeader HdrSetCookie ("name=" ++ name)
+                $ insertHeader HdrSetCookie ("pass=" ++ pass)
+                $ insertHeader HdrContentType "text/html" 
+                $ httpSendText OK (renderHtml html)
+
 
 sendFile     :: StatusCode -> ByteString -> Response String
 sendFile s v  = insertHeader HdrContentType "application/octet-stream" 
@@ -111,9 +228,14 @@ httpSendBinary s v    = insertHeader HdrContentLength (show (Bin.length v))
 getFiles :: FilePath -> Bool -> IO [FilePath]
 getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then
         if isFilter then
-            filterHidden <$> getDirectoryContents dir
-        else getDirectoryContents dir
+            filterHidden <$> getDirectoryContents dir >>= \files -> mapM slashDirectory files
+        else getDirectoryContents dir >>= \files -> mapM slashDirectory files
     else return []
+
+slashDirectory :: FilePath -> IO FilePath
+slashDirectory file = doesDirectoryExist file >>= \e -> if e then 
+        return $ file ++ "//"
+        else return file
 
 filterHidden :: [FilePath] -> [FilePath]
 filterHidden = Prelude.filter dotFilter
