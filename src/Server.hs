@@ -28,16 +28,17 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".html" | hasAuthCookie request ->
                        sendResponse Prelude.readFile 
                         (\stat str -> sendHtml stat (primHtml str)) url
-                    | "files.html" `Data.List.isInfixOf` url_path url -> 
+                    | "files.html" `Data.List.isInfixOf` url_path url -> do
+                        Prelude.putStrLn $ debugHeaders request
                         return $ sendHtml NotFound $
-                        thehtml $ concatHtml
-                        [ thead noHtml, body $ concatHtml
-                           [ toHtml "You don't authorized! If you want to load this page "
-                           , toHtml $ exportURL url { url_type = HostRelative }
-                           , toHtml ", you must be authorized." 
-                           , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-                           ]
-                        ]
+                            thehtml $ concatHtml
+                            [ thead noHtml, body $ concatHtml
+                               [ toHtml "You don't authorized! If you want to load this page "
+                               , toHtml $ exportURL url { url_type = HostRelative }
+                               , toHtml ", you must be authorized." 
+                               , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
+                               ]
+                            ]
                     | otherwise -> sendResponse Prelude.readFile 
                         (\stat str -> sendHtml stat (primHtml str)) url
             ".js" -> sendResponse Prelude.readFile sendScript url
@@ -53,8 +54,12 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
              case parse pQuery "" $ rqBody request of 
                  Left e -> return $ sendHtml OK 
                      $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show e
-                 Right a -> return $ sendHtml OK 
+                 Right a -> case Prelude.length a of 
+                    2 ->
+                     return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
                      $ toHtml $ "hello hello!!!" ++ show a
+                    _ -> return $ sendHtml OK 
+                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show a
             _ -> case Prelude.length (url_params url) of
                 1 -> case Prelude.head (url_params url) of
                     ("dir", d) -> --print $ rqBody request -- Prelude.putStr 
@@ -85,9 +90,9 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
 hasAuthCookie :: Request String -> Bool -- TODO: when created database, add a feature that will verificate cookie password
-hasAuthCookie rq = Prelude.any (Data.List.isPrefixOf "name=") 
+hasAuthCookie rq = Prelude.any (Data.List.isInfixOf "name=") 
                       (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) &&
-                      Prelude.any (Data.List.isPrefixOf "pass=")
+                      Prelude.any (Data.List.isInfixOf "pass=")
                       (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
 
 debugHeaders :: Request String -> String
@@ -196,10 +201,12 @@ sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 sendIco     :: StatusCode -> ByteString -> Response String
 sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
 
-sendAuth :: String -> String -> Response String
-sendAuth name pass = insertHeader HdrSetCookie ("name=" ++ name)
+sendAuth :: String -> String -> Html -> Response String
+sendAuth name pass html = insertHeader HdrSetCookie ("name=" ++ name)
                 $ insertHeader HdrSetCookie ("pass=" ++ pass)
-                (respond OK)
+                $ insertHeader HdrContentType "text/html" 
+                $ httpSendText OK (renderHtml html)
+
 
 sendFile     :: StatusCode -> ByteString -> Response String
 sendFile s v  = insertHeader HdrContentType "application/octet-stream" 
