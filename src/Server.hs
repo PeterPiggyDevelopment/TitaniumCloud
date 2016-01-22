@@ -11,9 +11,13 @@ import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
+import Text.Parsec hiding (try)
+import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
-import Data.List(isPrefixOf, unlines)
-import Data.List.Utils(strFromAL)
+import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
+import Data.List.Utils(strFromAL, strToAL)
+import Data.List.Split(splitOneOf)
+import Numeric(readHex)
 
 main :: IO ()
 main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
@@ -21,8 +25,21 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
-            ".html" -> sendResponse Prelude.readFile 
-                (\stat str -> sendHtml stat (primHtml str)) url
+            ".html" | hasAuthCookie request ->
+                       sendResponse Prelude.readFile 
+                        (\stat str -> sendHtml stat (primHtml str)) url
+                    | "files.html" `Data.List.isInfixOf` url_path url -> 
+                        return $ sendHtml NotFound $
+                        thehtml $ concatHtml
+                        [ thead noHtml, body $ concatHtml
+                           [ toHtml "You don't authorized! If you want to load this page "
+                           , toHtml $ exportURL url { url_type = HostRelative }
+                           , toHtml ", you must be authorized." 
+                           , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
+                           ]
+                        ]
+                    | otherwise -> sendResponse Prelude.readFile 
+                        (\stat str -> sendHtml stat (primHtml str)) url
             ".js" -> sendResponse Prelude.readFile sendScript url
             ".css" -> sendResponse Prelude.readFile sendCss url
             ".png" -> sendResponse Bin.readFile sendPng url
@@ -31,40 +48,100 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             ".ico" -> sendResponse Bin.readFile sendIco url
             _ -> sendResponse Bin.readFile sendFile url
 
-        POST -> case Prelude.length (url_params url) of
-            1 -> case Prelude.head (url_params url) of
-                ("dir", d) ->
-                    --print $ rqBody request
-                    --Prelude.putStr (strFromAL $ headerToAssociation <$>  rqHeaders request)
-                    liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
-                        (getFiles ("./" ++ url_path url) True)
-                (p, a) -> do 
+        POST -> case url_path url of 
+            "resource/register" -> 
+             case parse pQuery "" $ rqBody request of 
+                 Left e -> return $ sendHtml OK 
+                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show e
+                 Right a -> return $ sendHtml OK 
+                     $ toHtml $ "hello hello!!!" ++ show a
+            _ -> case Prelude.length (url_params url) of
+                1 -> case Prelude.head (url_params url) of
+                    ("dir", d) -> --print $ rqBody request -- Prelude.putStr 
+                        liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
+                            (getFiles ("./" ++ d) True)
+                    (p, a) -> do 
+                        Prelude.putStrLn $ 
+                            ":ALERT: Invalid params in url " ++ url_path url ++ 
+                            " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                            " fst param: " ++ p ++ ", " ++ a
+                        return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
+
+                2 -> case Prelude.head (url_params url) of
+                    ("file", f) -> sendUsrFile (snd (url_params url !! 1) ++ "/" ++ f)
+                    (p, a) -> return $ sendHtml BadRequest 
+                        $ toHtml $ "Sorry, invalid url parameters" ++ 
+                            ":ALERT: Invalid params in url " ++ url_path url ++ 
+                            " params nu: " ++ show (Prelude.length (url_params url)) ++ 
+                            " fst param: " ++ p ++ ", " ++ a
+
+                n -> do 
                     Prelude.putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
-                        " params nu: " ++ show (Prelude.length (url_params url)) ++ 
-                        " fst param: " ++ p ++ ", " ++ a
+                        " params nu: " ++ show n
                     return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
-
-            2 -> case Prelude.head (url_params url) of
-                ("file", f) -> sendUsrFile (snd (url_params url !! 1) ++ "/" ++ f)
-                (p, a) -> do
-                    Prelude.putStrLn $ 
-                        ":ALERT: Invalid params in url " ++ url_path url ++ 
-                        " params nu: " ++ show (Prelude.length (url_params url)) ++ 
-                        " fst param: " ++ p ++ ", " ++ a
-                    return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
-
-            n -> do 
-                Prelude.putStrLn $ 
-                    ":ALERT: Invalid params in url " ++ url_path url ++ 
-                    " params nu: " ++ show n
-                return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
+hasAuthCookie :: Request String -> Bool -- TODO: when created database, add a feature that will verificate cookie password
+hasAuthCookie rq = Prelude.any (Data.List.isPrefixOf "name=") 
+                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) &&
+                      Prelude.any (Data.List.isPrefixOf "pass=")
+                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+
+debugHeaders :: Request String -> String
+debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
+
+getAuthCookies :: Request String -> (String, String)
+getAuthCookies rq = (first, second)
+        where 
+          first = if Prelude.any (Data.List.isPrefixOf "name=") 
+              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then 
+                  Prelude.drop 5 $ Prelude.head $ 
+                  Prelude.filter (Data.List.isPrefixOf "name=") 
+                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+              else []
+          second = if Prelude.any (Data.List.isPrefixOf "pass=") 
+              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then
+                  Prelude.drop 5 $ Prelude.head $ 
+                  Prelude.filter (Data.List.isPrefixOf "pass=")
+                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+              else []
+
 headerToAssociation :: Header -> (String, String)
 headerToAssociation (Header n s) = (show n, s)
+
+parseBodyParams :: Request String -> [(String, String)]
+parseBodyParams rq =   strToAL $ Data.List.unwords (splitOneOf "=" 
+                         (Data.List.unlines (splitOneOf "&" (rqBody rq))))
+
+pQuery :: CharParser () [(String, String)]
+pQuery = pPair `sepBy` char '&'
+
+pPair :: CharParser () (String, String)
+pPair = many1 pChar >>= 
+        \name -> optionMaybe (char '=' >> many pChar) >>=
+        \value -> return (name, fromMaybe value)
+
+fromMaybe :: Maybe String -> String
+fromMaybe (Just a) = a
+fromMaybe Nothing = ""
+
+pChar :: CharParser () Char
+pChar = oneOf urlBaseChars
+     <|> (char '+' >> return ' ')
+          <|> pHex
+
+urlBaseChars = ['a'..'z']++['A'..'Z']++['0'..'9']++"$-_.!*'(),"
+
+pHex :: CharParser () Char
+pHex = do
+          char '%'
+          a <- hexDigit
+          b <- hexDigit
+          let ((d, _):_) = readHex [a,b]
+          return . toEnum $ d
 
 sendResponse ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 

@@ -97,12 +97,23 @@ return arr;
 
 function loadDoc() {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/.", true);
+    xhttp.open("POST", "/.?dir=/resource", true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             var folder = sort(xhttp.responseText);
             draw(folder);
         }
     };
+    xhttp.send();
+}
+
+function loadFile(file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/.?file="+file+"&dir=resource", true);
+    /*xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            draw(sort(xhttp.responseText));
+        }
+    };*/
     xhttp.send();
 }
