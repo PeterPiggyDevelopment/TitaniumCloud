@@ -16,4 +16,4 @@ cabal.sandbox.config
 .stack-work/
 build/*
 *.swp
-TitaniumCloud-Front-end
+TitaniumCloud-Front-end/
