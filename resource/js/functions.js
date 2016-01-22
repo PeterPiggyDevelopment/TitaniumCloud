@@ -6,28 +6,28 @@ function typeDocument(string) { //определяет тип документа
                 src; //src иконки
                 
             if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
-                src='image.png';
+                src='image/image.png';
             }
             else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
-                src='document.png';
+                src='image/document.png';
             }
             else if (type=='fb2' || type=='epub' || type=='mobi') {
-                src='book.png';
+                src='image/book.png';
             }
             else if (type=='exe') {
-                src='program.png';
+                src='image/program.png';
             }
             else if (type=='mp3' || type=='amr') {
-                src='music.png';
+                src='image/music.png';
             }
             else if(type=='mp4' || type=='3gp' || type=='avi') {
-                src='video.png';
+                src='image/video.png';
             }
             else if (string[length-1]=='/' && string[length-2]=='/') {
-            	src='folder.png';
+            	src='image/folder.png';
             }
             else {
-                src='other.png';
+                src='image/other.png';
             }
 
 return src;
@@ -90,19 +90,19 @@ function sort(string) { //сначала идут папки!
             }
     }
 
-console.log(arr);
-
 return arr;
 }
 
-function loadDoc() {
+function loadDir() {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/.?dir=/resource", true);
     xhttp.onreadystatechange = function() {
-        if (xhttp.readyState == 4 && xhttp.status == 200) {
-            var folder = sort(xhttp.responseText);
-            draw(folder);
-        }
+        if (xhttp.readyState == 4 && xhttp.status == 200) 
+            folder=sort(xhttp.responseText); //массив, с которого будем рисовать
+            count=countFolders(folder); //количетво папок
+            draw(folder); //отрисовали структуру
+            renameFolders(); //переименовали папки
+            createShare(); //создание кнопки "Поделиться"
     };
     xhttp.send();
 }
@@ -116,4 +116,28 @@ function loadFile(file) {
         }
     };*/
     xhttp.send();
+}
+
+function countFolders(arr) {
+    var count=0;
+    for (var i=0; i<arr.length; i++) {
+        if (arr[i].lastIndexOf('//')!=-1) {
+            count++;
+        }
+    }
+
+return count;
+}
+
+function renameFolders() {
+        for (var i=0; i<count; i++) {
+        $('.parent').eq(i).addClass('folders'); //идентифицировали папки
+        var ch=$('.parent').eq(i).children().eq(1),
+            children=ch.children().eq(0),
+            text=children.text();
+
+        text=text.substring(0, text.length-2);
+
+        children.text(text);
+    }
 }
