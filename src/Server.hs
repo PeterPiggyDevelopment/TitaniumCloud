@@ -62,9 +62,11 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
                      $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show a
             _ -> case Prelude.length (url_params url) of
                 1 -> case Prelude.head (url_params url) of
-                    ("dir", d) -> --print $ rqBody request -- Prelude.putStr 
-                        liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
-                            (getFiles ("./" ++ d) True)
+                    ("dir", dir) -> do 
+                         liftM (Prelude.init . Data.List.unlines)
+                             (getFiles dir True) >>= print
+                         liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
+                            (getFiles dir True)
                     (p, a) -> do 
                         Prelude.putStrLn $ 
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -73,7 +75,7 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
                         return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
 
                 2 -> case Prelude.head (url_params url) of
-                    ("file", f) -> sendUsrFile (snd (url_params url !! 1) ++ "/" ++ f)
+                    ("file", f) -> sendUsrFile ("./" ++ snd (url_params url !! 1) ++ "/" ++ f)
                     (p, a) -> return $ sendHtml BadRequest 
                         $ toHtml $ "Sorry, invalid url parameters" ++ 
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -228,13 +230,15 @@ httpSendBinary s v    = insertHeader HdrContentLength (show (Bin.length v))
 getFiles :: FilePath -> Bool -> IO [FilePath]
 getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then
         if isFilter then
-            filterHidden <$> getDirectoryContents dir >>= \files -> mapM slashDirectory files
-        else getDirectoryContents dir >>= \files -> mapM slashDirectory files
+            filterHidden <$> getDirectoryContents dir >>= \files -> mapM (slashDirectory dir) files
+        else getDirectoryContents dir >>= \files -> mapM (slashDirectory dir) files
     else return []
 
-slashDirectory :: FilePath -> IO FilePath
-slashDirectory file = doesDirectoryExist file >>= \e -> if e then 
-        return $ file ++ "//"
+slashDirectory :: FilePath -> FilePath -> IO FilePath
+slashDirectory dir file = do
+        print (dir ++ "/" ++ file)
+        doesDirectoryExist (dir ++ "/" ++ file) >>= \e -> if e then 
+            return $ file ++ "//"
         else return file
 
 filterHidden :: [FilePath] -> [FilePath]

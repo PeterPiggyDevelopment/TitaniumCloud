@@ -119,7 +119,7 @@ function renameFolders() {
 
 function loadDir(dir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/.?dir="+dir, true);
+    xhttp.open("POST", "/?dir="+dir, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) 
             folder=sort(xhttp.responseText); //массив, с которого будем рисовать
@@ -133,7 +133,7 @@ function loadDir(dir) {
 
 function loadFile(dir, file) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/.?file="+file+"&dir="+dir, true);
+    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             downloadFile(xhttp.responseText);
