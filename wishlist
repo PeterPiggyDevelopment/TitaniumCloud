@@ -1,9 +1,13 @@
 file download
 file upload
 
+|/ defend from '/.' queries and hacker attacks
+
 registration form
-authentication form
-cookie
+|/ authentication form
+add illegal symbols check
+|/ cookie
+|/ create database for users
 DataBase for users: remove crutch 'init'
 
 snake if 404
@@ -12,6 +16,4 @@ snake if 404
 ssl (optionaly)
 rename image to images
 
-defend from '/.' queries and hacker attacks
-
-visiting statistics
+visiting statistics (optionaly)
