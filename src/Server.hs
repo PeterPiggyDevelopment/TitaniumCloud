@@ -8,6 +8,7 @@ import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
 import Control.Monad(sequence, liftM)
 import Control.Concurrent(forkIO)
+import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
@@ -16,22 +17,39 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
-import Data.List.Utils(strFromAL, strToAL, replace)
+import Data.List.Utils(strFromAL, strToAL, replace, split)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 
+commandLoop :: IO ()
+commandLoop = do
+        procesCommands
+        commandLoop
+
+procesCommands :: IO ()
+procesCommands = Prelude.getLine >>= 
+        \com -> case com of
+             "rmdb" -> Prelude.writeFile "DataBase" "\ninit:init" >> 
+                 Prelude.putStrLn "Data Base removed"
+             "listdb" -> Prelude.readFile "DataBase" >>=
+                 \db -> Prelude.putStrLn $ "Data Base: " ++ db
+             "finduser" -> findUserInDB "namename" >>=
+                 \user -> case user of 
+                   Just u -> Prelude.putStrLn $ "Data Base " ++ u
+                   Nothing -> Prelude.putStrLn "Data Base doesn't has such user"
+             _ -> Prelude.putStrLn "Invalid Invalidovich"
+
 main :: IO ()
 main = do 
-  forkIO procesCommands
+  forkIO commandLoop
   serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
     case rqMethod request of 
-
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
-            ".html" | hasAuthCookie request ->
-                       sendResponse Prelude.readFile 
-                        (\stat str -> sendHtml stat (primHtml str)) url
-                    | "files.html" `Data.List.isInfixOf` url_path url -> do
+            ".html" -> ifM (isAuthenticated request) 
+                       (sendResponse Prelude.readFile 
+                        (\stat str -> sendHtml stat (primHtml str)) url)
+                    (if "files.html" `Data.List.isInfixOf` url_path url then do
                         Prelude.putStrLn $ debugHeaders request
                         return $ sendHtml NotFound $
                             thehtml $ concatHtml
@@ -42,8 +60,8 @@ main = do
                                , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
                                ]
                             ]
-                    | otherwise -> sendResponse Prelude.readFile 
-                        (\stat str -> sendHtml stat (primHtml str)) url
+                    else sendResponse Prelude.readFile
+                        (\stat str -> sendHtml stat (primHtml str)) url)
             ".js" -> sendResponse Prelude.readFile sendScript url
             ".css" -> sendResponse Prelude.readFile sendCss url
             ".png" -> sendResponse Bin.readFile sendPng url
@@ -51,7 +69,6 @@ main = do
             ".jpeg" -> sendResponse Bin.readFile sendJpg url
             ".ico" -> sendResponse Bin.readFile sendIco url
             _ -> sendResponse Bin.readFile sendFile url
-
         POST -> case url_path url of 
             "resource/register" -> 
              case parse pQuery "" $ rqBody request of 
@@ -74,7 +91,6 @@ main = do
                             " params nu: " ++ show (Prelude.length (url_params url)) ++ 
                             " fst param: " ++ p ++ ", " ++ a
                         return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
-
                 2 -> case Prelude.head (url_params url) of
                     ("file", f) -> sendUsrFile ("./" ++ 
                         replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
@@ -83,7 +99,6 @@ main = do
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
                             " params nu: " ++ show (Prelude.length (url_params url)) ++ 
                             " fst param: " ++ p ++ ", " ++ a
-
                 n -> do 
                     Prelude.putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -93,24 +108,33 @@ main = do
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
 
-procesCommands :: IO ()
-procesCommands = Prelude.getLine >>= 
-        \com -> case com of
-             "rmdb" -> removeFile "DataBase" >> 
-                 Prelude.putStrLn "Data Base removed"
-             _ -> Prelude.putStrLn "Invalid Invalidovich"
-
 registerUser :: [(String, String)] -> IO (Response String)
-registerUser a = do
-    Prelude.appendFile "DataBase" $ snd (Prelude.head a) ++ " : " ++ snd (a !! 1) ++ "\n"
-    return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
-                 $ toHtml $ "hello hello!!!" ++ show a
+registerUser a = findUserInDB (snd (Prelude.head a)) >>=
+        \user -> case user of 
+            Just u -> return $ sendHtml BadRequest $ toHtml $ "You're allready in base, " ++ u
+            Nothing -> do
+                Prelude.putStrLn $ "User registered: " ++ show (snd (Prelude.head a))
+                Prelude.appendFile "DataBase" $ "\n" ++ 
+                    snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
+                return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
+                             $ toHtml $ "hello hello!!!" ++ show a
 
-hasAuthCookie :: Request String -> Bool -- TODO: when created database, add a feature that will verificate cookie password
-hasAuthCookie rq = Prelude.any (Data.List.isInfixOf "name=") 
-                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) &&
-                      Prelude.any (Data.List.isInfixOf "pass=")
-                      (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
+findUserInDB :: String -> IO (Maybe String)
+findUserInDB name = 
+            Prelude.readFile "DataBase" >>= \db ->
+             case parse pDB "" (Prelude.tail db) of 
+                 Left e -> return Nothing
+                 Right a -> return $ 
+                         (\strs -> if not (Prelude.null strs)
+                             then Just (Prelude.head strs)
+                             else Nothing)
+                           $ Prelude.filter (name ==) (Prelude.map fst a)
+
+isAuthenticated :: Request String -> IO Bool
+isAuthenticated rq = findUserInDB (fst (getAuthCookies rq)) >>= 
+                    \usr -> case usr of
+                       Nothing -> return False
+                       Just _ -> return True
 
 debugHeaders :: Request String -> String
 debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
@@ -118,18 +142,16 @@ debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
 getAuthCookies :: Request String -> (String, String)
 getAuthCookies rq = (first, second)
         where 
-          first = if Prelude.any (Data.List.isPrefixOf "name=") 
-              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then 
-                  Prelude.drop 5 $ Prelude.head $ 
-                  Prelude.filter (Data.List.isPrefixOf "name=") 
-                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
-              else []
-          second = if Prelude.any (Data.List.isPrefixOf "pass=") 
-              (Prelude.map hdrValue (retrieveHeaders HdrCookie rq)) then
-                  Prelude.drop 5 $ Prelude.head $ 
-                  Prelude.filter (Data.List.isPrefixOf "pass=")
-                  (Prelude.map hdrValue (retrieveHeaders HdrCookie rq))
-              else []
+          first = Prelude.head $ 
+                  Prelude.map (getCookieValue "name=" . hdrValue) 
+                  (retrieveHeaders HdrCookie rq)
+          second = Prelude.head $ 
+                  Prelude.map (getCookieValue "pass=" . hdrValue) 
+                  (retrieveHeaders HdrCookie rq)
+
+getCookieValue :: String -> String -> String
+getCookieValue val cook = Prelude.head (Data.List.Utils.split ";" 
+                        (Data.List.Utils.split val cook !! 1))
 
 headerToAssociation :: Header -> (String, String)
 headerToAssociation (Header n s) = (show n, s)
@@ -144,11 +166,9 @@ pQuery = pPair `sepBy` char '&'
 pPair :: CharParser () (String, String)
 pPair = many1 pChar >>= 
         \name -> optionMaybe (char '=' >> many pChar) >>=
-        \value -> return (name, fromMaybe value)
-
-fromMaybe :: Maybe String -> String
-fromMaybe (Just a) = a
-fromMaybe Nothing = ""
+        \value -> case value of 
+            Just a -> return (name, a)
+            Nothing -> return (name, "")
 
 pChar :: CharParser () Char
 pChar = oneOf urlBaseChars
@@ -164,6 +184,19 @@ pHex = do
           b <- hexDigit
           let ((d, _):_) = readHex [a,b]
           return . toEnum $ d
+
+pDB :: CharParser () [(String, String)]
+pDB = pDBPair `sepBy` char '\n'
+
+pDBPair :: CharParser () (String, String)
+pDBPair = many1 pDBChar >>= 
+        \name -> optionMaybe (char ':' >> many pDBChar) >>=
+        \value -> case value of 
+            Just a -> return (name, a)
+            Nothing -> return (name, "")
+
+pDBChar :: CharParser () Char
+pDBChar = oneOf urlBaseChars
 
 sendResponse ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 
