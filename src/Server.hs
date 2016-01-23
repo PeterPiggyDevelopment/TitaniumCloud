@@ -26,7 +26,7 @@ import Data.List.Utils(strFromAL, strToAL, replace, split)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 
-help = "Hello! This is a TitaniumCloud server!\nIf you want to print this help, type \"help\"\nIf you want to exit (:()), type \"exit\"\n If want to delete DataBase of users, type \"rmdb\"\nIf you want to list the Data Base, type \"lsdb\"\nIf you want to find user \"namename\" in Data Base, type \"finduser\""
+help = "Hello! This is a TitaniumCloud server!\nIf you want to print this help, type \"help\"\nIf you want to exit (:()), type \"exit\"\nIf want to delete DataBase of users, type \"rmdb\"\nIf you want to list the Data Base, type \"lsdb\"\nIf you want to find user \"namename\" in Data Base, type \"finduser\""
 
 commandLoop :: IO ()
 commandLoop = do
