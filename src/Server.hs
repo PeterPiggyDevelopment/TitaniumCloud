@@ -29,9 +29,9 @@ commandLoop = do
 procesCommands :: IO ()
 procesCommands = Prelude.getLine >>= 
         \com -> case com of
-             "rmdb" -> Prelude.writeFile "DataBase" "\ninit:init" >> 
+             "rmdb" -> Prelude.writeFile "DataBase" "" >> 
                  Prelude.putStrLn "Data Base removed"
-             "listdb" -> Prelude.readFile "DataBase" >>=
+             "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
              "finduser" -> findUserInDB "namename" >>=
                  \user -> case user of 
@@ -122,7 +122,10 @@ registerUser a = findUserInDB (snd (Prelude.head a)) >>=
 findUserInDB :: String -> IO (Maybe String)
 findUserInDB name = 
             Prelude.readFile "DataBase" >>= \db ->
-             case parse pDB "" (Prelude.tail db) of 
+             case db of 
+                [] -> return Nothing
+                "\n" -> return Nothing
+                _ -> case parse pDB "" (Prelude.tail db) of 
                  Left e -> return Nothing
                  Right a -> return $ 
                          (\strs -> if not (Prelude.null strs)
