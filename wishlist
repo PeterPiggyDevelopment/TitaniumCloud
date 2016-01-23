@@ -12,4 +12,6 @@ snake if 404
 ssl (optionaly)
 rename image to images
 
-defend from '/.' queries
+defend from '/.' queries and hacker attacks
+
+visiting statistics

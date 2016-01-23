@@ -7,6 +7,7 @@ import Text.XHtml
 import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
 import Control.Monad(sequence, liftM)
+import Control.Concurrent(forkIO)
 import System.FilePath(takeExtension)
 import System.Directory
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
@@ -15,12 +16,14 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
-import Data.List.Utils(strFromAL, strToAL)
+import Data.List.Utils(strFromAL, strToAL, replace)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 
 main :: IO ()
-main = serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
+main = do 
+  forkIO procesCommands
+  serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
     case rqMethod request of 
 
         GET -> let ext = takeExtension (url_path url) in 
@@ -53,20 +56,18 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
             "resource/register" -> 
              case parse pQuery "" $ rqBody request of 
                  Left e -> return $ sendHtml OK 
-                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show e
+                     $ toHtml $ "Error on HTTP Line while registering " ++ 
+                        "in request body!!! " ++ show e
                  Right a -> case Prelude.length a of 
-                    2 ->
-                     return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
-                     $ toHtml $ "hello hello!!!" ++ show a
+                    2 -> registerUser a
                     _ -> return $ sendHtml OK 
-                     $ toHtml $ "Error on HTTP Line while registering in request body!!! " ++ show a
+                     $ toHtml $ "Error on HTTP Line while registering " ++ 
+                        "in request body!!! " ++ show a
             _ -> case Prelude.length (url_params url) of
                 1 -> case Prelude.head (url_params url) of
-                    ("dir", dir) -> do 
-                         liftM (Prelude.init . Data.List.unlines)
-                             (getFiles dir True) >>= print
+                    ("dir", dir) ->
                          liftM (httpSendText OK . Prelude.init . Data.List.unlines) 
-                            (getFiles dir True)
+                            (getFiles (replace ".." "" dir) True)
                     (p, a) -> do 
                         Prelude.putStrLn $ 
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -75,7 +76,8 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
                         return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
 
                 2 -> case Prelude.head (url_params url) of
-                    ("file", f) -> sendUsrFile ("./" ++ snd (url_params url !! 1) ++ "/" ++ f)
+                    ("file", f) -> sendUsrFile ("./" ++ 
+                        replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
                     (p, a) -> return $ sendHtml BadRequest 
                         $ toHtml $ "Sorry, invalid url parameters" ++ 
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -90,6 +92,19 @@ main = serverWith defaultConfig {srvPort = 8888} $ \_ url request ->
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
+
+procesCommands :: IO ()
+procesCommands = Prelude.getLine >>= 
+        \com -> case com of
+             "rmdb" -> removeFile "DataBase" >> 
+                 Prelude.putStrLn "Data Base removed"
+             _ -> Prelude.putStrLn "Invalid Invalidovich"
+
+registerUser :: [(String, String)] -> IO (Response String)
+registerUser a = do
+    Prelude.appendFile "DataBase" $ snd (Prelude.head a) ++ " : " ++ snd (a !! 1) ++ "\n"
+    return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
+                 $ toHtml $ "hello hello!!!" ++ show a
 
 hasAuthCookie :: Request String -> Bool -- TODO: when created database, add a feature that will verificate cookie password
 hasAuthCookie rq = Prelude.any (Data.List.isInfixOf "name=") 
