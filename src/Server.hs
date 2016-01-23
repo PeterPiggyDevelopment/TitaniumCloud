@@ -14,6 +14,8 @@ import Control.Concurrent.Suspend
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
+import System.Exit(ExitCode(ExitSuccess))
+import System.Posix.Process(exitImmediately)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.Parsec hiding (try)
@@ -23,6 +25,8 @@ import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
 import Data.List.Utils(strFromAL, strToAL, replace, split)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
+
+help = "Hello! This is a TitaniumCloud server!\nIf you want to print this help, type \"help\"\nIf you want to exit (:()), type \"exit\"\n If want to delete DataBase of users, type \"rmdb\"\nIf you want to list the Data Base, type \"lsdb\"\nIf you want to find user \"namename\" in Data Base, type \"finduser\""
 
 commandLoop :: IO ()
 commandLoop = do
@@ -34,6 +38,8 @@ procesCommands = Prelude.getLine >>=
         \com -> case com of
              "rmdb" -> Prelude.writeFile "DataBase" "" >> 
                  Prelude.putStrLn "Data Base removed"
+             "exit" -> exitImmediately ExitSuccess
+             "help" -> Prelude.putStrLn help
              "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
              "finduser" -> findUserInDB "namename" >>=
@@ -44,6 +50,7 @@ procesCommands = Prelude.getLine >>=
 
 main :: IO ()
 main = do 
+  Prelude.putStrLn help
   mv <- newEmptyMVar 
   forkIO commandLoop
   repeatedTimer (timerTick mv) (usDelay 1000000)
