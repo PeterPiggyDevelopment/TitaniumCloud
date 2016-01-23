@@ -8,9 +8,14 @@ import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
 import Control.Monad(sequence, liftM)
 import Control.Concurrent(forkIO)
+import Control.Concurrent.Timer(repeatedTimer)
+import Control.Concurrent.MVar
+import Control.Concurrent.Suspend
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
+import System.Exit(ExitCode(ExitSuccess))
+import System.Posix.Process(exitImmediately)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.Parsec hiding (try)
@@ -20,6 +25,8 @@ import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
 import Data.List.Utils(strFromAL, strToAL, replace, split)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
+
+help = "Hello! This is a TitaniumCloud server!\nIf you want to print this help, type \"help\"\nIf you want to exit (:()), type \"exit\"\nIf want to delete DataBase of users, type \"rmdb\"\nIf you want to list the Data Base, type \"lsdb\"\nIf you want to find user \"namename\" in Data Base, type \"finduser\""
 
 commandLoop :: IO ()
 commandLoop = do
@@ -31,6 +38,8 @@ procesCommands = Prelude.getLine >>=
         \com -> case com of
              "rmdb" -> Prelude.writeFile "DataBase" "" >> 
                  Prelude.putStrLn "Data Base removed"
+             "exit" -> exitImmediately ExitSuccess
+             "help" -> Prelude.putStrLn help
              "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
              "finduser" -> findUserInDB "namename" >>=
@@ -41,8 +50,12 @@ procesCommands = Prelude.getLine >>=
 
 main :: IO ()
 main = do 
+  Prelude.putStrLn help
+  mv <- newEmptyMVar 
   forkIO commandLoop
-  serverWith defaultConfig {srvPort = 8888} $ \_ url request -> 
+  repeatedTimer (timerTick mv) (usDelay 1000000)
+  serverWith defaultConfig {srvPort = 8888} ((\mvar _ url request -> 
+    takeMVar mvar >>
     case rqMethod request of 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
@@ -107,6 +120,10 @@ main = do
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
+    ) mv)
+
+timerTick :: MVar () -> IO ()
+timerTick m = putMVar m ()
 
 registerUser :: [(String, String)] -> IO (Response String)
 registerUser a = findUserInDB (snd (Prelude.head a)) >>=
