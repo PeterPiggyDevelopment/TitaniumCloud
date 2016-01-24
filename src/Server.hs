@@ -54,7 +54,7 @@ procesCommands store = Prelude.getLine >>=
                  Prelude.putStrLn "Data Base removed"
              "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
-             "fnusr" -> findUserInDB "namename" >>=
+             "fnusr" -> findUserInDB ("namename", "namename") False >>=
                  \user -> case user of 
                    Just u -> Prelude.putStrLn $ "Data Base has user " ++ fst u
                    Nothing -> Prelude.putStrLn "Data Base has no users whith name \"namename\""
@@ -155,7 +155,9 @@ main = do
 timerTick :: MVar () -> IO ()
 timerTick m = putMVar m ()
 
-statisticsThread :: MVar String -> MVar [(String, Int)]-> IO ()
+statisticsThread :: MVar String -> -- MVar for user names to write them to the statistics base
+                    MVar [(String, Int)]-> -- MVvar for statistics base
+                    IO ()
 statisticsThread m store = do 
     name <- takeMVar m
     st <- readMVar store
@@ -174,37 +176,45 @@ incUsrStats usrs name = if hasKeyAL name usrs then
     else addToAL usrs name 1
 
 registerUser :: [(String, String)] -> IO (Response String)
-registerUser a = findUserInDB (snd (Prelude.head a)) >>=
+registerUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False >>=
         \user -> case user of 
-            Just u -> return $ sendAuth u
-                $ toHtml $ "You're now authenticated " ++ fst u
+            Just u -> if snd u == snd (Prelude.last a) then
+                    return $ sendAuth u
+                    $ toHtml $ "You're now authenticated " ++ fst u
+                else return $ sendHtml NotAcceptable $ toHtml
+                    "User with same login is allready exists"
             Nothing -> do
-                Prelude.putStrLn $ "User registered: " ++ show (snd (Prelude.head a))
                 Prelude.appendFile "DataBase" $ "\n" ++ 
                     snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
                 return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
-                             $ toHtml $ "hello hello!!!" ++ show a
+                             $ toHtml $ "hello hello, " ++ snd (Prelude.head a) ++ "!!!"
 
-findUserInDB :: String -> IO (Maybe (String, String))
-findUserInDB name = 
-            Prelude.readFile "DataBase" >>= \db ->
-             case db of 
-                [] -> return Nothing
-                "\n" -> return Nothing
-                _ -> case parse pDB "" (Prelude.tail db) of 
-                 Left e -> return Nothing
-                 Right a -> return $ 
-                         (\strs -> if not (Prelude.null strs)
-                             then Just (Prelude.head strs)
-                             else Nothing)
-                           $ Prelude.filter (\(n, p) -> name == n) a
+findUserInDB :: (String, String) -> 
+                Bool -> 
+                IO (Maybe (String, String))
+findUserInDB (name, pass) f = 
+    Prelude.readFile "DataBase" >>= \db ->
+     case db of 
+        [] -> return Nothing
+        "\n" -> return Nothing
+        _ -> case parse pDB "" (Prelude.tail db) of
+         Left e -> return Nothing
+         Right a -> return $ 
+             (\strs -> if not (Prelude.null strs)
+                 then Just (Prelude.head strs)
+                 else Nothing)
+               $ Prelude.filter (\(n, p) -> if f 
+                    then name == n && pass == p
+                    else name == n) a
 
 isAuthenticated :: Request String -> IO Bool
-isAuthenticated rq = findUserInDB (fst (getAuthCookies rq)) >>= 
+isAuthenticated rq = findUserInDB (getAuthCookies rq) True >>= 
                     \usr -> case usr of
                        Nothing ->  return False
-                       Just u -> if snd u == snd (getAuthCookies rq) then return True
-                                     else return False
+                       Just u -> do
+                           print $ show (getAuthCookies rq) ++ show usr
+                           if snd u == snd (getAuthCookies rq) then return True
+                                         else return False
 
 debugHeaders :: Request String -> String
 debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
