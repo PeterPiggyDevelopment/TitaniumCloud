@@ -22,48 +22,77 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
-import Data.List.Utils(strFromAL, strToAL, replace, split)
+import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 
-help = "Hello! This is a TitaniumCloud server!\nIf you want to print this help, type \"help\"\nIf you want to exit (:()), type \"exit\"\nIf want to delete DataBase of users, type \"rmdb\"\nIf you want to list the Data Base, type \"lsdb\"\nIf you want to find user \"namename\" in Data Base, type \"finduser\""
+-- Delay between processing requests
+-- Added to protect server from rudimentary malicious attacks
+timenet = usDelay 1
 
-commandLoop :: IO ()
-commandLoop = do
-        procesCommands
-        commandLoop
+-- Help massage
+help = "Hello! This is a TitaniumCloud server!\n" ++
+    "If you want to print this help, type \"help\"\n" ++
+    "If you want to exit (:()), type \"exit\"\n" ++ 
+    "If want to delete DataBase of users, type \"rmdb\"\n" ++
+    "If you want to list the Data Base, type \"lsdb\"\n" ++
+    "If you want to find user \"namename\" in Data Base, type \"fnusr\"\n" ++
+    "If you want to print statistics about users, type \"pst\"" ++
+    "If you want to print short statistics about users, type \"stst\""
 
-procesCommands :: IO ()
-procesCommands = Prelude.getLine >>= 
+commandLoop :: MVar [(String, Int)] ->  IO ()
+commandLoop store = do
+        procesCommands store
+        commandLoop store
+
+procesCommands :: MVar [(String, Int)] -> IO ()
+procesCommands store = Prelude.getLine >>= 
         \com -> case com of
+             "help" -> Prelude.putStrLn help
+             "exit" -> exitImmediately ExitSuccess
              "rmdb" -> Prelude.writeFile "DataBase" "" >> 
                  Prelude.putStrLn "Data Base removed"
-             "exit" -> exitImmediately ExitSuccess
-             "help" -> Prelude.putStrLn help
              "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
-             "finduser" -> findUserInDB "namename" >>=
+             "fnusr" -> findUserInDB "namename" >>=
                  \user -> case user of 
-                   Just u -> Prelude.putStrLn $ "Data Base " ++ u
-                   Nothing -> Prelude.putStrLn "Data Base doesn't has such user"
+                   Just u -> Prelude.putStrLn $ "Data Base has user " ++ fst u
+                   Nothing -> Prelude.putStrLn "Data Base has no users whith name \"namename\""
+             "pst" -> readMVar store >>=
+                 \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
+                    strFromAL st)
+             "stst" -> readMVar store >>=
+                 \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
+                    "Authenticated users: " ++ show (fst (genShortStats st)) ++ "\n" ++
+                    "Not authenticated users: " ++ show (snd (genShortStats st)))
              _ -> Prelude.putStrLn "Invalid Invalidovich"
+
+genShortStats :: [(String, Int)] -> (Int, Int)
+genShortStats usrs = (first, second)
+        where 
+          first = Prelude.length (Prelude.tail usrs)
+          second = snd $ Prelude.last usrs
 
 main :: IO ()
 main = do 
   Prelude.putStrLn help
   mv <- newEmptyMVar 
-  forkIO commandLoop
-  repeatedTimer (timerTick mv) (usDelay 1000000)
-  serverWith defaultConfig {srvPort = 8888} ((\mvar _ url request -> 
-    takeMVar mvar >>
+  statmv <- newEmptyMVar 
+  statstore <- newMVar [("+disauthed", 0)]
+  forkIO (commandLoop statstore)
+  forkIO (statisticsThread statmv statstore)
+  repeatedTimer (timerTick mv) timenet
+  serverWith defaultConfig {srvPort = 8888} ((\tickmvar statmvar _ url request -> 
+    takeMVar tickmvar >>
     case rqMethod request of 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
             ".html" -> ifM (isAuthenticated request) 
-                       (sendResponse Prelude.readFile 
+                       (putMVar statmvar (fst (getAuthCookies request)) 
+                        >> sendResponse Prelude.readFile 
                         (\stat str -> sendHtml stat (primHtml str)) url)
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
-                        Prelude.putStrLn $ debugHeaders request
+                        putMVar statmvar "+disauthed"
                         return $ sendHtml NotFound $
                             thehtml $ concatHtml
                             [ thead noHtml, body $ concatHtml
@@ -73,7 +102,8 @@ main = do
                                , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
                                ]
                             ]
-                    else sendResponse Prelude.readFile
+                    else putMVar statmvar "+disauthed" >> 
+                        sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url)
             ".js" -> sendResponse Prelude.readFile sendScript url
             ".css" -> sendResponse Prelude.readFile sendCss url
@@ -120,23 +150,42 @@ main = do
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
-    ) mv)
+    ) mv statmv)
 
 timerTick :: MVar () -> IO ()
 timerTick m = putMVar m ()
 
+statisticsThread :: MVar String -> MVar [(String, Int)]-> IO ()
+statisticsThread m store = do 
+    name <- takeMVar m
+    st <- readMVar store
+    case name of 
+        "+disauthed" -> swapMVar store 
+         (("+disauthed" , snd (Prelude.head st) + 1)
+                            :Prelude.tail st) 
+                >> statisticsThread m store
+        _ -> swapMVar store (incUsrStats st name) 
+            >> statisticsThread m store
+
+incUsrStats :: [(String, Int)] -> String -> [(String, Int)]
+incUsrStats usrs name = if hasKeyAL name usrs then
+    addToAL usrs name (snd (Prelude.head 
+    (Prelude.filter (\(n, s) -> n == name) usrs)) + 1)
+    else addToAL usrs name 1
+
 registerUser :: [(String, String)] -> IO (Response String)
 registerUser a = findUserInDB (snd (Prelude.head a)) >>=
         \user -> case user of 
-            Just u -> return $ sendHtml BadRequest $ toHtml $ "You're allready in base, " ++ u
+            Just u -> return $ sendAuth u
+                $ toHtml $ "You're now authenticated " ++ fst u
             Nothing -> do
                 Prelude.putStrLn $ "User registered: " ++ show (snd (Prelude.head a))
                 Prelude.appendFile "DataBase" $ "\n" ++ 
                     snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
-                return $ sendAuth (snd (Prelude.head a)) (snd (a !! 1))
+                return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
                              $ toHtml $ "hello hello!!!" ++ show a
 
-findUserInDB :: String -> IO (Maybe String)
+findUserInDB :: String -> IO (Maybe (String, String))
 findUserInDB name = 
             Prelude.readFile "DataBase" >>= \db ->
              case db of 
@@ -148,13 +197,14 @@ findUserInDB name =
                          (\strs -> if not (Prelude.null strs)
                              then Just (Prelude.head strs)
                              else Nothing)
-                           $ Prelude.filter (name ==) (Prelude.map fst a)
+                           $ Prelude.filter (\(n, p) -> name == n) a
 
 isAuthenticated :: Request String -> IO Bool
 isAuthenticated rq = findUserInDB (fst (getAuthCookies rq)) >>= 
                     \usr -> case usr of
-                       Nothing -> return False
-                       Just _ -> return True
+                       Nothing ->  return False
+                       Just u -> if snd u == snd (getAuthCookies rq) then return True
+                                     else return False
 
 debugHeaders :: Request String -> String
 debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
@@ -271,8 +321,8 @@ sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 sendIco     :: StatusCode -> ByteString -> Response String
 sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
 
-sendAuth :: String -> String -> Html -> Response String
-sendAuth name pass html = insertHeader HdrSetCookie ("name=" ++ name)
+sendAuth :: (String, String) -> Html -> Response String
+sendAuth (name, pass) html = insertHeader HdrSetCookie ("name=" ++ name)
                 $ insertHeader HdrSetCookie ("pass=" ++ pass)
                 $ insertHeader HdrContentType "text/html" 
                 $ httpSendText OK (renderHtml html)
@@ -303,8 +353,7 @@ getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then
     else return []
 
 slashDirectory :: FilePath -> FilePath -> IO FilePath
-slashDirectory dir file = do
-        print (dir ++ "/" ++ file)
+slashDirectory dir file = 
         doesDirectoryExist (dir ++ "/" ++ file) >>= \e -> if e then 
             return $ file ++ "//"
         else return file
