@@ -43,5 +43,5 @@
 |/ |prevent from '/.' queries
 -------------------------------------------------------------------
 ************************* CLIENT ****************************
-   |write a http client for cloud to browse files from console
+   |write a http client for cloud to browse files from console (optional)
 -------------------------------------------------------------------
