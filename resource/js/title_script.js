@@ -11,12 +11,12 @@ function showMenu(ul, position) {
             stopAnOut = true;
             backgroundFadeIn(ul);
         }
-            else {
+        else {
             stopAnIn = true;
             stopAnOut = false;
             backgroundFadeOut(ul);
         }
-    };
+     };
 
     function backgroundFadeIn(ul){
         var id = setInterval(frameIn, 10);
