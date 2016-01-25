@@ -17,5 +17,4 @@ cabal.sandbox.config
 build/*
 *.swp
 TitaniumCloud-Front-end/
-DataBase
 dist/*
