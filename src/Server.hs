@@ -8,9 +8,7 @@ import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
 import Control.Monad(sequence, liftM)
 import Control.Concurrent(forkIO)
-import Control.Concurrent.Timer(repeatedTimer)
 import Control.Concurrent.MVar
-import Control.Concurrent.Suspend
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
@@ -25,10 +23,6 @@ import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
 import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
-
--- Delay between processing requests
--- Added to protect server from rudimentary malicious attacks
-timenet = usDelay 1
 
 -- Help massage
 help = "Hello! This is a TitaniumCloud server!\n" ++
@@ -76,14 +70,11 @@ genShortStats usrs = (first, second)
 main :: IO ()
 main = do 
   Prelude.putStrLn help
-  mv <- newEmptyMVar 
   statmv <- newEmptyMVar 
   statstore <- newMVar [("+disauthed", 0)]
   forkIO (commandLoop statstore)
   forkIO (statisticsThread statmv statstore)
-  repeatedTimer (timerTick mv) timenet
-  serverWith defaultConfig {srvPort = 8888} ((\tickmvar statmvar _ url request -> 
-    takeMVar tickmvar >>
+  serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
     case rqMethod request of 
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
@@ -150,10 +141,7 @@ main = do
         _ -> do 
             Prelude.putStrLn ("Something is coming!" ++ url_path url ++ rqBody request)
             return $ sendHtml BadRequest $ toHtml "Sorry, invalid http request"
-    ) mv statmv)
-
-timerTick :: MVar () -> IO ()
-timerTick m = putMVar m ()
+    ) statmv)
 
 statisticsThread :: MVar String -> -- MVar for user names to write them to the statistics base
                     MVar [(String, Int)]-> -- MVvar for statistics base
@@ -211,8 +199,7 @@ isAuthenticated :: Request String -> IO Bool
 isAuthenticated rq = findUserInDB (getAuthCookies rq) True >>= 
                     \usr -> case usr of
                        Nothing ->  return False
-                       Just u -> do
-                           print $ show (getAuthCookies rq) ++ show usr
+                       Just u ->
                            if snd u == snd (getAuthCookies rq) then return True
                                          else return False
 
@@ -222,12 +209,18 @@ debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
 getAuthCookies :: Request String -> (String, String)
 getAuthCookies rq = (first, second)
         where 
-          first = Prelude.head $ 
-                  Prelude.map (getCookieValue "name=" . hdrValue) 
-                  (retrieveHeaders HdrCookie rq)
-          second = Prelude.head $ 
-                  Prelude.map (getCookieValue "pass=" . hdrValue) 
-                  (retrieveHeaders HdrCookie rq)
+          first = if Prelude.null (Prelude.map (getCookieValue "name=" . hdrValue) 
+                  (retrieveHeaders HdrCookie rq))
+                  then []
+                  else Prelude.head $ 
+                      Prelude.map (getCookieValue "name=" . hdrValue) 
+                      (retrieveHeaders HdrCookie rq)
+          second = if Prelude.null (Prelude.map (getCookieValue "pass=" . hdrValue) 
+                  (retrieveHeaders HdrCookie rq))
+                  then []
+                  else Prelude.head $ 
+                      Prelude.map (getCookieValue "pass=" . hdrValue) 
+                      (retrieveHeaders HdrCookie rq)
 
 getCookieValue :: String -> String -> String
 getCookieValue val cook = Prelude.head (Data.List.Utils.split ";" 
@@ -348,11 +341,13 @@ httpSendText       :: StatusCode -> String -> Response String
 httpSendText s v    = insertHeader HdrContentLength (show (Prelude.length txt))
                 $ insertHeader HdrContentEncoding "UTF-8"
                 $ insertHeader HdrContentEncoding "text/plain"
+                $ insertHeader HdrConnection "close" 
                 $ (respond s :: Response String) { rspBody = txt }
                   where txt = encodeString v
 
 httpSendBinary       :: StatusCode -> ByteString -> Response String
-httpSendBinary s v    = insertHeader HdrContentLength (show (Bin.length v))
+httpSendBinary s v    = insertHeader HdrConnection "close" 
+                $ insertHeader HdrContentLength (show (Bin.length v))
                  (respond s :: Response String)  { rspBody = C.unpack v }
 
 getFiles :: FilePath -> Bool -> IO [FilePath]

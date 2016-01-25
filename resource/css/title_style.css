@@ -15,6 +15,33 @@ html, body {
     background-color:white;
 }
 
+.top_bar a:link, .top_bar a:visited {
+    background-color: PeachPuff;
+    color: black;
+    padding: 14px 25px;
+    text-align: center; 
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+.top_bar a:hover, .top_bar a:active {
+    background-color: #C8C8C8;
+}
+
+ul {
+    position: fixed;
+    z-index: 999;
+    width: 100%;
+    word-spacing: 3em;
+    padding: 1% 0% 1% 1%;
+}
+
+li {
+    display: inline;
+    color: white;
+}
+
 #first_slide_text_group {
     display: -moz-inline-box;
     display: inline-block;
@@ -156,17 +183,4 @@ html, body {
     font-family: 'Indie Flower', cursive;
     margin-left: 36vw;
     margin-right: 36vw;
-}
-
-ul {
-    position: fixed;
-    z-index: 999;
-    width: 100%;
-    word-spacing: 3em;
-    padding: 1% 0% 1% 1%;
-}
-
-li {
-    display: inline;
-    color: white;
 }
