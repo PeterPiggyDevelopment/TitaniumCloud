@@ -3,7 +3,7 @@ function showMenu(ul, position) {
     var stopAnIn = false;
     var stopAnOut = false;
     var li=ul.children();
-    ul.css("background-color", "rgba(4, 176, 237, 0)");
+    ul.css("background-color", "rgba(0, 0, 0, 0)");
     window.onscroll = function() {
     var scrolled = window.pageYOffset;
         if (scrolled>position) {
@@ -21,11 +21,11 @@ function showMenu(ul, position) {
     function backgroundFadeIn(ul){
         var id = setInterval(frameIn, 10);
         function frameIn() {
-            if ((pos >= 70) || (stopAnIn)) {
+            if ((pos >= 40) || (stopAnIn)) {
                 clearInterval(id);
             } else {
                 pos+=1;
-                ul.css("background-color", "rgba(90, 94, 171, " + pos/100 + ")");
+                ul.css("background-color", "rgba(216,216,216, " + pos/100 + ")");
             }
         }
     }
@@ -37,7 +37,7 @@ function showMenu(ul, position) {
                 clearInterval(id);
             } else {
                 pos-=1;
-                ul.css("background-color", "rgba(90, 94, 171, " + pos/100 + ")");
+                ul.css("background-color", "rgba(216,216,216, " + pos/100 + ")");
             }
         }
     }

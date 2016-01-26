@@ -79,8 +79,8 @@ main = do
         GET -> let ext = takeExtension (url_path url) in 
           case ext of
             ".html" -> ifM (isAuthenticated request) 
-                       (putMVar statmvar (fst (getAuthCookies request)) 
-                        >> sendResponse Prelude.readFile 
+                       (putMVar statmvar (fst (getAuthCookies request)) >> 
+                       sendResponse Prelude.readFile 
                         (\stat str -> sendHtml stat (primHtml str)) url)
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
                         putMVar statmvar "+disauthed"
@@ -196,7 +196,10 @@ findUserInDB (name, pass) f =
                     else name == n) a
 
 isAuthenticated :: Request String -> IO Bool
-isAuthenticated rq = findUserInDB (getAuthCookies rq) True >>= 
+isAuthenticated rq = if Prelude.null (fst $ getAuthCookies rq)
+                         && Prelude.null (snd $ getAuthCookies rq)
+                 then return False
+                 else findUserInDB (getAuthCookies rq) True >>= 
                     \usr -> case usr of
                        Nothing ->  return False
                        Just u ->
