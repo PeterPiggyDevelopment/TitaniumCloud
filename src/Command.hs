@@ -1,30 +1,9 @@
 module Command(initialHelp, commandLoop) where 
 
-import Network.HTTP.Server.HtmlForm()
-import Data.ByteString as Bin
-import Data.ByteString.Char8 as C
-import Network.HTTP.Server
-import Network.URL as URL
-import Text.XHtml
-import Codec.Binary.UTF8.String
-import Control.Exception(try,SomeException)
-import Control.Monad(sequence, liftM)
-import Control.Concurrent(forkIO)
 import Control.Concurrent.MVar
-import Control.Conditional(ifM)
-import System.FilePath(takeExtension)
-import System.Directory
 import System.Exit(ExitCode(ExitSuccess))
 import System.Posix.Process(exitImmediately)
-import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
-import Text.JSON.Types
-import Text.Parsec hiding (try)
-import Text.ParserCombinators.Parsec.Char
-import Text.JSON.String(runGetJSON)
-import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
-import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
-import Data.List.Split(splitOneOf)
-import Numeric(readHex)
+import Data.List.Utils(strFromAL)
 import DataBase
 
 
