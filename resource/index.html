@@ -3,17 +3,20 @@
     <head>
         <title> Titanium </title>
         <meta charset="UTF-8">
-        <link rel="stylesheet" type="text/css" href="title_style.css"/>
+        <link rel="stylesheet" type="text/css" href="css/title_style.css"/>
         <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One">
     <head>
     <body>
-    <ul>
-        <li><a href='files.html'>My files</a></li>
-        <li>two</li>
-        <li>three</li>
-        <li>four</li>
-        <li>five</li>
-    </ul>
+        <ul class='top_bar'>
+            <li><span><a href='files.html'>My files</a></span></li>
+            <li>
+                <form id='reg_form' action='register' name='reg_name_form' method='post'> 
+                    <input name='name' type='text'>
+                    <input name='pass' type='password'> 
+                    <input type='submit' value='Отправить'> 
+                </form>
+            </li>
+        </ul>
         <div id='gradient_container'>
             <div id='first_slide'> </div> 
             <div id='gradient'>
@@ -62,11 +65,9 @@
             This site is written for you in VIM by Kirill Yartsev<br>
         </div>
     </body>
-    <script src="title_script.js"></script>
-    <script src='jquery.js'></script>
+    <script src="js/title_script.js" type="text/javascript"></script>
+    <script src='js/jquery.js'></script>
     <script type="text/javascript">
-
-
-
+        showMenu($('ul').eq(0), 30);
     </script>
 </html>
