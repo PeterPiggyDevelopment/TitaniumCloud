@@ -110,9 +110,7 @@ function renameFolders() {
         var ch=$('.parent').eq(i).children().eq(1),
             children=ch.children().eq(0),
             text=children.text();
-
         text=text.substring(0, text.length-2);
-
         children.text(text);
     }
 }
