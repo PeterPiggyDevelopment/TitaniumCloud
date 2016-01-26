@@ -35,7 +35,7 @@ allowed only this symbols:
 -------------------------------------------------------------------
    |add administrators for site
 -------------------------------------------------------------------
-   |create command "find <username>" for server
+|/ |create command "find <username>" for server
 -------------------------------------------------------------------
 FAILED |increase requests processing speed
 -------------------------------------------------------------------
