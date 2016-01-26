@@ -4,7 +4,7 @@ function typeDocument(string) { //определяет тип документа
                 length=string.length,
                 type=string.substring(pos+1, len), //расширение файла
                 src; //src иконки
-                
+
             if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
                 src='image/image.png';
             }
@@ -32,7 +32,7 @@ function typeDocument(string) { //определяет тип документа
 
 return src;
 };
-  
+
 
 function draw(li) { //отрисовка полосочек
 
@@ -56,9 +56,25 @@ function draw(li) { //отрисовка полосочек
      }
 
      $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-};      
+};
 
-function createShare() {$('.parent').on('mouseover', function() { //создание кнопки поделиться
+function createShare() { //костыли
+
+    $('.child').on('mouseover', function() {
+      $('.download').detach();
+    var child=$(this).children().eq(1),
+        text=child.children().eq(0);
+    $(this).after('<p class="download"><span class="share_text">Поделиться</span></p>');
+
+    });
+
+    $('.child').on('mouseout', function() {
+        $('.download').detach();
+    });
+
+
+    $('.parent').on('mouseover', function() {
+    $('.download').detach();
     var child=$(this).children().eq(1),
         text=child.children().eq(0);
     text.after('<p class="download"><span class="share_text">Поделиться</span></p>');
@@ -67,7 +83,9 @@ function createShare() {$('.parent').on('mouseover', function() { //создан
     $('.parent').on('mouseout', function() {
         $('.download').detach();
     });
+
 };
+
 
 function sort(string) { //сначала идут папки!
     var arr=string.split('\n'),
@@ -91,7 +109,7 @@ function sort(string) { //сначала идут папки!
     }
 
 return arr;
-}
+};
 
 function countFolders(arr) {
     var count=0;
@@ -102,7 +120,7 @@ function countFolders(arr) {
     }
 
 return count;
-}
+};
 
 function renameFolders() {
         for (var i=0; i<count; i++) {
@@ -110,35 +128,40 @@ function renameFolders() {
         var ch=$('.parent').eq(i).children().eq(1),
             children=ch.children().eq(0),
             text=children.text();
-
         text=text.substring(0, text.length-2);
-
         children.text(text);
     }
-}
+};
 
-function loadDir(dir) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?dir="+dir, true);
-    xhttp.onreadystatechange = function() {
-        if (xhttp.readyState == 4 && xhttp.status == 200) 
-            folder=sort(xhttp.responseText); //массив, с которого будем рисовать
-            count=countFolders(folder); //количетво папок
-            draw(folder); //отрисовали структуру
-            renameFolders(); //переименовали папки
-            createShare(); //создание кнопки "Поделиться"
-    };
-    xhttp.send();
-}
-
-function loadFile(dir, file) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
-    xhttp.onreadystatechange = function() {
-        if (xhttp.readyState == 4 && xhttp.status == 200) {
-            downloadFile(xhttp.responseText);
-        }
-    };
-    xhttp.send();
-}
-
+function drawFunctions() { //создание всплывающего меню
+    $('.parent').on('contextmenu', function(e) {
+        
+        $('.functions-menu').detach();
+        var top=e.pageY-$('#listFile').offset().top,
+            left=e.pageX-$(this).offset().left + 10,
+            element=$(this),
+            menu;
+            
+        e.preventDefault();
+        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons">Копировать</li><li class="functions-menu-buttons">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        menu=$('.functions-menu');
+        menu.css({
+            'position': 'absolute',
+            'top': top,
+            'left': left
+        });
+        
+        var last=$('.parent').eq($('.parent').length-1);
+        $(document).one('click', function(){ 
+            menu.detach(); 
+        })
+        //удаление
+        .off('click', 'li#delete')
+        .on('click', 'li#delete', function(){ 
+            element.detach(); 
+        });
+          
+        
+    return false;
+    });
+};

@@ -5,7 +5,7 @@ function showMenu(ul, position) {
     var li=ul.children();
     ul.css("background-color", "rgba(106,136,167, 0)");
     window.onscroll = function() {
-    var scrolled = window.pageYOffset;
+        var scrolled = window.pageYOffset;
         if (scrolled>position) {
             stopAnIn = false;
             stopAnOut = true;
