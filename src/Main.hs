@@ -23,52 +23,9 @@ import Data.List(isPrefixOf, isInfixOf, unlines, unwords)
 import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
-
--- Initial massage
-initialHelp = "Hello! This is a TitaniumCloud server!\n" ++
-    "If you want to print help, type \"help\""
-
--- Help massage
-help = "If you want to print this help, type \"help\"\n" ++
-    "If you want to exit (:()), type \"exit\"\n" ++ 
-    "If want to delete DataBase of users, type \"rmdb\"\n" ++
-    "If you want to list the Data Base, type \"lsdb\"\n" ++
-    "If you want to find user \"namename\" in Data Base, type \"fnusr\"\n" ++
-    "If you want to print statistics about users, type \"pst\"" ++
-    "If you want to print short statistics about users, type \"stst\""
-
-commandLoop :: MVar [(String, Int)] ->  IO ()
-commandLoop store = do
-        procesCommands store
-        commandLoop store
-
-procesCommands :: MVar [(String, Int)] -> IO ()
-procesCommands store = Prelude.getLine >>= 
-        \com -> case com of
-             "help" -> Prelude.putStrLn help
-             "exit" -> exitImmediately ExitSuccess
-             "rmdb" -> Prelude.writeFile "DataBase" "" >> 
-                 Prelude.putStrLn "Data Base removed"
-             "lsdb" -> Prelude.readFile "DataBase" >>=
-                 \db -> Prelude.putStrLn $ "Data Base: " ++ db
-             "fnusr" -> findUserInDB ("namename", "namename") False >>=
-                 \user -> case user of 
-                   Just u -> Prelude.putStrLn $ "Data Base has user " ++ fst u
-                   Nothing -> Prelude.putStrLn "Data Base has no users whith name \"namename\""
-             "pst" -> readMVar store >>=
-                 \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
-                    strFromAL st)
-             "stst" -> readMVar store >>=
-                 \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
-                    "Authenticated users: " ++ show (fst (genShortStats st)) ++ "\n" ++
-                    "Not authenticated users: " ++ show (snd (genShortStats st)))
-             _ -> Prelude.putStrLn "Invalid Invalidovich"
-
-genShortStats :: [(String, Int)] -> (Int, Int)
-genShortStats usrs = (first, second)
-        where 
-          first = Prelude.length (Prelude.tail usrs)
-          second = snd $ Prelude.last usrs
+import Command
+import DataBase
+import HttpSend
 
 main :: IO ()
 main = do 
@@ -188,25 +145,6 @@ registerUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False
                     snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
                 return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
                              $ toHtml $ "hello hello, " ++ snd (Prelude.head a) ++ "!!!"
-
-findUserInDB :: (String, String) -> 
-                Bool -> 
-                IO (Maybe (String, String))
-findUserInDB (name, pass) f = 
-    Prelude.readFile "DataBase" >>= \db ->
-     case db of 
-        [] -> return Nothing
-        "\n" -> return Nothing
-        _ -> case parse pDB "" (Prelude.tail db) of
-         Left e -> return Nothing
-         Right a -> return $ 
-             (\strs -> if not (Prelude.null strs)
-                 then Just (Prelude.head strs)
-                 else Nothing)
-               $ Prelude.filter (\(n, p) -> if f 
-                    then name == n && pass == p
-                    else name == n) a
-
 isAuthenticated :: Request String -> IO Bool
 isAuthenticated rq = if Prelude.null (fst $ getAuthCookies rq)
                          && Prelude.null (snd $ getAuthCookies rq)
@@ -272,98 +210,6 @@ pHex = do
           b <- hexDigit
           let ((d, _):_) = readHex [a,b]
           return . toEnum $ d
-
-pDB :: CharParser () [(String, String)]
-pDB = pDBPair `sepBy` char '\n'
-
-pDBPair :: CharParser () (String, String)
-pDBPair = many1 pDBChar >>= 
-        \name -> optionMaybe (char ':' >> many pDBChar) >>=
-        \value -> case value of 
-            Just a -> return (name, a)
-            Nothing -> return (name, "")
-
-pDBChar :: CharParser () Char
-pDBChar = oneOf urlBaseChars
-
-sendResponse ::  (String -> IO a) -> 
-                (StatusCode -> a -> Response String) -> 
-                URL.URL -> 
-                IO (Response String)
-sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
-    Right a -> return $ send OK a
-    Left e -> return $ sendHtml NotFound $
-        thehtml $ concatHtml
-          [ thead noHtml, body $ concatHtml
-             [ toHtml "I could not find " , toHtml $ exportURL url { url_type = HostRelative }
-             , toHtml ", so I made this with XHTML combinators. "
-             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-             ]
-          ]
-          where _hack :: SomeException
-                _hack = e
-
-sendUsrFile ::  String -> IO (Response String)
-sendUsrFile s = try (Bin.readFile s) >>= \mb_txt -> case mb_txt of
-    Right a -> return $ sendFile OK a
-    Left e -> return $ sendHtml NotFound $
-        thehtml $ concatHtml
-          [ thead noHtml, body $ concatHtml
-             [ toHtml "I could not find " , toHtml s
-             , toHtml ", so I made this with XHTML combinators. "
-             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-             ]
-          ]
-          where _hack :: SomeException
-                _hack = e
-
-sendHtml       :: StatusCode -> Html -> Response String
-sendHtml s v    = insertHeader HdrContentType "text/html" $ httpSendText s (renderHtml v)
-
-sendCss       :: StatusCode -> String -> Response String
-sendCss s v    = insertHeader HdrContentType "text/css" $ httpSendText s (renderHtml v)
-
-sendScript     :: StatusCode -> String -> Response String
-sendScript s v  = insertHeader HdrContentType "application/x-javascript" $ httpSendText s v
-
-sendJson       :: StatusCode -> JSValue -> Response String
-sendJson s v    = insertHeader HdrContentType "application/json"
-                $ httpSendText s (showJSValue v "")
-
-sendPng     :: StatusCode -> ByteString -> Response String
-sendPng s v  = insertHeader HdrContentType "image/png" $ httpSendBinary s v
-
-sendJpg     :: StatusCode -> ByteString -> Response String
-sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
-
-sendIco     :: StatusCode -> ByteString -> Response String
-sendIco s v  = insertHeader HdrContentType "image/ico" $ httpSendBinary s v
-
-sendAuth :: (String, String) -> Html -> Response String
-sendAuth (name, pass) html = insertHeader HdrSetCookie ("name=" ++ name)
-                $ insertHeader HdrSetCookie ("pass=" ++ pass)
-                $ insertHeader HdrContentType "text/html" 
-                $ httpSendText OK (renderHtml html)
-
-
-sendFile     :: StatusCode -> ByteString -> Response String
-sendFile s v  = insertHeader HdrContentType "application/octet-stream" 
-                  $ insertHeader (HdrCustom "Content-Disposition") "attachment"
-                  $ httpSendBinary s v
-
---http functions
-httpSendText       :: StatusCode -> String -> Response String
-httpSendText s v    = insertHeader HdrContentLength (show (Prelude.length txt))
-                $ insertHeader HdrContentEncoding "UTF-8"
-                $ insertHeader HdrContentEncoding "text/plain"
-                $ insertHeader HdrConnection "close" 
-                $ (respond s :: Response String) { rspBody = txt }
-                  where txt = encodeString v
-
-httpSendBinary       :: StatusCode -> ByteString -> Response String
-httpSendBinary s v    = insertHeader HdrConnection "close" 
-                $ insertHeader HdrContentLength (show (Bin.length v))
-                 (respond s :: Response String)  { rspBody = C.unpack v }
 
 getFiles :: FilePath -> Bool -> IO [FilePath]
 getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then

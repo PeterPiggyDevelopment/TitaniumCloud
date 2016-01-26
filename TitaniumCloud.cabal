@@ -4,22 +4,18 @@
 name:                TitaniumCloud
 version:             0.1.0.0
 synopsis:            A cloud of titanium
--- description:         
 homepage:            https://github.com/PeterPiggyDevelopment/TitaniumCloud
 license:             GPL-3
 license-file:        LICENSE
 author:              Kirill Yartsev
 maintainer:          deadwolfst@gmail.com
--- copyright:           
 category:            Web
 build-type:          Simple
-extra-source-files:  README.md
 cabal-version:       >=1.10
 
 executable TitaniumCloud
-  main-is:             Server.hs
-  -- other-modules:       
-  -- other-extensions:    
+  main-is:             Main.hs
+  hs-source-dirs:      src
   build-depends:       
       distributed-process
       , process
@@ -40,5 +36,4 @@ executable TitaniumCloud
       , utf8-string
       , filepath
   ghc-options: -O2 -threaded
-  hs-source-dirs:      src
   default-language:    Haskell2010
