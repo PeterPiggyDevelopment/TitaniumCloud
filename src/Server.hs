@@ -79,9 +79,7 @@ main = do
   forkIO (statisticsThread statmv statstore)
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
     case rqMethod request of 
-        GET -> do
-         Prelude.putStrLn $ debugHeaders request
-         let ext = takeExtension (url_path url) in 
+        GET -> let ext = takeExtension (url_path url) in 
           case ext of
             ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -339,7 +337,7 @@ sendJpg     :: StatusCode -> ByteString -> Response String
 sendJpg s v  = insertHeader HdrContentType "image/jpg" $ httpSendBinary s v
 
 sendIco     :: StatusCode -> ByteString -> Response String
-sendIco s v  = insertHeader HdrContentType "image/webp" $ httpSendBinary s v
+sendIco s v  = insertHeader HdrContentType "image/ico" $ httpSendBinary s v
 
 sendAuth :: (String, String) -> Html -> Response String
 sendAuth (name, pass) html = insertHeader HdrSetCookie ("name=" ++ name)
