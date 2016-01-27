@@ -35,6 +35,8 @@ allowed only this symbols:
 -------------------------------------------------------------------
    |add administrators for site
 -------------------------------------------------------------------
+   |add click statistic map
+-------------------------------------------------------------------
 |/ |create command "find <username>" for server
 -------------------------------------------------------------------
 FAILED |increase requests processing speed
@@ -51,7 +53,7 @@ FAILED |increase requests processing speed
 -------------------------------------------------------------------
 |/ |DataBase for users: remove crutch 'init'
 -------------------------------------------------------------------
-|/ |prevent from hacker attacks
+FAILED |prevent from hacker attacks
 -------------------------------------------------------------------
 |/ |prevent from '/.' queries
 -------------------------------------------------------------------

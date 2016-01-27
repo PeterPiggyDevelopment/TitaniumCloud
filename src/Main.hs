@@ -109,7 +109,7 @@ main = do
     ) statmv)
 
 debugHeaders :: Request String -> String
-debugHeaders rq = strFromAL $ headerToAssociation <$>  rqHeaders rq
+debugHeaders rq = strFromAL $ fmap headerToAssociation (rqHeaders rq)
 
 headerToAssociation :: Header -> (String, String)
 headerToAssociation (Header n s) = (show n, s)
@@ -146,7 +146,7 @@ pHex = do
 getFiles :: FilePath -> Bool -> IO [FilePath]
 getFiles dir isFilter = doesDirectoryExist dir >>= \e -> if e then
         if isFilter then
-            filterHidden <$> getDirectoryContents dir >>= \files -> mapM (slashDirectory dir) files
+            fmap filterHidden (getDirectoryContents dir) >>= \files -> mapM (slashDirectory dir) files
         else getDirectoryContents dir >>= \files -> mapM (slashDirectory dir) files
     else return []
 
