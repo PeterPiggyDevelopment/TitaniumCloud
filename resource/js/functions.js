@@ -171,8 +171,7 @@ function drawFunctions() { //создание всплывающего меню
         deleteFile(element, menu);
         renameFile(element, menu);
         isCopy=copyFile(element, menu);
-        pasteFile(element, menu);
-        console.log(isCopy);
+
 
 
     return false;
@@ -185,23 +184,37 @@ function pasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
-    var copy=element;
-      $('.parent').clone().append($('.parent').eq(6));
-      element.attr('id', 'qwert');
+    element.clone(true).appendTo('section');
+    var name=element.children().eq(1).text();
+    name=name.slice(0, name.length-10);
+    var k=identicalName(name);
+    //element.children().eq(1).text(name);
+    if (k!='-1' && k!='0') {
+      if (name.lastIndexOf('.')!=-1) { //файл
+        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+      }
+    }
+    var listFileText=$('.listFileText');
+    listFileText.eq(listFileText.length-1).text(name);
+    $('.functions-menu').detach();
+
+    console.log(name);
   });
 };
 
 
 function copyFile(element, menu) {
+  var copyFile;
   $(document).one('click', function(){
       menu.detach();
   })
   .off('click', 'li#copy')
   .on('click', 'li#copy', function(){
     isCopy=true;
-
+    pasteFile(element, menu);
   });
   isCopy=isCopy;
+
 
   return isCopy;
 }
@@ -229,7 +242,6 @@ function renameFile(element, menu) { //переименование
                   len=pos.length,
                   type; //расширение файла
 
-                  //type=text.slice(first+1, text.length);
                   if (text[first+2]%2!=NaN && text[first+3]==')' || text[first+2]%2!=NaN && text[first+3]%2!=NaN && text[first+4]==')') { //если файл имеет имя типа "name.type (number)"
                     type=string.slice(0, first); //убрали (number)
                     type=string.slice(pos+1, type.length); //обрезали всё, кроме расширения
@@ -397,7 +409,7 @@ function loadFile(dir, file) {
     xhttp.send();
 }
 
-(function openAndDownloadFile() {
+function openAndDownloadFile() {
   $('.parent').on('click', function() {
     var element=$(this);
     if(element.hasClass('folders')==true) { //если папка
@@ -406,7 +418,5 @@ function loadFile(dir, file) {
     else { //если файл
       //код для скачивания файла
     }
-
-
   })
-})();
+}
