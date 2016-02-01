@@ -348,3 +348,30 @@ function copyFile(element, menu) {
         isCopy==true;
   });
 }
+
+//Функции для взаимодействия с сервером
+function loadDir(dir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/?dir="+dir, true);
+    xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200) 
+        folder=sort(xhttp.responseText); //массив, с которого будем рисовать
+        count=countFolders(folder); //количетво папок
+        draw(folder); //отрисовали структуру
+        renameFolders(); //переименовали папки
+        createShare(); //создание кнопки "Поделиться"
+    };  
+    xhttp.send();
+}
+
+function loadFile(dir, file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            downloadFile(xhttp.responseText);
+        }
+    };  
+    xhttp.send();
+}
+
