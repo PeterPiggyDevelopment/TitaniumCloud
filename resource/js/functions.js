@@ -397,7 +397,7 @@ function loadFile(dir, file) {
     xhttp.send();
 }
 
-function openAndDownloadFile() {
+(function openAndDownloadFile() {
   $('.parent').on('click', function() {
     var element=$(this);
     if(element.hasClass('folders')==true) { //если папка
@@ -406,5 +406,7 @@ function openAndDownloadFile() {
     else { //если файл
       //код для скачивания файла
     }
+
+
   })
-}
+})();
