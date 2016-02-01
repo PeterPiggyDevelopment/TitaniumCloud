@@ -95,9 +95,9 @@
         </style>
     <head>
     <body>
-    <br>
-    <button type='button'  onclick='loadDir("resource")'>Yeah</button>
-    <br><br>
+        <br>
+        <button type='button' onclick='loadDir("./resource")'>load links from server</button>
+        <button type='button' onclick='loadFile("resource/image","other.png")'>load file from server</button>
         <section id='listFile'></section>
     </body>
 
@@ -105,15 +105,13 @@
     <script src='js/functions.js'></script>
     <script type="text/javascript">
 
-    var string='lol\nlel.png//\ndir//\nlol.txt\nderrr//\npog.mpe', //передаваемая строчка
-    	folder=sort(string), //массив, с которого будем рисовать
-    	count=countFolders(folder); //количетво папок
-
-
-	draw(folder); //отрисовали структуру
-	renameFolders(); //переименовали папки
-	createShare(); //создание кнопки "Поделиться"
-	drawFunctions(); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
+        var string='lol\nlel.png//\ndir//\nlol.txt\nderrr//\npog.mpe\nbook.fb2\nfiles//', //передаваемая строчка
+        folder=sort(string), //массив, с которого будем рисовать
+        count=countFolders(folder); //количетво папок
+        draw(folder); //отрисовали структуру
+        renameFolders(); //переименовали папки
+        createShare(); //создание кнопки "Поделиться"
+        drawFunctions(); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
 
     </script>
 </html>
