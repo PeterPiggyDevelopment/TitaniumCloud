@@ -3,7 +3,7 @@ function showMenu(ul, position) {
     var stopAnIn = false;
     var stopAnOut = false;
     var li=ul.children();
-    ul.css("background-color", "rgba(4, 176, 237, 0)");
+    ul.css("background-color", "rgba(106,136,167, 0)");
     window.onscroll = function() {
         var scrolled = window.pageYOffset;
         if (scrolled>position) {
@@ -25,7 +25,7 @@ function showMenu(ul, position) {
                 clearInterval(id);
             } else {
                 pos+=1;
-                ul.css("background-color", "rgba(90, 94, 171, " + pos/100 + ")");
+                ul.css("background-color", "rgba(106,136,167, " + pos/100 + ")");
             }
         }
     }
@@ -37,7 +37,7 @@ function showMenu(ul, position) {
                 clearInterval(id);
             } else {
                 pos-=1;
-                ul.css("background-color", "rgba(90, 94, 171, " + pos/100 + ")");
+                ul.css("background-color", "rgba(106,136,167, " + pos/100 + ")");
             }
         }
     }

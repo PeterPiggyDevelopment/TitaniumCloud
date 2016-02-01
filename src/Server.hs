@@ -24,12 +24,9 @@ import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 
--- Initial massage
-initialHelp = "Hello! This is a TitaniumCloud server!\n" ++
-    "If you want to print help, type \"help\""
-
 -- Help massage
-help = "If you want to print this help, type \"help\"\n" ++
+help = "Hello! This is a TitaniumCloud server!\n" ++
+    "If you want to print this help, type \"help\"\n" ++
     "If you want to exit (:()), type \"exit\"\n" ++ 
     "If want to delete DataBase of users, type \"rmdb\"\n" ++
     "If you want to list the Data Base, type \"lsdb\"\n" ++
@@ -72,16 +69,14 @@ genShortStats usrs = (first, second)
 
 main :: IO ()
 main = do 
-  Prelude.putStrLn initialHelp
+  Prelude.putStrLn help
   statmv <- newEmptyMVar 
   statstore <- newMVar [("+disauthed", 0)]
   forkIO (commandLoop statstore)
   forkIO (statisticsThread statmv statstore)
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
     case rqMethod request of 
-        GET -> do
-         Prelude.putStrLn $ debugHeaders request
-         let ext = takeExtension (url_path url) in 
+        GET -> let ext = takeExtension (url_path url) in 
           case ext of
             ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) 
@@ -131,22 +126,13 @@ main = do
                             " fst param: " ++ p ++ ", " ++ a
                         return $ sendHtml BadRequest $ toHtml "Sorry, invalid url parameters"
                 2 -> case Prelude.head (url_params url) of
-                    ("file", f) -> sendUsrFile ("./" ++
+                    ("file", f) -> sendUsrFile ("./" ++ 
                         replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
-                    ("del", file) -> removeFile ( "./" ++ 
-                        snd (Prelude.last (url_params url)) ++ file)
-                        >> return (respond OK :: Response String)
                     (p, a) -> return $ sendHtml BadRequest 
                         $ toHtml $ "Sorry, invalid url parameters" ++ 
                             ":ALERT: Invalid params in url " ++ url_path url ++ 
                             " params nu: " ++ show (Prelude.length (url_params url)) ++ 
                             " fst param: " ++ p ++ ", " ++ a
-                3 -> case Prelude.head (url_params url) of
-                    ("rename", file) -> renameFile 
-                        ("./" ++ snd (Prelude.last (url_params url)) ++ file) 
-                        ("./" ++ snd (Prelude.last (url_params url)) ++ 
-                            snd (url_params url !! 1)) 
-                            >> return (respond OK :: Response String)
                 n -> do 
                     Prelude.putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 

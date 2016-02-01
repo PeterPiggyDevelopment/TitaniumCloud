@@ -4,26 +4,29 @@
         <title> Game </title>
         <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
         <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="title_style.css"/>
+
         <style type="text/css">
 
+        section {
+            width: 50%;
+            position: relative;
+            margin: 0 auto;
+        }
 
-	  * {
-		  margin: 0;
-		  padding: 0;
-		  box-sizing: border-box;
-	  }
+        .listFileText {
+            font-family: 'Open Sans Light';
+            /*padding-top: 0.7%;
+            padding-bottom: 0.7%;*/
+            /*margin-left: 5%;*/
+            font-size: 1em;
+    /*text-align: left;
+    display: block;
+    width: 50%;
+    float: left;*/
 
-    section {
-        width: 50%;
-        position: relative;
-        margin: 0 auto;
-        border-top: 1px solid #87CEEB;
-    }
+        }
 
-    .listFileText {
-        font-family: 'Open Sans Light';
-        font-size: 1em;
-    }
 
     .parent {
       width: 100%;
@@ -38,64 +41,61 @@
       width: 100%;
       display:flex;
       justify-content: space-between;
-    }
+    }    
 
     .child_img {
       width: 2.5%;
+      /*height: 3%;*/
       display:flex;
-      justify-content: flex-start;
+      justify-content: flex-start;  
+      /*background-color: red;*/
       margin-right: 1%;
     }
 
-    .parent:hover {
-        background-color: #F0FFF0;
-        cursor: pointer;
-    }
 
-	  .download {
-    	  font-family: 'Open Sans Light';
-    	  font-size: 0.8em;
-    	  display: flex;
-    	  justify-content: flex-end;
-	  }
+        .parent:hover {
+            background-color: #F0FFF0;
+            cursor: pointer;
+        }
 
-	  .download:link {
-      	zoom: 0.7;
-	  }
 
-	  .share_text {
-      	border: 1px solid #4682B4;
-      	border-radius: 7px;
-      	padding-left: 5px;
-      	padding-right: 5px;
-      	background-color: #B0E0E6;
-	  }
 
-	  .functions-menu {
-	  	color: #000000;
-	  	background-color: #FFFFFF;
-	  	z-index: 9999;
-	  	list-style-type: none;
-	  	border: 1px solid #D3D3D3;
-	  	border-radius: 5px;
-	  	padding: 0.5%;
-	  }
+.download {
+    font-family: 'Open Sans Light';
+    font-size: 0.8em;
+    /*border: 1px solid #4682B4;
+    border-radius: 7px;
+    padding-right: 5px;
+    padding-left: 5px;*/
+    width: 96.5%;
+    display:flex;
+    justify-content: flex-end;
+}
 
-	  .functions-menu-buttons {
-	  	color: #000000;
-	  	font-family: 'Open Sans Light';
-	  	font-size: 0.9em;
-	  }
+.download:link {
+    zoom: 0.7;
+}
 
-	  .functions-menu-buttons:hover {
-  		color: #1E90FF;
-  		cursor: pointer;
-	  }
+.share_text {
+    border: 1px solid #4682B4;
+    border-radius: 7px;
+    padding-left: 5px; 
+    padding-right: 5px;
+    background-color: #B0E0E6;
+}
 
+
+      @font-face {
+        
+    font-family: Dewberry;
+    src: url('Dewberry.otf') format('opentype');
+   }
         </style>
     <head>
     <body>
-    <br><br><br>
+        <button type='button' onclick='loadDir("./resource")'>load links from server</button>
+        <button type='button' onclick='loadFile("resource/image","other.png")'>load file from server</button>
+
         <section id='listFile'></section>
     </body>
 
@@ -103,15 +103,13 @@
     <script src='js/functions.js'></script>
     <script type="text/javascript">
 
-    var string='lol\nlel.png//\ndir//\nlol.txt\nderrr//\npog.mpe', //передаваемая строчка
-    	folder=sort(string), //массив, с которого будем рисовать
-    	count=countFolders(folder); //количетво папок
+        var string='lol\nlel.png//\ndir//\nlol.txt\nderrr//\npog.mpe\nbook.fb2\nfiles//', //передаваемая строчка
+        folder=sort(string), //массив, с которого будем рисовать
+        count=countFolders(folder); //количетво папок
+        draw(folder); //отрисовали структуру
+        renameFolders(); //переименовали папки
+        createShare(); //создание кнопки "Поделиться"
 
-
-	draw(folder); //отрисовали структуру
-	renameFolders(); //переименовали папки
-	createShare(); //создание кнопки "Поделиться"
-	drawFunctions(); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
 
     </script>
 </html>
