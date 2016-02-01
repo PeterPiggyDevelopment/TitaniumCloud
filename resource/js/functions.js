@@ -157,7 +157,7 @@ function drawFunctions() { //создание всплывающего меню
 
 
         e.preventDefault();
-        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
         if (isCopy==true || isCut==true) {
           $('#paste').css('display', 'block');
         }
@@ -171,6 +171,7 @@ function drawFunctions() { //создание всплывающего меню
         deleteFile(element, menu);
         renameFile(element, menu);
         isCopy=copyFile(element, menu);
+        isCut=cutFile(element, menu);
 
 
 
@@ -178,7 +179,7 @@ function drawFunctions() { //создание всплывающего меню
     });
 };
 
-function pasteFile(element, menu) {
+function copyPasteFile(element, menu) {
   $(document).one('click', function(){
       menu.detach();
   })
@@ -215,21 +216,73 @@ function pasteFile(element, menu) {
   });
 };
 
+function cutPasteFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#paste')
+  .on('click', 'li#paste', function(){
+    if (element.hasClass('folders')==false) { //файл
+      console.log('файл');
+      element.clone(true).appendTo('section');
+      element.detach();
+      var name=element.children().eq(1).text();
+      name=name.slice(0, name.length-10);
+      var k=identicalName(name);
+      if (k!='-1' && k!='0') {
+        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+      }
+    var listFileText=$('.listFileText');
+    listFileText.eq(listFileText.length-1).text(name);
+  }
+  else if(element.hasClass('folders')==true) { //папка
+    console.log('папка');
+    var folders=$('.folders');
+    element.prependTo('section');
+    var name=element.children().eq(1).text();
+    name=name.slice(0, name.length-10);
+    var k=identicalName(name);
+    if (k!='-1' && k!='0') {
+      name=name + ' ('+k+')';
+    }
+      console.log(name);
+      var listFileText=$('.listFileText');
+      listFileText.eq(0).text(name);
+  }
+    $('.functions-menu').detach();
+
+  });
+};
 
 function copyFile(element, menu) {
-  var copyFile;
   $(document).one('click', function(){
       menu.detach();
   })
   .off('click', 'li#copy')
   .on('click', 'li#copy', function(){
     isCopy=true;
-    pasteFile(element, menu);
+    copyPasteFile(element, menu);
   });
   isCopy=isCopy;
 
 
   return isCopy;
+}
+
+function cutFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#cut')
+  .on('click', 'li#cut', function(){
+    isCut=true;
+    cutPasteFile(element, menu);
+    element.detach();
+  });
+  isCut=isCut;
+
+
+  return isCut;
 }
 
 function deleteFile(element, menu) { //удаление
