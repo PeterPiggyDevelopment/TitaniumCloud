@@ -143,7 +143,7 @@ function renameFolders() { //удаление '//' из названия
         children.text(text);
     }
 };
-
+var isCopy=false, isCut=false;
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
     $('.parent').on('contextmenu', function(e) {
@@ -154,10 +154,13 @@ function drawFunctions() { //создание всплывающего меню
             element=$(this),
             menu;
 
-        var isCopy, //нажати ли кнопка "скопировать"
-            isCut; //нажата ли кнопка "вырезать";
+
+
         e.preventDefault();
-        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        if (isCopy==true || isCut==true) {
+          $('#paste').css('display', 'block');
+        }
         menu=$('.functions-menu');
         menu.css({
             'position': 'absolute',
@@ -167,13 +170,41 @@ function drawFunctions() { //создание всплывающего меню
 
         deleteFile(element, menu);
         renameFile(element, menu);
-        copyFile(element, menu);
-
+        isCopy=copyFile(element, menu);
+        pasteFile(element, menu);
+        console.log(isCopy);
 
 
     return false;
     });
 };
+
+function pasteFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#paste')
+  .on('click', 'li#paste', function(){
+    var copy=element;
+      $('.parent').clone().append($('.parent').eq(6));
+      element.attr('id', 'qwert');
+  });
+};
+
+
+function copyFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#copy')
+  .on('click', 'li#copy', function(){
+    isCopy=true;
+
+  });
+  isCopy=isCopy;
+
+  return isCopy;
+}
 
 function deleteFile(element, menu) { //удаление
   $(document).one('click', function(){
@@ -338,29 +369,20 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-function copyFile(element, menu) {
 
-  $(document).one('click', function(){
-      menu.detach();
-  })
-  .off('click', 'li#copy')
-  .on('click', 'li#copy', function(){
-        isCopy==true;
-  });
-}
 
 //Функции для взаимодействия с сервером
 function loadDir(dir) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("POST", "/?dir="+dir, true);
     xhttp.onreadystatechange = function() {
-    if (xhttp.readyState == 4 && xhttp.status == 200) 
+    if (xhttp.readyState == 4 && xhttp.status == 200)
         folder=sort(xhttp.responseText); //массив, с которого будем рисовать
         count=countFolders(folder); //количетво папок
         draw(folder); //отрисовали структуру
         renameFolders(); //переименовали папки
         createShare(); //создание кнопки "Поделиться"
-    };  
+    };
     xhttp.send();
 }
 
@@ -371,7 +393,18 @@ function loadFile(dir, file) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             downloadFile(xhttp.responseText);
         }
-    };  
+    };
     xhttp.send();
 }
 
+function openAndDownloadFile() {
+  $('.parent').on('click', function() {
+    var element=$(this);
+    if(element.hasClass('folders')==true) { //если папка
+      //код для открытия папки
+    }
+    else { //если файл
+      //код для скачивания файла
+    }
+  })
+}
