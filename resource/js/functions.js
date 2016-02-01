@@ -184,21 +184,34 @@ function pasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
-    element.clone(true).appendTo('section');
+    if (element.hasClass('folders')==false) { //файл
+      console.log('файл');
+      element.clone(true, true).appendTo('section');
+      var name=element.children().eq(1).text();
+      name=name.slice(0, name.length-10);
+      var k=identicalName(name);
+      if (k!='-1' && k!='0') {
+        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+      }
+    var listFileText=$('.listFileText');
+    listFileText.eq(listFileText.length-1).text(name);
+  }
+  else if(element.hasClass('folders')==true) { //папка
+    console.log('папка');
+    var folders=$('.folders');
+    element.clone(true, true).prependTo('section');
     var name=element.children().eq(1).text();
     name=name.slice(0, name.length-10);
     var k=identicalName(name);
-    //element.children().eq(1).text(name);
     if (k!='-1' && k!='0') {
-      if (name.lastIndexOf('.')!=-1) { //файл
-        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
-      }
+      name=name + ' ('+k+')';
     }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(name);
+      console.log(name);
+      var listFileText=$('.listFileText');
+      listFileText.eq(0).text(name);
+  }
     $('.functions-menu').detach();
 
-    console.log(name);
   });
 };
 
