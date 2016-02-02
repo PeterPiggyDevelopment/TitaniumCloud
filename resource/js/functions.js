@@ -156,7 +156,7 @@ function renameFolders() { //удаление '//' из названия
         children.text(text);
     }
 };
-var isCopy=false, isCut=false;
+var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
     $('.parent').on('contextmenu', function(e) {
@@ -188,7 +188,7 @@ function drawFunctions() { //создание всплывающего меню
 
 
 
-    return false;
+    return false; //чтобы не всплывало стандартное меню
     });
 };
 
@@ -341,43 +341,34 @@ function renameFile(element, menu) { //переименование
               inputNewName.attr('value', text);
               inputNewName.select(); //выделение всего текста
               zamena.hide(); //скрыли текст
-              inputNewName.blur(function() { //перестали вводить новое имя
-                var newName=document.getElementById('inputNewName').value; //новое имя
-                inputNewName.detach();
-                zamena.show();
-                zamena.replaceWith('<p class="listFileText" id="last"></p>');
-                var last=$('#last');
-                last.text(newName); //перезаписываем новое имя
-                newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр.
-                var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
-                if (newSrc!=type && element.hasClass('folders')==false) { //если да, подбираем новую иконку
-                  element.children().eq(0).attr('src', newSrc);
-                };
-                last.text(newName); //перезаписываем новое имя
-                last.wrap('<div class="child"></div>');
-                last.removeAttr('id');
-                httpRenameFile(getCurrentDirectory(), text, newName);
+              inputNewName.blur(function() { //перестали вводить новое имя (исчезла фокусировка на поле ввода)
+                endRename(zamena, text, type, inputNewName, element);
               });
-              inputNewName.keydown(function(event) {
-                if (event.which==13) {
-                  var newName=document.getElementById('inputNewName').value; //новое имя
-                  inputNewName.detach();
-                  zamena.show();
-                  zamena.replaceWith('<p class="listFileText" id="last"></p>');
-                  var last=$('#last');
-                  last.text(newName); //перезаписываем новое имя
-                  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр.
-                  var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
-                  if (newSrc!=type) { //если да, подбираем новую иконку
-                    element.children().eq(0).attr('src', newSrc);
-                  };
-                  last.text(newName);
-                  last.wrap('<div class="child"></div>');
-                  last.removeAttr('id');
+              inputNewName.keydown(function(event) { //перестали вводить новое имя (нажали на Enter)
+                if (event.which==13) { //нажали именно Enter
+                  endRename(zamena, text, type, inputNewName, element);
                 }
               })
     });
 };
+
+function endRename(zamena, text, type, inputNewName, element) {
+  var newName=document.getElementById('inputNewName').value; //новое имя
+  inputNewName.detach();
+  zamena.show();
+  zamena.replaceWith('<p class="listFileText" id="last"></p>');
+  var last=$('#last');
+  last.text(newName); //перезаписываем новое имя
+  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр.
+  var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
+  if (newSrc!=type && element.hasClass('folders')==false) { //если да, подбираем новую иконку
+    element.children().eq(0).attr('src', newSrc);
+  };
+  last.text(newName); //перезаписываем новое имя
+  last.wrap('<div class="child"></div>');
+  last.removeAttr('id');
+  httpRenameFile(getCurrentDirectory(), text, newName);
+}
 
 function identicalName(string) { //проверяет, нет ли таких же файлов
     var allText=$('.listFileText'),
@@ -519,7 +510,7 @@ function httpLoadDir(dir) {
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
             document.getElementById('globalDirectory').innerHTML = CurrentDirectory;
         }
-    };  
+    };
     xhttp.send();
 }
 
@@ -531,7 +522,7 @@ function httpLoadFile(dir, file) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             downloadFile(xhttp.responseText);
         }
-    };  
+    };
     xhttp.send();
 }
 
