@@ -13,8 +13,9 @@ import Text.JSON.Types
 sendResponse ::  (String -> IO a) -> 
                 (StatusCode -> a -> Response String) -> 
                 URL.URL -> 
+                String ->
                 IO (Response String)
-sendResponse readf send url = try (readf (url_path url)) >>= \mb_txt -> case mb_txt of
+sendResponse readf send url filePath = try (readf filePath) >>= \mb_txt -> case mb_txt of
     Right a -> return $ send OK a
     Left e -> return $ sendHtml NotFound $
         thehtml $ concatHtml
