@@ -53,7 +53,7 @@ function typeDocument(string) { //определяет тип документа
             	src='image/folder.png';
             }
             else {
-                src='image/other.png';
+              src='image/other.png';
             }
 return src;
 };
@@ -156,7 +156,9 @@ function renameFolders() { //удаление '//' из названия
         children.text(text);
     }
 };
+
 var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
+
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
     $('.parent').on('contextmenu', function(e) {
@@ -181,12 +183,11 @@ function drawFunctions() { //создание всплывающего меню
             'left': left
         });
 
+        //функции всплывающего меню
         deleteFile(element, menu);
         renameFile(element, menu);
         isCopy=copyFile(element, menu);
         isCut=cutFile(element, menu);
-
-
 
     return false; //чтобы не всплывало стандартное меню
     });
@@ -453,11 +454,31 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-function addNewDirectory() { //создание новой папки
-  var folders=$('.folders'),
-      count=folders.length; //количество папок
-      folders.eq(count-1).after()
-}
+(function addNewDirectory() { //создание новой папки
+  $('#newDir').on('click', function() {
+    var folders=$('.folders'),
+        count=folders.length; //количество папок
+    folders.eq(count-1).after('<img class="child_img" src="image/folder.png" id="new">');
+    var greenElephant=$('#new');
+    greenElephant.wrap('<div class="parent folders" id="last"></div>');
+    $('#new').after('<input type="text" id="inputNewName">');
+    var inputNewName=$('#inputNewName');
+    inputNewName.wrap('<div class="child"></div>');
+    inputNewName.focus();
+
+    inputNewName.blur(function() {
+        endCreateNewDirectory(inputNewName)
+    });
+
+    inputNewName.keydown(function(event) {
+      if (event.which==13) {
+        endCreateNewDirectory(inputNewName)
+      }
+    });
+
+});
+
+})();
 
 //Функции для взаимодействия с сервером
 function loadDir(dir) {
@@ -497,6 +518,14 @@ function openAndDownloadFile() {
   })
 }
 
+function endCreateNewDirectory(inputNewName) {
+  var name=document.getElementById('inputNewName').value; //имя новой папки
+  inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');
+  var newName=$('#newName');
+  newName.text(name); //переименовали
+  newName.removeAttr('id');
+  newName.removeAttr('id');
+};
 
 //Функции для взаимодействия с сервером
 function httpLoadDir(dir) {
@@ -529,6 +558,7 @@ function httpLoadFile(dir, file) {
     };
     xhttp.send();
 }
+
 
 function httpDeleteFile(dir, file) {
     var xhttp = new XMLHttpRequest();
