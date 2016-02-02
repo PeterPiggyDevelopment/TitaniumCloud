@@ -317,8 +317,8 @@ function renameFile(element, menu) { //переименование
     $(document).off('click', 'li#rename');
     $(document).on('click', 'li#rename', function(event) {
               var zamena=element.children().eq(1),
-                  text=zamena.text();//старое имя
-              text=text.slice(0, text.length-10); //имя + расширение
+                  text=zamena.text();
+              text=text.slice(0, text.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ФАЙЛА
               var first=text.lastIndexOf(' ('), //последнее вхождение " ("
                   pos=text.lastIndexOf('.'), //последнее вхождение точки
                   len=pos.length,
@@ -359,12 +359,12 @@ function endRename(zamena, text, type, inputNewName, element) {
   zamena.replaceWith('<p class="listFileText" id="last"></p>');
   var last=$('#last');
   last.text(newName); //перезаписываем новое имя
-  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр.
+  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр. <--ДЖОН, ВОТ НОВОЕ ИМЯ ФАЙЛА
   var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
   if (newSrc!=type && element.hasClass('folders')==false) { //если да, подбираем новую иконку
     element.children().eq(0).attr('src', newSrc);
   };
-  last.text(newName); //перезаписываем новое имя
+  last.text(newName);
   last.wrap('<div class="child"></div>');
   last.removeAttr('id');
   httpRenameFile(getCurrentDirectory(), text, newName);
@@ -453,7 +453,11 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-
+function addNewDirectory() { //создание новой папки
+  var folders=$('.folders'),
+      count=folders.length; //количество папок
+      folders.eq(count-1).after()
+}
 
 //Функции для взаимодействия с сервером
 function loadDir(dir) {
