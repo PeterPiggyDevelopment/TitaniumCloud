@@ -1,5 +1,23 @@
 'use strict';
 
+var CurrentDirectory = '';
+
+function getCurrentDirectory(){
+    return '/'+getNameCookie()+'/'+CurrentDirectory;
+}
+
+function getNameCookie(){
+    var co = document.cookie;
+    co = co.slice(co.indexOf("=")+1, co.indexOf(";"));
+    return co;
+}
+
+function back(){
+    var pos=getCurrentDirectory().lastIndexOf('/');
+    CurrentDirectory = getCurrentDirectory().slice(('/'+getNameCookie()+'/').length-1, pos);
+    httpLoadDir(getCurrentDirectory());
+}
+
 function typeDocument(string) { //определяет тип документа
             var pos=string.lastIndexOf('.'), //последнее вхождение точки
                 length=string.length,
@@ -34,14 +52,9 @@ function typeDocument(string) { //определяет тип документа
             else if (string[length-1]=='/' && string[length-2]=='/') {
             	src='image/folder.png';
             }
-            else if (type=='') {
-              src='image/folder.png';
-            }
             else {
                 src='image/other.png';
             }
-
-
 return src;
 };
 
@@ -182,6 +195,9 @@ function deleteFile(element, menu) { //удаление
   .off('click', 'li#delete')
   .on('click', 'li#delete', function(){
       element.detach();
+      var filename = element.children().eq(1).text();
+      filename = filename.slice(0, filename.length-10);
+      httpDeleteFile(getCurrentDirectory(), filename);
   });
 };
 
@@ -231,6 +247,7 @@ function renameFile(element, menu) { //переименование
                 last.text(newName); //перезаписываем новое имя
                 last.wrap('<div class="child"></div>');
                 last.removeAttr('id');
+                httpRenameFile(getCurrentDirectory(), text, newName);
               });
               inputNewName.keydown(function(event) {
                 if (event.which==13) {
@@ -250,8 +267,6 @@ function renameFile(element, menu) { //переименование
                   last.removeAttr('id');
                 }
               })
-
-
     });
 };
 
@@ -350,25 +365,29 @@ function copyFile(element, menu) {
 }
 
 //Функции для взаимодействия с сервером
-function loadDir(dir) {
+function httpLoadDir(dir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?dir="+dir, true);
+    xhttp.open("GET", "/?dir="+dir, true);
+    xhttp.withCredentials = true;
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             folder=sort(xhttp.responseText), //массив, с которого будем рисовать
             count=countFolders(folder); //количетво папок
             draw(folder); //отрисовали структуру
             renameFolders(); //переименовали папки
+            openAndDownloadFile();
             createShare(); //создание кнопки "Поделиться"
-            drawFunctions(); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
+            drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
+            document.getElementById('globalDirectory').innerHTML = getCurrentDirectory();
         }
     };  
     xhttp.send();
 }
 
-function loadFile(dir, file) {
+function httpLoadFile(dir, file) {
     var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?file="+file+"&dir="+dir, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             downloadFile(xhttp.responseText);
@@ -376,3 +395,49 @@ function loadFile(dir, file) {
     };  
     xhttp.send();
 }
+
+function httpDeleteFile(dir, file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?del="+file+"&dir="+dir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpRenameFile(dir, file, newname) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?rename="+file+"&newname="+newname+"&dir="+dir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpCreateFile(dir, file, newname) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?create="+file+"&dir="+dir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function openAndDownloadFile() {
+    $('.parent').on('click', function() {
+        var element=$(this);
+        if(element.hasClass('folders')==true) { //если папка
+            var dirname = element.children().eq(1).text();
+            dirname = dirname.slice(0, dirname.length-10);
+            if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
+                CurrentDirectory += dirname;
+            } else {
+                CurrentDirectory += "/"+dirname;
+            }
+            httpLoadDir(getCurrentDirectory());
+        }
+        else { //если файл
+            //код для скачивания файла
+        }
+    })
+};

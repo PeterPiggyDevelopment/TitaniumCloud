@@ -6,6 +6,7 @@ import Data.ByteString.Char8 as C
 import Network.HTTP.Server
 import Network.URL as URL
 import Text.XHtml
+import System.Directory
 import Codec.Binary.UTF8.String
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
@@ -58,6 +59,7 @@ registerUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False
             Nothing -> do
                 Prelude.appendFile "DataBase" $ "\n" ++ 
                     snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
+                createDirectory $ snd (Prelude.head a)
                 return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
                              $ toHtml $ "hello hello, " ++ snd (Prelude.head a) ++ "!!!"
 
