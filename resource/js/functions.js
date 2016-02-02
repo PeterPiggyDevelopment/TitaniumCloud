@@ -364,6 +364,7 @@ function copyFile(element, menu) {
   });
 }
 
+
 //Функции для взаимодействия с сервером
 function httpLoadDir(dir) {
     var xhttp = new XMLHttpRequest();
