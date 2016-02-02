@@ -517,7 +517,7 @@ function httpLoadDir(dir) {
             openAndDownloadFile();
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
-            document.getElementById('globalDirectory').innerHTML = getCurrentDirectory();
+            document.getElementById('globalDirectory').innerHTML = CurrentDirectory;
         }
     };  
     xhttp.send();
