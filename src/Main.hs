@@ -46,7 +46,7 @@ main = do
                             "in request body!!! " ++ show a
             _ -> case length (url_params url) of
                     1 -> case head (url_params url) of
-                        ("dir", dir) -> print dir >> getFiles (replace ".." "" ("./" ++ dir)) True >>=
+                        ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                                 \files -> case unlines files of
                                  [] -> return $ httpSendText OK ""
                                  str -> return (httpSendText OK (init str))

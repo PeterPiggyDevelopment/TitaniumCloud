@@ -156,7 +156,7 @@ function renameFolders() { //удаление '//' из названия
         children.text(text);
     }
 };
-
+var isCopy=false, isCut=false;
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
     $('.parent').on('contextmenu', function(e) {
@@ -167,10 +167,13 @@ function drawFunctions() { //создание всплывающего меню
             element=$(this),
             menu;
 
-        var isCopy, //нажати ли кнопка "скопировать"
-            isCut; //нажата ли кнопка "вырезать";
+
+
         e.preventDefault();
-        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        if (isCopy==true || isCut==true) {
+          $('#paste').css('display', 'block');
+        }
         menu=$('.functions-menu');
         menu.css({
             'position': 'absolute',
@@ -180,13 +183,120 @@ function drawFunctions() { //создание всплывающего меню
 
         deleteFile(element, menu);
         renameFile(element, menu);
-        copyFile(element, menu);
+        isCopy=copyFile(element, menu);
+        isCut=cutFile(element, menu);
 
 
 
     return false;
     });
 };
+
+function copyPasteFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#paste')
+  .on('click', 'li#paste', function(){
+    if (element.hasClass('folders')==false) { //файл
+      console.log('файл');
+      element.clone(true, true).appendTo('section');
+      var name=element.children().eq(1).text();
+      name=name.slice(0, name.length-10);
+      var k=identicalName(name);
+      if (k!='-1' && k!='0') {
+        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+      }
+    var listFileText=$('.listFileText');
+    listFileText.eq(listFileText.length-1).text(name);
+  }
+  else if(element.hasClass('folders')==true) { //папка
+    console.log('папка');
+    var folders=$('.folders');
+    element.clone(true, true).prependTo('section');
+    var name=element.children().eq(1).text();
+    name=name.slice(0, name.length-10);
+    var k=identicalName(name);
+    if (k!='-1' && k!='0') {
+      name=name + ' ('+k+')';
+    }
+      console.log(name);
+      var listFileText=$('.listFileText');
+      listFileText.eq(0).text(name);
+  }
+    $('.functions-menu').detach();
+
+  });
+};
+
+function cutPasteFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#paste')
+  .on('click', 'li#paste', function(){
+    if (element.hasClass('folders')==false) { //файл
+      console.log('файл');
+      element.clone(true).appendTo('section');
+      element.detach();
+      var name=element.children().eq(1).text();
+      name=name.slice(0, name.length-10);
+      var k=identicalName(name);
+      if (k!='-1' && k!='0') {
+        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+      }
+    var listFileText=$('.listFileText');
+    listFileText.eq(listFileText.length-1).text(name);
+  }
+  else if(element.hasClass('folders')==true) { //папка
+    console.log('папка');
+    var folders=$('.folders');
+    element.prependTo('section');
+    var name=element.children().eq(1).text();
+    name=name.slice(0, name.length-10);
+    var k=identicalName(name);
+    if (k!='-1' && k!='0') {
+      name=name + ' ('+k+')';
+    }
+      console.log(name);
+      var listFileText=$('.listFileText');
+      listFileText.eq(0).text(name);
+  }
+    $('.functions-menu').detach();
+
+  });
+};
+
+function copyFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#copy')
+  .on('click', 'li#copy', function(){
+    isCopy=true;
+    copyPasteFile(element, menu);
+  });
+  isCopy=isCopy;
+
+
+  return isCopy;
+}
+
+function cutFile(element, menu) {
+  $(document).one('click', function(){
+      menu.detach();
+  })
+  .off('click', 'li#cut')
+  .on('click', 'li#cut', function(){
+    isCut=true;
+    cutPasteFile(element, menu);
+    element.detach();
+  });
+  isCut=isCut;
+
+
+  return isCut;
+}
 
 function deleteFile(element, menu) { //удаление
   $(document).one('click', function(){
@@ -214,7 +324,6 @@ function renameFile(element, menu) { //переименование
                   len=pos.length,
                   type; //расширение файла
 
-                  //type=text.slice(first+1, text.length);
                   if (text[first+2]%2!=NaN && text[first+3]==')' || text[first+2]%2!=NaN && text[first+3]%2!=NaN && text[first+4]==')') { //если файл имеет имя типа "name.type (number)"
                     type=string.slice(0, first); //убрали (number)
                     type=string.slice(pos+1, type.length); //обрезали всё, кроме расширения
@@ -353,15 +462,44 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-function copyFile(element, menu) {
 
-  $(document).one('click', function(){
-      menu.detach();
+
+//Функции для взаимодействия с сервером
+function loadDir(dir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/?dir="+dir, true);
+    xhttp.onreadystatechange = function() {
+    if (xhttp.readyState == 4 && xhttp.status == 200)
+        folder=sort(xhttp.responseText); //массив, с которого будем рисовать
+        count=countFolders(folder); //количетво папок
+        draw(folder); //отрисовали структуру
+        renameFolders(); //переименовали папки
+        createShare(); //создание кнопки "Поделиться"
+    };
+    xhttp.send();
+}
+
+function loadFile(dir, file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
+    xhttp.onreadystatechange = function() {
+        if (xhttp.readyState == 4 && xhttp.status == 200) {
+            downloadFile(xhttp.responseText);
+        }
+    };
+    xhttp.send();
+}
+
+function openAndDownloadFile() {
+  $('.parent').on('click', function() {
+    var element=$(this);
+    if(element.hasClass('folders')==true) { //если папка
+      //код для открытия папки
+    }
+    else { //если файл
+      //код для скачивания файла
+    }
   })
-  .off('click', 'li#copy')
-  .on('click', 'li#copy', function(){
-        isCopy==true;
-  });
 }
 
 
