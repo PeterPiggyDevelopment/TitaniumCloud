@@ -33,18 +33,7 @@ main = do
   forkIO (statisticsThread statmv statstore)
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
     case rqMethod request of 
-        GET ->  case url_path url of 
-            "resource/register" -> 
-                 case parse pQuery "" $ rqBody request of 
-                     Left e -> return $ sendHtml OK 
-                         $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show e
-                     Right a -> case length a of 
-                        2 -> registerUser a
-                        _ -> return $ sendHtml OK 
-                         $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show a
-            _ -> case length (url_params url) of
+        GET -> case length (url_params url) of
                     1 -> case head (url_params url) of
                         ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                                 \files -> case unlines files of
@@ -104,6 +93,19 @@ main = do
                         ".ico" -> sendResponse Bin.readFile sendIco url
                         _ -> sendResponse Bin.readFile sendFile url
                     n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
+        POST -> case url_path url of 
+            "resource/register" -> 
+                 case parse pQuery "" $ rqBody request of 
+                     Left e -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while registering " ++ 
+                            "in request body!!! " ++ show e
+                     Right a -> case length a of 
+                        2 -> registerUser a
+                        _ -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while registering " ++ 
+                            "in request body!!! " ++ show a
+            n -> return $ sendHtml BadRequest $ toHtml 
+                $ "Error on HTTP addres while registering in request body!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
     ) statmv)
 
