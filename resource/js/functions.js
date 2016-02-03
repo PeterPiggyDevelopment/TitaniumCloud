@@ -203,27 +203,28 @@ function copyPasteFile(element, menu) {
       console.log('файл');
       element.clone(true, true).appendTo('section');
       var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10);
+      name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ФАЙЛА
       var k=identicalName(name);
       if (k!='-1' && k!='0') {
         name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
       }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(name);
+    var listFileText=$('.listFileText'),
+        newName=name;//<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ КОПИРОВАНИИ ФАЙЛА
+    listFileText.eq(listFileText.length-1).text(newName);
   }
   else if(element.hasClass('folders')==true) { //папка
     console.log('папка');
     var folders=$('.folders');
     element.clone(true, true).prependTo('section');
-    var name=element.children().eq(1).text();
+    var name=element.children().eq(1).text(); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
     name=name.slice(0, name.length-10);
     var k=identicalName(name);
     if (k!='-1' && k!='0') {
       name=name + ' ('+k+')';
     }
-      console.log(name);
-      var listFileText=$('.listFileText');
-      listFileText.eq(0).text(name);
+      var listFileText=$('.listFileText'),
+          newName=name;//<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
+      listFileText.eq(0).text(newName);
   }
     $('.functions-menu').detach();
 
@@ -241,27 +242,29 @@ function cutPasteFile(element, menu) {
       element.clone(true).appendTo('section');
       element.detach();
       var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10);
+      name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ФАЙЛА
       var k=identicalName(name);
       if (k!='-1' && k!='0') {
         name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
       }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(name);
+    var listFileText=$('.listFileText'),
+        newName=name; //<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ФАЙЛА
+    listFileText.eq(listFileText.length-1).text(newName);
   }
   else if(element.hasClass('folders')==true) { //папка
     console.log('папка');
     var folders=$('.folders');
     element.prependTo('section');
-    var name=element.children().eq(1).text();
+    var name=element.children().eq(1).text(); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ПАПКИ
     name=name.slice(0, name.length-10);
     var k=identicalName(name);
     if (k!='-1' && k!='0') {
       name=name + ' ('+k+')';
     }
       console.log(name);
-      var listFileText=$('.listFileText');
-      listFileText.eq(0).text(name);
+      var listFileText=$('.listFileText'),
+          newName=name; //<--ДЖОН, ВОТ НООВЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ПАПКИ
+      listFileText.eq(0).text(newName);
   }
     $('.functions-menu').detach();
 
@@ -465,7 +468,7 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
     var inputNewName=$('#inputNewName');
     inputNewName.wrap('<div class="child"></div>');
     inputNewName.focus();
-
+    greenElephant.removeAttr('id');
     inputNewName.blur(function() {
         endCreateNewDirectory(inputNewName)
     });
