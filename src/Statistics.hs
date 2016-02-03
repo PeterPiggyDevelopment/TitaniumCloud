@@ -1,6 +1,6 @@
 module Statistics(statisticsThread) where
 import Control.Concurrent.MVar
-import Data.List.Utils(strToAL, hasKeyAL, addToAL)
+import Data.Lists(strToAL, hasKeyAL, addToAL)
 
 statisticsThread :: MVar String -> -- MVar for user names to write them to the statistics base
                     MVar [(String, Int)]-> -- MVvar for statistics base

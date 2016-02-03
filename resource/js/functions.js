@@ -1,5 +1,3 @@
-'use strict';
-
 var CurrentDirectory = '';
 
 function getCurrentDirectory(){
@@ -53,7 +51,7 @@ function typeDocument(string) { //определяет тип документа
             	src='image/folder.png';
             }
             else {
-                src='image/other.png';
+              src='image/other.png';
             }
 return src;
 };
@@ -82,22 +80,11 @@ function draw(li) { //отрисовка полосочек
      $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
 };
 
-function createShare() { //костыли
+function createShare() {
 
-    $('.child').on('mouseover', function() {
-      $('.download').detach();
-    var child=$(this).children().eq(1),
-        text=child.children().eq(0);
-    $(this).after('<p class="download"><span class="share_text">Поделиться</span></p>');
-
-    });
-
-    $('.child').on('mouseout', function() {
-        $('.download').detach();
-    });
-
-
-    $('.parent').on('mouseover', function() {
+    $('.parent').on('mouseover', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
     $('.download').detach();
     var child=$(this).children().eq(1),
         text=child.children().eq(0);
@@ -110,6 +97,40 @@ function createShare() { //костыли
 
 };
 
+function drawFunctions() { //создание всплывающего меню
+  $('.parent').off('contextmenu');
+    $('.parent').on('contextmenu', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.functions-menu').detach();
+        // var top=e.pageY-$('#listFile').offset().top,
+        //     left=e.pageX-$(this).offset().left + 10,
+        var top=e.pageY-5,
+            left=e.pageX+5,
+            element=$(this),
+            menu;
+
+        e.preventDefault();
+        $('body').append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        if (isCopy==true || isCut==true) {
+          $('#paste').css('display', 'block');
+        }
+        menu=$('.functions-menu');
+        menu.css({
+            'position': 'absolute',
+            'top': top,
+            'left': left
+        });
+
+        //функции всплывающего меню
+        deleteFile(element, menu);
+        renameFile(element, menu);
+        isCopy=copyFile(element, menu);
+        isCut=cutFile(element, menu);
+
+    return false; //чтобы не всплывало стандартное меню
+    });
+};
 
 function sort(string) { //сначала идут папки!
     var arr=string.split('\n'),
@@ -156,41 +177,10 @@ function renameFolders() { //удаление '//' из названия
         children.text(text);
     }
 };
+
 var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
-function drawFunctions() { //создание всплывающего меню
-  $('.parent').off('contextmenu');
-    $('.parent').on('contextmenu', function(e) {
-
-        $('.functions-menu').detach();
-        var top=e.pageY-$('#listFile').offset().top,
-            left=e.pageX-$(this).offset().left + 10,
-            element=$(this),
-            menu;
-
-
-
-        e.preventDefault();
-        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
-        if (isCopy==true || isCut==true) {
-          $('#paste').css('display', 'block');
-        }
-        menu=$('.functions-menu');
-        menu.css({
-            'position': 'absolute',
-            'top': top,
-            'left': left
-        });
-
-        deleteFile(element, menu);
-        renameFile(element, menu);
-        isCopy=copyFile(element, menu);
-        isCut=cutFile(element, menu);
-
-
-
-    return false; //чтобы не всплывало стандартное меню
-    });
-};
+var OldName="";
+var OldDir="";
 
 function copyPasteFile(element, menu) {
   $(document).one('click', function(){
@@ -198,32 +188,25 @@ function copyPasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
+        var k=identicalName(OldName);
+        var name = OldName;
     if (element.hasClass('folders')==false) { //файл
-      console.log('файл');
-      element.clone(true, true).appendTo('section');
-      var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10);
-      var k=identicalName(name);
-      if (k!='-1' && k!='0') {
-        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
-      }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(name);
-  }
-  else if(element.hasClass('folders')==true) { //папка
-    console.log('папка');
-    var folders=$('.folders');
-    element.clone(true, true).prependTo('section');
-    var name=element.children().eq(1).text();
-    name=name.slice(0, name.length-10);
-    var k=identicalName(name);
-    if (k!='-1' && k!='0') {
-      name=name + ' ('+k+')';
+        if (k!='-1' && k!='0') {
+            name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpCopyFile(OldName, OldDir, newName, getCurrentDirectory());
+    } else {
+        if (k!='-1' && k!='0') {
+          name=name + ' ('+k+')';
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpCopyDir(OldName, OldDir, newName, getCurrentDirectory());
     }
-      console.log(name);
-      var listFileText=$('.listFileText');
-      listFileText.eq(0).text(name);
-  }
     $('.functions-menu').detach();
 
   });
@@ -235,33 +218,25 @@ function cutPasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
+        var k=identicalName(OldName);
+        var name = OldName;
     if (element.hasClass('folders')==false) { //файл
-      console.log('файл');
-      element.clone(true).appendTo('section');
-      element.detach();
-      var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10);
-      var k=identicalName(name);
-      if (k!='-1' && k!='0') {
-        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
-      }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(name);
-  }
-  else if(element.hasClass('folders')==true) { //папка
-    console.log('папка');
-    var folders=$('.folders');
-    element.prependTo('section');
-    var name=element.children().eq(1).text();
-    name=name.slice(0, name.length-10);
-    var k=identicalName(name);
-    if (k!='-1' && k!='0') {
-      name=name + ' ('+k+')';
+        if (k!='-1' && k!='0') {
+            name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpMoveFile(OldName, OldDir, newName, getCurrentDirectory());
+    } else {
+        if (k!='-1' && k!='0') {
+          name=name + ' ('+k+')';
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpMoveDir(OldName, OldDir, newName, getCurrentDirectory());
     }
-      console.log(name);
-      var listFileText=$('.listFileText');
-      listFileText.eq(0).text(name);
-  }
     $('.functions-menu').detach();
 
   });
@@ -274,11 +249,12 @@ function copyFile(element, menu) {
   .off('click', 'li#copy')
   .on('click', 'li#copy', function(){
     isCopy=true;
+    OldName = element.children().eq(1).text();
+    OldName = OldName.slice(0, OldName.length-10);
+    OldDir = getCurrentDirectory();
     copyPasteFile(element, menu);
   });
   isCopy=isCopy;
-
-
   return isCopy;
 }
 
@@ -289,6 +265,9 @@ function cutFile(element, menu) {
   .off('click', 'li#cut')
   .on('click', 'li#cut', function(){
     isCut=true;
+    OldName = element.children().eq(1).text();
+    OldName = OldName.slice(0, OldName.length-10);
+    OldDir = getCurrentDirectory();
     cutPasteFile(element, menu);
     element.detach();
   });
@@ -317,8 +296,8 @@ function renameFile(element, menu) { //переименование
     $(document).off('click', 'li#rename');
     $(document).on('click', 'li#rename', function(event) {
               var zamena=element.children().eq(1),
-                  text=zamena.text();//старое имя
-              text=text.slice(0, text.length-10); //имя + расширение
+                  text=zamena.text();
+              text=text.slice(0, text.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ФАЙЛА
               var first=text.lastIndexOf(' ('), //последнее вхождение " ("
                   pos=text.lastIndexOf('.'), //последнее вхождение точки
                   len=pos.length,
@@ -359,12 +338,12 @@ function endRename(zamena, text, type, inputNewName, element) {
   zamena.replaceWith('<p class="listFileText" id="last"></p>');
   var last=$('#last');
   last.text(newName); //перезаписываем новое имя
-  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр.
+  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр. <--ДЖОН, ВОТ НОВОЕ ИМЯ ФАЙЛА
   var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
   if (newSrc!=type && element.hasClass('folders')==false) { //если да, подбираем новую иконку
     element.children().eq(0).attr('src', newSrc);
   };
-  last.text(newName); //перезаписываем новое имя
+  last.text(newName);
   last.wrap('<div class="child"></div>');
   last.removeAttr('id');
   httpRenameFile(getCurrentDirectory(), text, newName);
@@ -453,7 +432,31 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
+(function addNewDirectory() { //создание новой папки
+  $('#newDir').on('click', function() {
+    var folders=$('.folders'),
+        count=folders.length; //количество папок
+    folders.eq(count-1).after('<img class="child_img" src="image/folder.png" id="new">');
+    var greenElephant=$('#new');
+    greenElephant.wrap('<div class="parent folders" id="last"></div>');
+    $('#new').after('<input type="text" id="inputNewName">');
+    var inputNewName=$('#inputNewName');
+    inputNewName.wrap('<div class="child"></div>');
+    inputNewName.focus();
+    greenElephant.removeAttr('id');
+    inputNewName.blur(function() {
+        endCreateNewDirectory(inputNewName)
+    });
 
+    inputNewName.keydown(function(event) {
+      if (event.which==13) {
+        endCreateNewDirectory(inputNewName)
+      }
+    });
+
+});
+
+})();
 
 //Функции для взаимодействия с сервером
 function loadDir(dir) {
@@ -492,7 +495,14 @@ function openAndDownloadFile() {
     }
   })
 }
-
+function endCreateNewDirectory(inputNewName) {
+  var name=document.getElementById('inputNewName').value; //имя новой папки
+  inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');
+  var newName=$('#newName');
+  newName.text(name); //переименовали
+  newName.removeAttr('id');
+  newName.removeAttr('id');
+};
 
 //Функции для взаимодействия с сервером
 function httpLoadDir(dir) {
@@ -526,6 +536,7 @@ function httpLoadFile(dir, file) {
     xhttp.send();
 }
 
+
 function httpDeleteFile(dir, file) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
@@ -544,6 +555,42 @@ function httpRenameFile(dir, file, newname) {
     return xhttp.readyState;
 }
 
+function httpMoveDir(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?dirmove="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpMoveFile(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?move="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(getCurrentDirectory());
+    return xhttp.readyState;
+}
+
+function httpCopyDir(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?dircopy="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpCopyFile(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?copy="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(getCurrentDirectory());
+    return xhttp.readyState;
+}
+
 function httpCreateFile(dir, file, newname) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
@@ -556,18 +603,19 @@ function httpCreateFile(dir, file, newname) {
 function openAndDownloadFile() {
     $('.parent').on('click', function() {
         var element=$(this);
-        if(element.hasClass('folders')==true) { //если папка
-            var dirname = element.children().eq(1).text();
-            dirname = dirname.slice(0, dirname.length-10);
-            if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
-                CurrentDirectory += dirname;
-            } else {
-                CurrentDirectory += "/"+dirname;
+        if (element.hasClass('functions-menu') == false){
+            if(element.hasClass('folders')==true) { //если папка
+                var dirname = element.children().eq(1).text();
+                dirname = dirname.slice(0, dirname.length-10);
+                if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
+                    CurrentDirectory += dirname;
+                } else {
+                    CurrentDirectory += "/"+dirname;
+                }
+                httpLoadDir(getCurrentDirectory());
+            } else { //если файл
+                //код для скачивания файла
             }
-            httpLoadDir(getCurrentDirectory());
-        }
-        else { //если файл
-            //код для скачивания файла
         }
     })
 };

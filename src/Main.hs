@@ -10,13 +10,14 @@ import Control.Concurrent.MVar
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
+import Path (copyDir)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isInfixOf)
-import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
+import Data.Lists(replace, strToAL, strFromAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 import Command
@@ -73,9 +74,31 @@ main = do
                         ("./" ++ replace ".." "" (snd (last (url_params url))) ++ "/" ++
                             snd (url_params url !! 1)) 
                             >> return (respond OK :: Response String)
-            n -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
-         _ -> let ext = takeExtension (url_path url) in 
+                (p, a) -> return $ sendHtml BadRequest 
+                    $ toHtml $ "Sorry, invalid url parameters" ++ 
+                        ":ALERT: Invalid params in url " ++ url_path url ++ 
+                        " params nu: " ++ show (length (url_params url)) ++ 
+                        " fst param: " ++ p ++ ", " ++ a
+            4 -> case head (url_params url) of
+                ("copy", file) -> copyFile 
+                    ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                    ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2)) 
+                    >> return (respond OK :: Response String)
+                ("dircopy", file) -> copyDir
+                  ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                  ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
+                    >> return (respond OK :: Response String)
+                ("move", file) -> renameFile 
+                  ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                  ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
+                  >> return (respond OK :: Response String)
+                ("dirmove", file) -> putStrLn "move dir" >> return (respond OK :: Response String)
+                (p, a) -> return $ sendHtml BadRequest 
+                    $ toHtml $ "Sorry, invalid url parameters" ++ 
+                        ":ALERT: Invalid params in url " ++ url_path url ++ 
+                        " params nu: " ++ show (length (url_params url)) ++ 
+                        " fst param: " ++ p ++ ", " ++ a
+            0 -> let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -102,6 +125,7 @@ main = do
                 ".jpeg" -> sendResponse Bin.readFile sendJpg url (url_path url)
                 ".ico" -> sendResponse Bin.readFile sendIco url (url_path url)
                 _ -> sendResponse Bin.readFile sendFile url (url_path url)
+            n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
         POST -> case url_path url of 
             "resource/register" -> 
                  case parse pQuery "" $ rqBody request of 
