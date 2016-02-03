@@ -12,7 +12,7 @@ function getNameCookie(){
 
 function back(){
     var pos=getCurrentDirectory().lastIndexOf('/');
-    CurrentDirectory = getCurrentDirectory().slice(('/'+getNameCookie()+'/').length-1, pos);
+    CurrentDirectory = getCurrentDirectory().slice(('/'+getNameCookie()+'/').length, pos);
     httpLoadDir(getCurrentDirectory());
 }
 
@@ -427,7 +427,7 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
 };
 
 (function addNewDirectory() { //создание новой папки
-  $('#newDir').on('click', function() {
+  $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
     folders.eq(count-1).after('<img class="child_img" src="image/folder.png" id="new">');
@@ -451,44 +451,6 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
 });
 
 })();
-
-//Функции для взаимодействия с сервером
-function loadDir(dir) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?dir="+dir, true);
-    xhttp.onreadystatechange = function() {
-    if (xhttp.readyState == 4 && xhttp.status == 200)
-        folder=sort(xhttp.responseText); //массив, с которого будем рисовать
-        count=countFolders(folder); //количетво папок
-        draw(folder); //отрисовали структуру
-        renameFolders(); //переименовали папки
-        createShare(); //создание кнопки "Поделиться"
-    };
-    xhttp.send();
-}
-
-function loadFile(dir, file) {
-    var xhttp = new XMLHttpRequest();
-    xhttp.open("POST", "/?file="+file+"&dir="+dir, true);
-    xhttp.onreadystatechange = function() {
-        if (xhttp.readyState == 4 && xhttp.status == 200) {
-            downloadFile(xhttp.responseText);
-        }
-    };
-    xhttp.send();
-}
-
-function openAndDownloadFile() {
-  $('.parent').on('click', function() {
-    var element=$(this);
-    if(element.hasClass('folders')==true) { //если папка
-      //код для открытия папки
-    }
-    else { //если файл
-      //код для скачивания файла
-    }
-  })
-}
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
   inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');
@@ -496,6 +458,7 @@ function endCreateNewDirectory(inputNewName) {
   newName.text(name); //переименовали
   newName.removeAttr('id');
   newName.removeAttr('id');
+  httpCreateDir(getCurrentDirectory(), name);
 };
 
 //Функции для взаимодействия с сервером
@@ -511,7 +474,7 @@ function httpLoadDir(dir) {
             openAndDownloadFile();
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
-            document.getElementById('globalDirectory').innerHTML = CurrentDirectory;
+            document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
         }
     };
     xhttp.send();
@@ -519,7 +482,6 @@ function httpLoadDir(dir) {
 
 function httpLoadFile(dir, file) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?file="+file+"&dir="+dir, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
@@ -529,10 +491,8 @@ function httpLoadFile(dir, file) {
     xhttp.send();
 }
 
-
 function httpDeleteFile(dir, file) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?del="+file+"&dir="+dir, true);
     xhttp.send();
     httpLoadDir(dir);
@@ -541,7 +501,6 @@ function httpDeleteFile(dir, file) {
 
 function httpRenameFile(dir, file, newname) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?rename="+file+"&newname="+newname+"&dir="+dir, true);
     xhttp.send();
     httpLoadDir(dir);
@@ -550,7 +509,6 @@ function httpRenameFile(dir, file, newname) {
 
 function httpMoveDir(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?dirmove="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
     httpLoadDir(newdir);
@@ -559,7 +517,6 @@ function httpMoveDir(file, dir, newname, newdir) {
 
 function httpMoveFile(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?move="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
     httpLoadDir(getCurrentDirectory());
@@ -568,7 +525,6 @@ function httpMoveFile(file, dir, newname, newdir) {
 
 function httpCopyDir(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?dircopy="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
     httpLoadDir(newdir);
@@ -577,19 +533,25 @@ function httpCopyDir(file, dir, newname, newdir) {
 
 function httpCopyFile(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?copy="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
     httpLoadDir(getCurrentDirectory());
     return xhttp.readyState;
 }
 
-function httpCreateFile(dir, file, newname) {
+function httpCreateFile(dir, file) {
     var xhttp = new XMLHttpRequest();
-    xhttp.withCredentials = true;
     xhttp.open("GET", "/?create="+file+"&dir="+dir, true);
     xhttp.send();
-    httpLoadDir(dir);
+    httpLoadDir(getCurrentDirectory());
+    return xhttp.readyState;
+}
+
+function httpCreateDir(dir, file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/?dircreate="+file+"&dir="+dir, true);
+    xhttp.send();
+    httpLoadDir(getCurrentDirectory());
     return xhttp.readyState;
 }
 

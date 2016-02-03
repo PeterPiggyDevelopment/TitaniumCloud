@@ -114,7 +114,20 @@
                 display: none;
             }
 
+            #globalDirectory {
+                margin: 1vw;
+                font-size: 3vw;
+
+            }
+
             #back_button {
+                margin: auto;
+                width: 15vw;
+                height: 5vw;
+                font-size: 2vw;
+            }
+
+            #add_dir_button {
                 margin: auto;
                 width: 15vw;
                 height: 5vw;
@@ -124,7 +137,8 @@
     <head>
     <body onload='httpLoadDir(getCurrentDirectory())'>
         <button id= 'back_button' type='button' onclick='back()'>BACK</button>
-        <div id='globalDirectory'>asdfasdf</div>
+        <button id= 'add_dir_button' type='button' onclick='addNewDirectory()'>Add directory</button>
+        <div id='globalDirectory'>Current directory: /</div>
         <section id='listFile'></section>
     </body>
 

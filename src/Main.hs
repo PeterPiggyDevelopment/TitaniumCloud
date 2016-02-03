@@ -62,6 +62,9 @@ main = do
                 ("create", file) ->writeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file) ""
                     >> return (respond OK :: Response String)
+                ("dircreate", file) -> createDirectory ("./" ++ 
+                    replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
+                    >> return (respond OK :: Response String)
                 (p, a) -> return $ sendHtml BadRequest 
                     $ toHtml $ "Sorry, invalid url parameters" ++ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
