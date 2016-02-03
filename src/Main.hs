@@ -42,7 +42,6 @@ main = do
          "resource" -> sendResponse Prelude.readFile
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
          "" -> case length (url_params url) of
-
             1 -> case head (url_params url) of
                 ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                         \files -> case unlines files of
@@ -92,13 +91,19 @@ main = do
                   ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
                   ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
                   >> return (respond OK :: Response String)
-                ("dirmove", file) -> putStrLn "move dir" >> return (respond OK :: Response String)
+                ("dirmove", file) -> renameDirectory
+                    ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                    ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
+                     >> return (respond OK :: Response String)
                 (p, a) -> return $ sendHtml BadRequest 
                     $ toHtml $ "Sorry, invalid url parameters" ++ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
                         " params nu: " ++ show (length (url_params url)) ++ 
                         " fst param: " ++ p ++ ", " ++ a
-            0 -> let ext = takeExtension (url_path url) in 
+            0 -> sendResponse Prelude.readFile
+                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
+            n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
+         _ ->  let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -125,7 +130,7 @@ main = do
                 ".jpeg" -> sendResponse Bin.readFile sendJpg url (url_path url)
                 ".ico" -> sendResponse Bin.readFile sendIco url (url_path url)
                 _ -> sendResponse Bin.readFile sendFile url (url_path url)
-            n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
+
         POST -> case url_path url of 
             "resource/register" -> 
                  case parse pQuery "" $ rqBody request of 

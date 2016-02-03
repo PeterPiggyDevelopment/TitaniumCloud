@@ -196,16 +196,14 @@ function copyPasteFile(element, menu) {
         }
         var listFileText=$('.listFileText'),
             newName=name;
-        listFileText.eq(listFileText.length-1).text(newName);
-        httpCopyFile(OldName, OldDir, newName, getCurrentDirectory());
+        httpCopyFile(name, OldDir, newName, getCurrentDirectory());
     } else {
         if (k!='-1' && k!='0') {
           name=name + ' ('+k+')';
         }
         var listFileText=$('.listFileText'),
             newName=name;
-        listFileText.eq(listFileText.length-1).text(newName);
-        httpCopyDir(OldName, OldDir, newName, getCurrentDirectory());
+        httpCopyDir(name, OldDir, newName, getCurrentDirectory());
     }
     $('.functions-menu').detach();
 
@@ -221,21 +219,19 @@ function cutPasteFile(element, menu) {
         var k=identicalName(OldName);
         var name = OldName;
     if (element.hasClass('folders')==false) { //файл
-        if (k!='-1' && k!='0') {
-            name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
-        }
+            if (k!='-1' && k!='0') {
+                name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
+            }
         var listFileText=$('.listFileText'),
             newName=name;
-        listFileText.eq(listFileText.length-1).text(newName);
-        httpMoveFile(OldName, OldDir, newName, getCurrentDirectory());
+        httpMoveFile(name, OldDir, newName, getCurrentDirectory());
     } else {
         if (k!='-1' && k!='0') {
           name=name + ' ('+k+')';
         }
         var listFileText=$('.listFileText'),
             newName=name;
-        listFileText.eq(listFileText.length-1).text(newName);
-        httpMoveDir(OldName, OldDir, newName, getCurrentDirectory());
+        httpMoveDir(name, OldDir, newName, getCurrentDirectory());
     }
     $('.functions-menu').detach();
 
@@ -250,7 +246,6 @@ function copyFile(element, menu) {
   .on('click', 'li#copy', function(){
     isCopy=true;
     OldName = element.children().eq(1).text();
-    OldName = OldName.slice(0, OldName.length-10);
     OldDir = getCurrentDirectory();
     copyPasteFile(element, menu);
   });
@@ -266,7 +261,6 @@ function cutFile(element, menu) {
   .on('click', 'li#cut', function(){
     isCut=true;
     OldName = element.children().eq(1).text();
-    OldName = OldName.slice(0, OldName.length-10);
     OldDir = getCurrentDirectory();
     cutPasteFile(element, menu);
     element.detach();
@@ -508,7 +502,6 @@ function endCreateNewDirectory(inputNewName) {
 function httpLoadDir(dir) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/?dir="+dir, true);
-    xhttp.withCredentials = true;
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             folder=sort(xhttp.responseText), //массив, с которого будем рисовать
@@ -558,9 +551,9 @@ function httpRenameFile(dir, file, newname) {
 function httpMoveDir(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
-    xhttp.open("GET", "/?dirmove="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.open("GET", "/?dirmove="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
-    httpLoadDir(dir);
+    httpLoadDir(newdir);
     return xhttp.readyState;
 }
 
@@ -576,9 +569,9 @@ function httpMoveFile(file, dir, newname, newdir) {
 function httpCopyDir(file, dir, newname, newdir) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
-    xhttp.open("GET", "/?dircopy="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.open("GET", "/?dircopy="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
     xhttp.send();
-    httpLoadDir(dir);
+    httpLoadDir(newdir);
     return xhttp.readyState;
 }
 
