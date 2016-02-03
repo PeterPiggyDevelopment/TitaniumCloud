@@ -158,6 +158,8 @@ function renameFolders() { //удаление '//' из названия
 };
 
 var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
+var OldName="";
+var OldDir="";
 
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
@@ -199,33 +201,25 @@ function copyPasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
+        var k=identicalName(OldName);
+        var name = OldName;
     if (element.hasClass('folders')==false) { //файл
-      element.clone(true, true).appendTo('section');
-      var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ФАЙЛА
-      var newName=name;
-      var k=identicalName(newName);
-      if (k!='-1' && k!='0') {
-        newName=newName.slice(0,newName.lastIndexOf('.')) + ' (' + k+ ')'+newName.slice(newName.lastIndexOf('.'), newName.length);
-      }
-    var listFileText=$('.listFileText');
-    listFileText.eq(listFileText.length-1).text(newName);
-    serverCopyFile(name, newName, getCurrentDirectory); //серверное копирование
-  }
-  else if(element.hasClass('folders')==true) { //папка
-    var folders=$('.folders');
-    element.clone(true, true).prependTo('section');
-    var name=element.children().eq(1).text();
-    name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
-    var newName=name;
-    var k=identicalName(newName);
-    if (k!='-1' && k!='0') {
-      newName=newName + ' ('+k+')';
+        if (k!='-1' && k!='0') {
+            name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpCopyFile(OldName, OldDir, newName, getCurrentDirectory());
+    } else {
+        if (k!='-1' && k!='0') {
+          name=name + ' ('+k+')';
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpCopyDir(OldName, OldDir, newName, getCurrentDirectory());
     }
-      var listFileText=$('.listFileText');
-      listFileText.eq(0).text(newName);
-      serverCopyFolder(name, newName, getCurrentDirectory)
-  }
     $('.functions-menu').detach();
 
   });
@@ -237,35 +231,25 @@ function cutPasteFile(element, menu) {
   })
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
+        var k=identicalName(OldName);
+        var name = OldName;
     if (element.hasClass('folders')==false) { //файл
-      console.log('файл');
-      element.clone(true).appendTo('section');
-      element.detach();
-      var name=element.children().eq(1).text();
-      name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ФАЙЛА
-      var k=identicalName(name);
-      if (k!='-1' && k!='0') {
-        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
-      }
-    var listFileText=$('.listFileText'),
-        newName=name; //<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ФАЙЛА
-    listFileText.eq(listFileText.length-1).text(newName);
-  }
-  else if(element.hasClass('folders')==true) { //папка
-    console.log('папка');
-    var folders=$('.folders');
-    element.prependTo('section');
-    var name=element.children().eq(1).text(); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ПАПКИ
-    name=name.slice(0, name.length-10);
-    var k=identicalName(name);
-    if (k!='-1' && k!='0') {
-      name=name + ' ('+k+')';
+        if (k!='-1' && k!='0') {
+            name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpMoveFile(OldName, OldDir, newName, getCurrentDirectory());
+    } else {
+        if (k!='-1' && k!='0') {
+          name=name + ' ('+k+')';
+        }
+        var listFileText=$('.listFileText'),
+            newName=name;
+        listFileText.eq(listFileText.length-1).text(newName);
+        httpMoveDir(OldName, OldDir, newName, getCurrentDirectory());
     }
-      console.log(name);
-      var listFileText=$('.listFileText'),
-          newName=name; //<--ДЖОН, ВОТ НООВЕ ИМЯ ПРИ ПЕРЕМЕЩЕНИИ ПАПКИ
-      listFileText.eq(0).text(newName);
-  }
     $('.functions-menu').detach();
 
   });
@@ -278,11 +262,12 @@ function copyFile(element, menu) {
   .off('click', 'li#copy')
   .on('click', 'li#copy', function(){
     isCopy=true;
+    OldName = element.children().eq(1).text();
+    OldName = OldName.slice(0, OldName.length-10);
+    OldDir = getCurrentDirectory();
     copyPasteFile(element, menu);
   });
   isCopy=isCopy;
-
-
   return isCopy;
 }
 
@@ -293,6 +278,9 @@ function cutFile(element, menu) {
   .off('click', 'li#cut')
   .on('click', 'li#cut', function(){
     isCut=true;
+    OldName = element.children().eq(1).text();
+    OldName = OldName.slice(0, OldName.length-10);
+    OldDir = getCurrentDirectory();
     cutPasteFile(element, menu);
     element.detach();
   });
@@ -581,6 +569,42 @@ function httpRenameFile(dir, file, newname) {
     return xhttp.readyState;
 }
 
+function httpMoveDir(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?dirmove="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpMoveFile(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?move="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(getCurrentDirectory());
+    return xhttp.readyState;
+}
+
+function httpCopyDir(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?dircopy="+file+"&olddir="+dir+"&newname="+dir+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(dir);
+    return xhttp.readyState;
+}
+
+function httpCopyFile(file, dir, newname, newdir) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.withCredentials = true;
+    xhttp.open("GET", "/?copy="+file+"&olddir="+dir+"&newname="+newname+"&newdir="+newdir, true);
+    xhttp.send();
+    httpLoadDir(getCurrentDirectory());
+    return xhttp.readyState;
+}
+
 function httpCreateFile(dir, file, newname) {
     var xhttp = new XMLHttpRequest();
     xhttp.withCredentials = true;
@@ -593,26 +617,19 @@ function httpCreateFile(dir, file, newname) {
 function openAndDownloadFile() {
     $('.parent').on('click', function() {
         var element=$(this);
-        if(element.hasClass('folders')==true) { //если папка
-            var dirname = element.children().eq(1).text();
-            dirname = dirname.slice(0, dirname.length-10);
-            if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
-                CurrentDirectory += dirname;
-            } else {
-                CurrentDirectory += "/"+dirname;
+        if (element.hasClass('functions-menu') == false){
+            if(element.hasClass('folders')==true) { //если папка
+                var dirname = element.children().eq(1).text();
+                dirname = dirname.slice(0, dirname.length-10);
+                if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
+                    CurrentDirectory += dirname;
+                } else {
+                    CurrentDirectory += "/"+dirname;
+                }
+                httpLoadDir(getCurrentDirectory());
+            } else { //если файл
+                //код для скачивания файла
             }
-            httpLoadDir(getCurrentDirectory());
-        }
-        else { //если файл
-            //код для скачивания файла
         }
     })
 };
-
-function serverCopyFile(name, newName, getCurrentDirectory) {
-
-}
-
-function serverCopyDirectory(name, newName, getCurrentDirectory) {
-
-}

@@ -10,6 +10,7 @@ import Control.Concurrent.MVar
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
+import System.Path (copyDir)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.Parsec hiding (try)
@@ -65,6 +66,30 @@ main = do
                                 ("./" ++ replace ".." "" (snd (last (url_params url))) ++ "/" ++
                                     snd (url_params url !! 1)) 
                                     >> return (respond OK :: Response String)
+                        (p, a) -> return $ sendHtml BadRequest 
+                            $ toHtml $ "Sorry, invalid url parameters" ++ 
+                                ":ALERT: Invalid params in url " ++ url_path url ++ 
+                                " params nu: " ++ show (length (url_params url)) ++ 
+                                " fst param: " ++ p ++ ", " ++ a
+                    4 -> case head (url_params url) of
+                        ("copy", file) -> copyFile 
+                            ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                            ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2)) 
+                            >> return (respond OK :: Response String)
+                        ("dircopy", file) -> copyDir
+                          ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                          ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
+                            >> return (respond OK :: Response String)
+                        ("move", file) -> renameFile 
+                          ("./" ++ snd (url_params url !! 1)  ++ "/" ++ file)
+                          ("./" ++  snd (last (url_params url))  ++ "/" ++ snd (url_params url !! 2))
+                          >> return (respond OK :: Response String)
+                        ("dirmove", file) -> putStrLn "move dir" >> return (respond OK :: Response String)
+                        (p, a) -> return $ sendHtml BadRequest 
+                            $ toHtml $ "Sorry, invalid url parameters" ++ 
+                                ":ALERT: Invalid params in url " ++ url_path url ++ 
+                                " params nu: " ++ show (length (url_params url)) ++ 
+                                " fst param: " ++ p ++ ", " ++ a
                     0 -> let ext = takeExtension (url_path url) in 
                       case ext of
                         ".html" -> ifM (isAuthenticated request) 
