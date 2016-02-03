@@ -17,15 +17,13 @@ executable TitaniumCloud
   main-is:             Main.hs
   hs-source-dirs:      src
   build-depends:       
-      distributed-process
-      , process
-      , unix
+      unix
+      , lists
       , suspend
       , timers
       , cond
       , parsec
       , split
-      , MissingH
       , base
       , json
       , directory

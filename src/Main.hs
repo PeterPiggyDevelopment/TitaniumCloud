@@ -10,14 +10,14 @@ import Control.Concurrent.MVar
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
-import System.Path (copyDir)
+import Path (copyDir)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isInfixOf)
-import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
+import Data.Lists(replace, strToAL, strFromAL)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 import Command

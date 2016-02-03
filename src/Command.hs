@@ -3,7 +3,7 @@ module Command(initialHelp, commandLoop) where
 import Control.Concurrent.MVar
 import System.Exit(ExitCode(ExitSuccess))
 import System.Posix.Process(exitImmediately)
-import Data.List.Utils(strFromAL)
+import Data.Lists(strFromAL)
 import Data.List(isPrefixOf)
 import DataBase
 

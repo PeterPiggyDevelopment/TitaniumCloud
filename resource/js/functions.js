@@ -1,5 +1,3 @@
-'use strict';
-
 var CurrentDirectory = '';
 
 function getCurrentDirectory(){
@@ -82,22 +80,11 @@ function draw(li) { //отрисовка полосочек
      $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
 };
 
-function createShare() { //костыли
+function createShare() {
 
-    $('.child').on('mouseover', function() {
-      $('.download').detach();
-    var child=$(this).children().eq(1),
-        text=child.children().eq(0);
-    $(this).after('<p class="download"><span class="share_text">Поделиться</span></p>');
-
-    });
-
-    $('.child').on('mouseout', function() {
-        $('.download').detach();
-    });
-
-
-    $('.parent').on('mouseover', function() {
+    $('.parent').on('mouseover', function(event) {
+      event.stopPropagation();
+      event.preventDefault();
     $('.download').detach();
     var child=$(this).children().eq(1),
         text=child.children().eq(0);
@@ -110,6 +97,40 @@ function createShare() { //костыли
 
 };
 
+function drawFunctions() { //создание всплывающего меню
+  $('.parent').off('contextmenu');
+    $('.parent').on('contextmenu', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        $('.functions-menu').detach();
+        // var top=e.pageY-$('#listFile').offset().top,
+        //     left=e.pageX-$(this).offset().left + 10,
+        var top=e.pageY-5,
+            left=e.pageX+5,
+            element=$(this),
+            menu;
+
+        e.preventDefault();
+        $('body').append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
+        if (isCopy==true || isCut==true) {
+          $('#paste').css('display', 'block');
+        }
+        menu=$('.functions-menu');
+        menu.css({
+            'position': 'absolute',
+            'top': top,
+            'left': left
+        });
+
+        //функции всплывающего меню
+        deleteFile(element, menu);
+        renameFile(element, menu);
+        isCopy=copyFile(element, menu);
+        isCut=cutFile(element, menu);
+
+    return false; //чтобы не всплывало стандартное меню
+    });
+};
 
 function sort(string) { //сначала идут папки!
     var arr=string.split('\n'),
@@ -160,40 +181,6 @@ function renameFolders() { //удаление '//' из названия
 var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
 var OldName="";
 var OldDir="";
-
-function drawFunctions() { //создание всплывающего меню
-  $('.parent').off('contextmenu');
-    $('.parent').on('contextmenu', function(e) {
-
-        $('.functions-menu').detach();
-        var top=e.pageY-$('#listFile').offset().top,
-            left=e.pageX-$(this).offset().left + 10,
-            element=$(this),
-            menu;
-
-
-
-        e.preventDefault();
-        $(this).append('<ul class="functions-menu"><li class="functions-menu-buttons" id="paste">Вставить</li><li class="functions-menu-buttons" id="copy">Копировать</li><li class="functions-menu-buttons" id="cut">Вырезать</li><li class="functions-menu-buttons" id="delete">Удалить</li><li class="functions-menu-buttons" id="rename">Переименовать</li></ul>');
-        if (isCopy==true || isCut==true) {
-          $('#paste').css('display', 'block');
-        }
-        menu=$('.functions-menu');
-        menu.css({
-            'position': 'absolute',
-            'top': top,
-            'left': left
-        });
-
-        //функции всплывающего меню
-        deleteFile(element, menu);
-        renameFile(element, menu);
-        isCopy=copyFile(element, menu);
-        isCut=cutFile(element, menu);
-
-    return false; //чтобы не всплывало стандартное меню
-    });
-};
 
 function copyPasteFile(element, menu) {
   $(document).one('click', function(){
@@ -508,7 +495,6 @@ function openAndDownloadFile() {
     }
   })
 }
-
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
   inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');

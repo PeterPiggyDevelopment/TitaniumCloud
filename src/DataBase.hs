@@ -10,7 +10,7 @@ import System.Directory
 import Codec.Binary.UTF8.String
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
-import Data.List.Utils(strFromAL, strToAL, replace, split, hasKeyAL, addToAL)
+import Data.Lists(strFromAL, strToAL, replace, splitOn, hasKeyAL, addToAL)
 import HttpSend
 
 
@@ -80,8 +80,8 @@ getAuthCookies rq = (first, second)
                       (retrieveHeaders HdrCookie rq)
 
 getCookieValue :: String -> String -> String
-getCookieValue val cook = Prelude.head (Data.List.Utils.split ";" 
-                        (Data.List.Utils.split val cook !! 1))
+getCookieValue val cook = Prelude.head (Data.Lists.splitOn ";" 
+                        (Data.Lists.splitOn val cook !! 1))
 
 
 isAuthenticated :: Request String -> IO Bool
