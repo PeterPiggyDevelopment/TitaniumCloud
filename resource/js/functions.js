@@ -200,31 +200,31 @@ function copyPasteFile(element, menu) {
   .off('click', 'li#paste')
   .on('click', 'li#paste', function(){
     if (element.hasClass('folders')==false) { //файл
-      console.log('файл');
       element.clone(true, true).appendTo('section');
       var name=element.children().eq(1).text();
       name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ФАЙЛА
-      var k=identicalName(name);
+      var newName=name;
+      var k=identicalName(newName);
       if (k!='-1' && k!='0') {
-        name=name.slice(0, name.lastIndexOf('.')) + ' (' + k+ ')'+name.slice(name.lastIndexOf('.'), name.length);
+        newName=newName.slice(0,newName.lastIndexOf('.')) + ' (' + k+ ')'+newName.slice(newName.lastIndexOf('.'), newName.length);
       }
-    var listFileText=$('.listFileText'),
-        newName=name;//<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ КОПИРОВАНИИ ФАЙЛА
+    var listFileText=$('.listFileText');
     listFileText.eq(listFileText.length-1).text(newName);
+    serverCopyFile(name, newName, getCurrentDirectory); //серверное копирование
   }
   else if(element.hasClass('folders')==true) { //папка
-    console.log('папка');
     var folders=$('.folders');
     element.clone(true, true).prependTo('section');
-    var name=element.children().eq(1).text(); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
-    name=name.slice(0, name.length-10);
-    var k=identicalName(name);
+    var name=element.children().eq(1).text();
+    name=name.slice(0, name.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
+    var newName=name;
+    var k=identicalName(newName);
     if (k!='-1' && k!='0') {
-      name=name + ' ('+k+')';
+      newName=newName + ' ('+k+')';
     }
-      var listFileText=$('.listFileText'),
-          newName=name;//<--ДЖОН, ВОТ НОВОЕ ИМЯ ПРИ КОПИРОВАНИИ ПАПКИ
+      var listFileText=$('.listFileText');
       listFileText.eq(0).text(newName);
+      serverCopyFolder(name, newName, getCurrentDirectory)
   }
     $('.functions-menu').detach();
 
@@ -608,3 +608,11 @@ function openAndDownloadFile() {
         }
     })
 };
+
+function serverCopyFile(name, newName, getCurrentDirectory) {
+
+}
+
+function serverCopyDirectory(name, newName, getCurrentDirectory) {
+
+}
