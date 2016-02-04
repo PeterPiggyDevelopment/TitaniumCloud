@@ -107,7 +107,7 @@ main = do
             0 -> sendResponse Prelude.readFile
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
-         _ -> print (url_path url) >> let ext = takeExtension (url_path url) in 
+         _ -> let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -149,7 +149,7 @@ main = do
                    where 
                     getFileName body = head (splitOn "\"" (last (splitOn "filename=\"" body)))
                     getNameAttr body = splitOn "\""  body !! 1
-                    getFile body = head (splitOn "\r\n------" (splitOn "\r\n\r\n"  body !! 1))
+                    getFile body = head (splitOn "\r\n------WebKitFormBoundary" (splitOn "\r\n\r\n"  body !! 1))
             n -> return $ sendHtml BadRequest $ toHtml 
                 $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
