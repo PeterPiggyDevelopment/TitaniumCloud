@@ -107,7 +107,7 @@ main = do
             0 -> sendResponse Prelude.readFile
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
-         _ ->  let ext = takeExtension (url_path url) in 
+         _ -> print (url_path url) >> let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -142,13 +142,14 @@ main = do
                          "in request body!!! " ++ show a
             "resource/files.html" -> (\filename path ->
                          Bin.writeFile ("./" ++ path ++ "/" ++ filename) 
-                         (pack (rqBody request)))
+                         (pack (getFile (rqBody request))))
                          (getFileName (rqBody request)) 
                          (getNameAttr (rqBody request))
                   >> return (respond OK :: Response String)
                    where 
                     getFileName body = head (splitOn "\"" (last (splitOn "filename=\"" body)))
                     getNameAttr body = splitOn "\""  body !! 1
+                    getFile body = head (splitOn "\r\n------" (splitOn "\r\n\r\n"  body !! 1))
             n -> return $ sendHtml BadRequest $ toHtml 
                 $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
