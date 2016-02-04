@@ -79,6 +79,7 @@ function draw(li) { //отрисовка полосочек
          }
 
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+         console.log(length);
      }
      else {
        $('body').prepend('<p class="clear">Нет файлов, дружище</p>');
