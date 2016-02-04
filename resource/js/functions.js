@@ -64,20 +64,25 @@ function draw(li) { //отрисовка полосочек
    var length=li.length,
        listFile=$('#listFile');
 
-     for (var i=0; i<length; i++) {
-         listFile.prepend('<p class="listFileText"></p>');
-     }
+     if (length!=0) {
+         for (var i=0; i<length; i++) {
+             listFile.prepend('<p class="listFileText"></p>');
+         }
 
-     for (var i=0; i<length; i++) {
-         $('.listFileText').eq(i).text(li[i]);
-         $('.listFileText').eq(i).wrap('<div class="child"></div');
-         $('.child').eq(i).wrap('<div class="parent"></div>');
-         $('.child').eq(i).before('<img class="child_img">');
-         var src=typeDocument(li[i]);
-         $('.child_img').eq(i).attr('src', src);
-     }
+         for (var i=0; i<length; i++) {
+             $('.listFileText').eq(i).text(li[i]);
+             $('.listFileText').eq(i).wrap('<div class="child"></div');
+             $('.child').eq(i).wrap('<div class="parent"></div>');
+             $('.child').eq(i).before('<img class="child_img">');
+             var src=typeDocument(li[i]);
+             $('.child_img').eq(i).attr('src', src);
+         }
 
-     $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+         $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+     }
+     else {
+       $('body').prepend('<p class="clear">Нет файлов, дружище</p>');
+     }
 };
 
 function createShare() {
