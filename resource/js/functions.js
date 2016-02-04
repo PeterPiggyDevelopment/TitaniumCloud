@@ -64,7 +64,7 @@ function draw(li) { //отрисовка полосочек
    var length=li.length,
        listFile=$('#listFile');
 
-     if (length!=0) {
+     if (li[0].length!=' ') {
          for (var i=0; i<length; i++) {
              listFile.prepend('<p class="listFileText"></p>');
          }
@@ -79,10 +79,10 @@ function draw(li) { //отрисовка полосочек
          }
 
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-         console.log(length);
+
      }
      else {
-       $('body').prepend('<p class="clear">Нет файлов, дружище</p>');
+       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
      }
 };
 
