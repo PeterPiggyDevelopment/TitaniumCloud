@@ -3,13 +3,36 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <style>
+        html, body {
+            height: 100%;
+            width:100%;
+        }
+            
+        body {
+            margin: 0;
+            padding: 0;
+            display: table;
+            text-align:center;
+        }
+        
+        #container {
+            width: 100%;
+            height: 100%;
+            display: table-cell;
+            vertical-align: middle;
+            margin: 0 auto;
+        }
+    </style>
   </head>
   <body>
-    <!-- Вход -->
-    <form id='input_form' action='register' name='input_name_form' method='post'>
-        <input name='name_input' type='text' placeholder='login'>
-        <input name='pass_input' type='password' placeholder='password'>
-        <input type='submit' value='Войти'>
-    </form>
+    <div id='container'>
+        <form id='input_form' action='register' name='input_name_form' method='post'>
+            <input name='name_input' type='text' placeholder='login'>
+            <input name='pass_input' type='password' placeholder='password'>
+            <input type='submit' value='Войти'>
+        </form>
+        <a href="/resource/register.html">Register</a>
+    </div>
   </body>
 </html>

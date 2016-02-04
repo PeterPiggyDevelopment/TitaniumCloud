@@ -114,15 +114,9 @@ main = do
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
                         putMVar statmvar "+disauthed"
-                        return $ sendHtml NotFound $
-                            thehtml $ concatHtml
-                            [ thead noHtml, body $ concatHtml
-                               [ toHtml "You don't authorized! If you want to load this page "
-                               , toHtml $ exportURL url { url_type = HostRelative }
-                               , toHtml ", you must be authorized." 
-                               , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-                               ]
-                            ]
+                        sendResponse Prelude.readFile
+                            (\stat str -> sendHtml stat (primHtml str)) url 
+                                "resource/authredirect.html"
                     else putMVar statmvar "+disauthed" >> 
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
