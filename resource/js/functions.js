@@ -475,6 +475,7 @@ function httpLoadDir(dir) {
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
             document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
+            document.getElementById('uploadfileinp').name = getCurrentDirectory();
         }
     };
     xhttp.send();

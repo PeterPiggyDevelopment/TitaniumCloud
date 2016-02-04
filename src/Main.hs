@@ -1,5 +1,6 @@
 import Network.HTTP.Server.HtmlForm()
-import Data.ByteString as Bin (readFile)
+import Data.ByteString as Bin (readFile, writeFile)
+import Data.ByteString.Char8 (pack)
 import Network.HTTP.Server
 import Network.URL as URL
 import Text.XHtml
@@ -17,7 +18,7 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isInfixOf)
-import Data.Lists(replace, strToAL, strFromAL)
+import Data.Lists(replace, strToAL, strFromAL, splitOn)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 import Command
@@ -59,7 +60,7 @@ main = do
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
-                ("create", file) ->writeFile ("./" ++ 
+                ("create", file) -> Prelude.writeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file) ""
                     >> return (respond OK :: Response String)
                 ("dircreate", file) -> createDirectory ("./" ++ 
@@ -133,14 +134,23 @@ main = do
                  case parse pQuery "" $ rqBody request of 
                      Left e -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show e
+                         "in request body!!! " ++ show e
                      Right a -> case length a of 
                         2 -> registerUser a
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show a
+                         "in request body!!! " ++ show a
+            "resource/files.html" -> (\filename path ->
+                         Bin.writeFile ("./" ++ path ++ "/" ++ filename) 
+                         (pack (rqBody request)))
+                         (getFileName (rqBody request)) 
+                         (getNameAttr (rqBody request))
+                  >> return (respond OK :: Response String)
+                   where 
+                    getFileName body = head (splitOn "\"" (last (splitOn "filename=\"" body)))
+                    getNameAttr body = splitOn "\""  body !! 1
             n -> return $ sendHtml BadRequest $ toHtml 
-                $ "Error on HTTP addres while registering in request body!!! " ++ show n
+                $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
     ) statmv)
 

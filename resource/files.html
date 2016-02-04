@@ -134,10 +134,14 @@
                 font-size: 2vw;
             }
         </style>
-    <head>
+        <head>
     <body onload='httpLoadDir(getCurrentDirectory())'>
         <button id= 'back_button' type='button' onclick='back()'>BACK</button>
         <button id= 'add_dir_button' type='button' onclick='addNewDirectory()'>Add directory</button>
+        <form method='post', enctype='multipart/form-data'>
+            <input id='uploadfileinp' type='file' name='uname'>
+            <input type='submit' name='uploadfile' value='Upload'>
+        </form>
         <div id='globalDirectory'>Current directory: /</div>
         <section id='listFile'></section>
     </body>
