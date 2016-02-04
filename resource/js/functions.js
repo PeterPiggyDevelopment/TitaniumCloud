@@ -64,24 +64,29 @@ function draw(li) { //отрисовка полосочек
    var length=li.length,
        listFile=$('#listFile');
 
-     for (var i=0; i<length; i++) {
-         listFile.prepend('<p class="listFileText"></p>');
-     }
+     if (li[0].length!=' ') {
+         for (var i=0; i<length; i++) {
+             listFile.prepend('<p class="listFileText"></p>');
+         }
 
-     for (var i=0; i<length; i++) {
-         $('.listFileText').eq(i).text(li[i]);
-         $('.listFileText').eq(i).wrap('<div class="child"></div');
-         $('.child').eq(i).wrap('<div class="parent"></div>');
-         $('.child').eq(i).before('<img class="child_img">');
-         var src=typeDocument(li[i]);
-         $('.child_img').eq(i).attr('src', src);
-     }
+         for (var i=0; i<length; i++) {
+             $('.listFileText').eq(i).text(li[i]);
+             $('.listFileText').eq(i).wrap('<div class="child"></div');
+             $('.child').eq(i).wrap('<div class="parent"></div>');
+             $('.child').eq(i).before('<img class="child_img">');
+             var src=typeDocument(li[i]);
+             $('.child_img').eq(i).attr('src', src);
+         }
 
-     $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+         $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+
+     }
+     else {
+       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
+     }
 };
 
 function createShare() {
-
     $('.parent').on('mouseover', function(event) {
       event.stopPropagation();
       event.preventDefault();
@@ -103,8 +108,7 @@ function drawFunctions() { //создание всплывающего меню
         e.preventDefault();
         e.stopPropagation();
         $('.functions-menu').detach();
-        // var top=e.pageY-$('#listFile').offset().top,
-        //     left=e.pageX-$(this).offset().left + 10,
+
         var top=e.pageY-5,
             left=e.pageX+5,
             element=$(this),
@@ -430,27 +434,33 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
-    folders.eq(count-1).after('<img class="child_img" src="image/folder.png" id="new">');
-    var greenElephant=$('#new');
-    greenElephant.wrap('<div class="parent folders" id="last"></div>');
-    $('#new').after('<input type="text" id="inputNewName">');
-    var inputNewName=$('#inputNewName');
-    inputNewName.wrap('<div class="child"></div>');
-    inputNewName.focus();
-    greenElephant.removeAttr('id');
-    inputNewName.blur(function() {
-        endCreateNewDirectory(inputNewName)
-    });
+    // if (count>0) { //если в папке есть другие папки
+    //
+    // }
+    // else { //если в папке нет других папок
+        $('section').prepend('<img class="child_img" src="image/folder.png" id="new">');
+        var greenElephant=$('#new');
+        greenElephant.wrap('<div class="parent folders" id="last"></div>');
+        $('#new').after('<input type="text" id="inputNewName">');
+        var inputNewName=$('#inputNewName');
+        inputNewName.wrap('<div class="child"></div>');
+        inputNewName.focus();
+        greenElephant.removeAttr('id');
+        inputNewName.blur(function() {
+            endCreateNewDirectory(inputNewName)
+        });
 
-    inputNewName.keydown(function(event) {
-      if (event.which==13) {
-        endCreateNewDirectory(inputNewName)
-      }
-    });
+        inputNewName.keydown(function(event) {
+          if (event.which==13) {
+            endCreateNewDirectory(inputNewName)
+          }
+        });
+
 
 });
 
 })();
+
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
   inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');
