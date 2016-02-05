@@ -1,7 +1,6 @@
 function handleEvent(e){
     var evt = e ? e:window.event;
     var clickX=0, clickY=0;
-    var arr=[];
 
     if ((evt.clientX || evt.clientY) &&
         document.body &&
@@ -21,15 +20,26 @@ function handleEvent(e){
         clickY = evt.pageY;
     }
 
-    arr[0]=clickX;
-    arr[1]=clickY;
-    httpSendClick(window.location.pathname, arr);
+    arr[Clicks-1]=[];
+    arr[Clicks-1][0]=clickX;
+    arr[Clicks-1][1]=clickY;
+    var arrStr="@";
+    for (var i=0; i<Clicks; i++){
+        arrStr+=arr[i][0]+","+arr[i][1];
+        if(i<Clicks-1) arrStr+="@";
+    }
+    //TODO: add onunload event and send data with it
+    //httpSendClick(window.location.pathname, arrStr);
+    Clicks++;
     return false;
 }
 
-function httpSendClick(page, arr){
+var Clicks=1;
+var arr=[];
+
+function httpSendClick(page, arrStr){
     var xhttp = new XMLHttpRequest();
-    xhttp.open("GET", "/?pageclicked="+page+"&"+arr[0]+"="+arr[1], true);
+    xhttp.open("GET", "/?pageclicked="+page+"&clicks="+arrStr, true);
     xhttp.send();
     return xhttp.readyState;
 }

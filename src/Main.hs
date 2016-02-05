@@ -44,10 +44,10 @@ main = do
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
          "" -> case length (url_params url) of
             1 -> case head (url_params url) of
-                ("dir", dir) -> print "dir" >> getFiles (replace ".." "" ("./" ++ dir)) True >>=
+                ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                         \files -> case unlines files of
-                         [] -> print "empty" >> return (httpSendText OK "")
-                         str -> print "full" >> return (httpSendText OK (init str))
+                         [] -> return (httpSendText OK "")
+                         str ->return (httpSendText OK (init str))
                 (p, a) -> do 
                     putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
