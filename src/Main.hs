@@ -57,6 +57,8 @@ main = do
             2 -> case head (url_params url) of
                 ("file", f) -> sendUsrFile ("./" ++
                     replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
+                ("pageclicked", f) -> print (url_params url)
+                            >> return (respond OK :: Response String)
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
