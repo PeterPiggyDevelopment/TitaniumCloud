@@ -138,9 +138,19 @@ main = do
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show e
                      Right a -> case length a of 
-                        2 -> registerUser a
+                        3 -> registerUser a
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
+                         "in request body!!! " ++ show a
+            "resource/signin" -> 
+                 case parse pQuery "" $ rqBody request of 
+                     Left e -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while signin " ++ 
+                         "in request body!!! " ++ show e
+                     Right a -> case length a of 
+                        2 -> signinUser a
+                        _ -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while signin " ++ 
                          "in request body!!! " ++ show a
             "resource/files.html" -> (\filename path ->
                          Bin.writeFile ("./" ++ path ++ "/" ++ filename) 

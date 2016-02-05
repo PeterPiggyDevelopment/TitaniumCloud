@@ -51,8 +51,8 @@ procesCommands store = Prelude.getLine >>=
              _ | "find" `isPrefixOf` com -> 
                 findUserInDB (drop 5 com, "") False >>=
                      \usr -> case usr of
-                         Just (n, p) -> if drop 5 com == n 
-                             then putStrLn $ n ++ " " ++ p
+                         Just (n, p, e) -> if drop 5 com == n 
+                             then putStrLn $ n ++ " " ++ p ++ " " ++ e
                              else  putStrLn "False"
                          Nothing -> putStrLn "False"
                | otherwise -> Prelude.putStrLn "Invalid Invalidovich"

@@ -1,4 +1,4 @@
-module DataBase(findUserInDB, pDB, registerUser, isAuthenticated, getAuthCookies) where 
+module DataBase(findUserInDB, pDB, signinUser, registerUser, isAuthenticated, getAuthCookies) where 
 
 import Network.HTTP.Server.HtmlForm()
 import Data.ByteString as Bin
@@ -11,27 +11,32 @@ import Codec.Binary.UTF8.String
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Data.Lists(strFromAL, strToAL, replace, splitOn, hasKeyAL, addToAL)
+import Control.Exception(try,SomeException)
 import HttpSend
 
+pDB :: CharParser () [(String, String, String)]
+pDB = pDBThree `sepBy` char '\n'
 
-baseAllowedChars = ['a'..'z']++['A'..'Z']++['0'..'9']++"$-_.!*'(),"
-
-pDB :: CharParser () [(String, String)]
-pDB = pDBPair `sepBy` char '\n'
-
-pDBPair :: CharParser () (String, String)
-pDBPair = many1 pDBChar >>= 
+pDBThree :: CharParser () (String, String, String)
+pDBThree = many1 pDBChar >>= 
         \name -> optionMaybe (char ':' >> many pDBChar) >>=
-        \value -> case value of 
-            Just a -> return (name, a)
-            Nothing -> return (name, "")
+        \pass -> optionMaybe (char ':' >> many pDBChar) >>=
+        \value -> case pass of 
+            Just p -> case value of 
+                Just a -> return (name, p, a)
+                Nothing -> return (name, p, "")
+            Nothing -> case value of 
+                Just a -> return (name, "", a)
+                Nothing -> return (name, "" , "")
 
 pDBChar :: CharParser () Char
 pDBChar = oneOf baseAllowedChars
 
+baseAllowedChars = ['a'..'z']++['A'..'Z']++['0'..'9']++"$-_.!*'(),"
+
 findUserInDB :: (String, String) -> 
                 Bool -> 
-                IO (Maybe (String, String))
+                IO (Maybe (String, String, String))
 findUserInDB (name, pass) f = 
     Prelude.readFile "DataBase" >>= \db ->
      case db of 
@@ -43,25 +48,52 @@ findUserInDB (name, pass) f =
              (\strs -> if not (Prelude.null strs)
                  then Just (Prelude.head strs)
                  else Nothing)
-               $ Prelude.filter (\(n, p) -> if f 
+               $ Prelude.filter (\(n, p, e) -> if f 
                     then name == n && pass == p
                     else name == n) a
 
+first :: (a, b, c) -> a
+first (a, _, _) = a
+
+second :: (a, b, c) -> b
+second (_, a, _) = a
+
+third :: (a, b, c) -> c
+third (_, _, a) = a
+
+signinUser :: [(String, String)] -> IO (Response String)
+signinUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False >>=
+        \user -> case user of 
+            Just u -> if second u == snd (Prelude.last a) then
+                    try (Prelude.readFile "resource/filesredirect.html") 
+                    >>= \mb_txt -> case mb_txt of
+                         Right cont -> return $ sendAuth (first u, second u) (primHtml cont)
+                         Left e -> return $ sendHtml NotFound (toHtml "OOOOPs")
+                               where _hack :: SomeException
+                                     _hack = e
+                else return $ sendHtml NotAcceptable $ toHtml
+                    "Invalid Invalidovich doesn't like your password or username"
+            Nothing -> return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
+                    $ toHtml $ "You're not in base, " ++ snd (Prelude.head a) ++ "!1!"
 
 registerUser :: [(String, String)] -> IO (Response String)
 registerUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False >>=
         \user -> case user of 
-            Just u -> if snd u == snd (Prelude.last a) then
-                    return $ sendAuth u
-                    $ toHtml $ "You're now authenticated " ++ fst u
+            Just u -> if second u == snd (Prelude.last a) then
+                    try (Prelude.readFile "resource/filesredirect.html") 
+                    >>= \mb_txt -> case mb_txt of
+                         Right cont -> return $ sendAuth (first u, second u) (primHtml cont)
+                         Left e -> return $ sendHtml NotFound (toHtml "OOOOPs")
+                               where _hack :: SomeException
+                                     _hack = e
                 else return $ sendHtml NotAcceptable $ toHtml
                     "User with same login is allready exists"
             Nothing -> do
                 Prelude.appendFile "DataBase" $ "\n" ++ 
-                    snd (Prelude.head a) ++ ":" ++ snd (a !! 1)
+                    snd (Prelude.head a) ++ ":" ++ snd (a !! 1) ++ ":" ++ snd (a !! 2)
                 createDirectory $ snd (Prelude.head a)
                 return $ sendAuth (snd (Prelude.head a), snd (a !! 1))
-                             $ toHtml $ "hello hello, " ++ snd (Prelude.head a) ++ "!!!"
+                             $ toHtml $ "hello hello, " ++ snd (Prelude.head a) ++ "!1!"
 
 getAuthCookies :: Request String -> (String, String)
 getAuthCookies rq = (first, second)
@@ -86,11 +118,11 @@ getCookieValue val cook = Prelude.head (Data.Lists.splitOn ";"
 
 isAuthenticated :: Request String -> IO Bool
 isAuthenticated rq = if Prelude.null (fst $ getAuthCookies rq)
-                         && Prelude.null (snd $ getAuthCookies rq)
+                         || Prelude.null (snd $ getAuthCookies rq)
                  then return False
                  else findUserInDB (getAuthCookies rq) True >>= 
                     \usr -> case usr of
                        Nothing ->  return False
                        Just u ->
-                           if snd u == snd (getAuthCookies rq) then return True
+                           if second u == snd (getAuthCookies rq) then return True
                                          else return False
