@@ -33,7 +33,7 @@ main = do
   statstore <- newMVar [("+disauthed", 0)]
   forkIO (commandLoop statstore)
   forkIO (statisticsThread statmv statstore)
-  serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
+  serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request ->
      case rqMethod request of 
         GET -> case url_path url of 
          "resource/register" -> return $ sendHtml BadRequest $ toHtml 
@@ -44,10 +44,10 @@ main = do
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
          "" -> case length (url_params url) of
             1 -> case head (url_params url) of
-                ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
+                ("dir", dir) -> print "dir" >> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                         \files -> case unlines files of
-                         [] -> return $ httpSendText OK ""
-                         str -> return (httpSendText OK (init str))
+                         [] -> print "empty" >> return (httpSendText OK "")
+                         str -> print "full" >> return (httpSendText OK (init str))
                 (p, a) -> do 
                     putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
