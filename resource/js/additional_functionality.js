@@ -61,7 +61,7 @@ function handleEvent(e){
         if(i<Clicks-1) arrStr+="@";
     }
     //TODO: add onunload event and send data with it
-    httpSendClick(window.location.pathname, arrStr);
+    //httpSendClick(window.location.pathname, arrStr);
     Clicks++;
     return false;
 }
