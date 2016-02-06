@@ -16,7 +16,7 @@ sendResponse ::  (String -> IO a) ->
                 String ->
                 IO (Response String)
 sendResponse readf send url filePath = try (readf filePath) >>= \mb_txt -> case mb_txt of
-    Right a -> return $ send OK a
+    Right b -> return $ send OK b
     Left e -> return $ sendHtml NotFound $
         thehtml $ concatHtml
           [ thead noHtml, body $ concatHtml

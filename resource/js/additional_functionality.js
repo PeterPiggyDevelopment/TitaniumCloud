@@ -1,3 +1,35 @@
+$(document).bind('keyup', function (e){
+    if(e.which==190 && e.ctrlKey) { //'Ctrl+.' bind
+        document.body.innerHTML += '<canvas id="clickshist"></canvas>';
+        var can = document.getElementById("clickshist");
+        can.width = window.innerWidth-15;
+        var body = document.body, html = document.documentElement;
+        var height = Math.max( body.scrollHeight, body.offsetHeight, 
+           html.clientHeight, html.scrollHeight, html.offsetHeight );
+        can.height = height;
+        var ctx = can.getContext("2d");
+        ctx.fillStyle = 'black';
+        var strs = httpGetPageClicks().split("@");
+        var points=[];
+        for (var i=1; i<strs.length; i++){
+            points[i-1] = strs[i].split(',');
+        }
+        for (var i=0; i<points.length; i++){
+            ctx.beginPath();
+            ctx.arc(points[i][0],points[i][1],4,0,2*Math.PI);
+            ctx.fill();
+            ctx.stroke();
+        }
+    }
+});
+
+function httpGetPageClicks(){
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/?getclicks="+window.location.pathname, false);
+    xhttp.send();
+    return xhttp.responseText;
+}
+
 function handleEvent(e){
     var evt = e ? e:window.event;
     var clickX=0, clickY=0;
@@ -29,7 +61,7 @@ function handleEvent(e){
         if(i<Clicks-1) arrStr+="@";
     }
     //TODO: add onunload event and send data with it
-    //httpSendClick(window.location.pathname, arrStr);
+    httpSendClick(window.location.pathname, arrStr);
     Clicks++;
     return false;
 }
@@ -43,4 +75,3 @@ function httpSendClick(page, arrStr){
     xhttp.send();
     return xhttp.readyState;
 }
-

@@ -583,7 +583,6 @@ function openAndDownloadFile() {
                 var name = element.children().eq(1).text();
                 name = name.slice(0, name.length-10);
                 window.location.href=getCurrentDirectory()+'/'+name;
-                //httpGetFile(getCurrentDirectory(), name);
             }
         }
     })

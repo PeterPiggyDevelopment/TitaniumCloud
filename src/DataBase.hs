@@ -1,4 +1,4 @@
-module DataBase(findUserInDB, pDB, signinUser, registerUser, isAuthenticated, getAuthCookies) where 
+module DataBase(findUserInDB, signinUser, registerUser, isAuthenticated, getAuthCookies) where 
 
 import Network.HTTP.Server.HtmlForm()
 import Data.ByteString as Bin

@@ -48,6 +48,7 @@ main = do
                         \files -> case unlines files of
                          [] -> return (httpSendText OK "")
                          str ->return (httpSendText OK (init str))
+                ("getclicks", f) -> liftM (httpSendText OK) (clicksReadPage f)
                 (p, a) -> do 
                     putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -57,8 +58,8 @@ main = do
             2 -> case head (url_params url) of
                 ("file", f) -> sendUsrFile ("./" ++
                     replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
-                ("pageclicked", f) -> print (url_params url)
-                            >> return (respond OK :: Response String)
+                ("pageclicked", f) -> writeClickStats f (snd (last (url_params url)))
+                            >>= (\foo -> return (respond OK :: Response String))
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
@@ -111,10 +112,10 @@ main = do
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
          _ -> let ext = takeExtension (url_path url) in 
               case ext of
-                ".html" -> ifM (isAuthenticated request) 
-                       (putMVar statmvar (fst (getAuthCookies request)) >> 
+                ".html" -> ifM (isAuthenticated request)
+                       (putMVar statmvar (fst (getAuthCookies request)) >>
                          sendResponse Prelude.readFile 
-                        (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
+                        (\stat str -> (sendHtml stat (primHtml str))) url (url_path url))
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
                         putMVar statmvar "+disauthed"
                         sendResponse Prelude.readFile
