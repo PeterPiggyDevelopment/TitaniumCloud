@@ -125,6 +125,7 @@ main = do
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
                 ".js" -> sendResponse Prelude.readFile sendScript url (url_path url)
+                ".svg" -> sendResponse Prelude.readFile sendSvg url (url_path url)
                 ".css" -> sendResponse Prelude.readFile sendCss url (url_path url)
                 ".png" -> sendResponse Bin.readFile sendPng url (url_path url)
                 ".jpg" -> sendResponse Bin.readFile sendJpg url (url_path url)
