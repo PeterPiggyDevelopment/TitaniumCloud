@@ -3,7 +3,7 @@
 It's a cloud of titanium
 
 ##Description
-It is a cloud, which allow us to locate files on it. It has a test account with test files to provide grater possibility to test it.
+It is a cloud, which allow us to locate files on it. It has a test account named 'namename' with password 'passpass' with test files to provide less effort to test it.
 
 This is my list of wishes, which came to my mind when I have just thought about realization.
 
