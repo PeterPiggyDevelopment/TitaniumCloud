@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One">
+    <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <title></title>
+    <style media="screen">
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Raleway;
+    }
+
+    #first {
+      height: 100%;
+      width: 100%;
+      background-image: url('wal.jpg');
+      background-size: cover;
+      display: flex;
+      align-items: center;
+      padding: 0 5%;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    .main {
+      height: 60%;
+      width: 60%;
+      position: relative;
+    }
+
+    .top {
+      width: 80%;
+      text-align: justify;
+    }
+
+    .bottom {
+      width: 100%;
+      position: absolute;
+      bottom: 0;
+    }
+
+    #zagolovok {
+      font-size: 2.6em;
+      color: white;
+      margin-bottom: 3%;
+    }
+
+    #text {
+      font-size: 1.6em;
+      color: white;
+    }
+
+    .links {
+      font-size: 0.9em;
+      color: white;
+      text-decoration: none;
+      margin-right: 2%;
+      border-bottom: 1px dotted white;
+    }
+
+    .links:hover {
+      border-bottom: 1px dotted rgb(28, 29, 26);
+      color: rgb(28, 29, 26);
+    }
+
+    .two {
+      height: 60%;
+      width: 40%;
+    }
+
+    .name {
+      height: 32px;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-size: 1em;
+      border: 1px solid #c0c0c0;
+      padding-left: 3px;
+      font-family: 'Open Sans';
+    }
+
+    #b-register {
+      border: 1px solid rgb(94, 143, 207);
+      width: 30%;
+      height: 32px;
+      /*padding: 4% 4%;*/
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(126, 176, 242);
+    }
+
+    #b-have {
+      border: 1px solid rgb(138, 68, 180);
+      width: 68%;
+      height: 32px;
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(171, 110, 208);
+    }
+
+    #b-have:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+
+    #b-register:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .name:focus {
+      -moz-box-shadow:0 0 10px rgb(160, 208, 238);
+      -webkit-box-shadow:0 0 10px rgb(160, 208, 238);
+      box-shadow:0 0 10px rgb(160, 208, 238);
+      outline: none;
+    }
+
+    #test {
+      align-items: center;
+      display: flex;
+      width: 38%;
+    }
+
+
+    #wrap-form {
+      width: 290px;
+      background-color: #ffffff;
+      padding: 5px 5px;
+      border-bottom-left-radius: 7px;
+      border-bottom-right-radius: 7px;
+    }
+
+    #green-elephant {
+      padding: 5px 0px;
+      padding-left: 5px;
+      border-top-left-radius: 7px;
+      border-top-right-radius: 7px;
+      background-color: white;
+      border-bottom: 1px solid rgba(191, 200, 203, 1);
+      width: 290px;
+      font-size: 1.2em;
+    }
+
+    </style>
+  </head>
+  <body>
+    <section id='first'>
+      <div class="main">
+        <div class="top">
+          <p id='zagolovok'>Titanium Cloud</p>
+          <p id='text'>Titanium is a great mobile safe for your files.
+            Use it if you need to get your files anywhere or protect them from malicious users.
+            With Titanium you can open and change your files and documents anywhere.</p>
+        </div>
+
+        <div class="bottom">
+          <a href='' class='links'>Repository on GitHub</a>
+          <a href='' class='links'>Сontact the developers</a>
+        </div>
+      </div>
+
+      <div class="two">
+        <form id='input_form' action='register' name='input_name_form' method='post'>
+          <div id='green-elephant'>New to Titanium? Sign up!</div>
+          <div id='wrap-form'>
+            <input name='name_input' type='text' placeholder='login' class='name'><br>
+            <input name='mail_input' type='text' placeholder='mail' class='name'><br>
+            <input name='pass_input' type='password' placeholder='password' class='name'><br>
+            <input type='submit' value='Sign up' id='b-register'>
+            <input type='submit' value='I have account' id='b-have'>
+          </div>
+
+      </form>
+      </div>
+
+
+
+
+
+
+    </section>
+  </body>
+</html>

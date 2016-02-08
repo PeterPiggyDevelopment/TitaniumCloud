@@ -1,5 +1,13 @@
 var CurrentDirectory = '';
 
+window.onbeforeunload=function() {
+  alert('Петух!');
+}
+
+$(window).on('click', function() {
+  console.log('QWERTYUIO');
+})
+
 function getCurrentDirectory(){
     return '/'+getNameCookie()+'/'+CurrentDirectory;
 }
@@ -82,6 +90,7 @@ function draw(li) { //отрисовка полосочек
 
      }
      else {
+       $('.clear').detach();
        listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
      }
 };
@@ -434,10 +443,6 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
-    // if (count>0) { //если в папке есть другие папки
-    //
-    // }
-    // else { //если в папке нет других папок
         $('section').prepend('<img class="child_img" src="image/folder.png" id="new">');
         var greenElephant=$('#new');
         greenElephant.wrap('<div class="parent folders" id="last"></div>');
@@ -584,3 +589,15 @@ function openAndDownloadFile() {
         }
     })
 };
+
+// function mapClick() {
+//   // $(window).unload(function() {
+//   //   alert('Петух!');
+//   // });
+//   console.log(1);
+//   window.onbeforeunload=function() {
+//     alert('Петух!');
+//   }
+// }
+
+//mapClick();
