@@ -11,10 +11,7 @@ import Control.Concurrent.MVar
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
-import System.IO
 import Path (copyDir)
-import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
-import Text.JSON.Types
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
@@ -120,8 +117,7 @@ main = do
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
                         putMVar statmvar "+disauthed"
                         sendResponse Prelude.readFile
-                            (\stat str -> sendHtml stat (primHtml str)) url 
-                                "web/authredirect.html"
+                            (\stat str -> sendHtml stat (primHtml str)) url "web/authredirect.html"
                     else putMVar statmvar "+disauthed" >> 
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
@@ -141,7 +137,7 @@ main = do
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show e
                      Right a -> case length a of 
-                        3 -> registerUser a
+                        3 -> print (a) >> registerUser a
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show a
