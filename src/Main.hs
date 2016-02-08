@@ -11,6 +11,7 @@ import Control.Concurrent.MVar
 import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
+import System.IO
 import Path (copyDir)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
@@ -58,8 +59,8 @@ main = do
             2 -> case head (url_params url) of
                 ("file", f) -> sendUsrFile ("./" ++
                     replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
-                ("pageclicked", f) -> writeClickStats f (snd (last (url_params url)))
-                            >>= (\foo -> return (respond OK :: Response String))
+                ("pageclicked", f) -> writeClickStats f (snd (last (url_params url))) 
+                    >>= (\foo -> return (respond OK :: Response String))
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)

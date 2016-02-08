@@ -4,6 +4,7 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Control.Concurrent.MVar
 import Data.Lists(strToAL, strFromAL, hasKeyAL, addToAL)
+import System.IO
 
 statisticsThread :: MVar String -> -- MVar for user names to write them to the statistics base
                     MVar [(String, Int)]-> -- MVvar for statistics base
@@ -26,14 +27,12 @@ incUsrStats usrs name = if hasKeyAL name usrs then
     else addToAL usrs name 1
 
 writeClickStats :: String -> String -> IO ()
-writeClickStats page clicks = 
-    readFile "ClickStats" >>= \db ->
+writeClickStats page clicks =
+    readFile "ClickStats" >>= \db -> putStr (drop (length db) db) >>
      case db of 
         [] -> writeFile "ClickStats" (strFromAL [(page, clicks)])
         "\n" -> writeFile "ClickStats" (strFromAL [(page, clicks)])
-        _ -> (\str -> putStr (drop (length str) str)) 
-            (show (strToAL db :: [(String, String)])) >> 
-            (\a -> case findPage a page of 
+        _ -> (\a -> case findPage a page of
             Just (p, c) -> writeFile "ClickStats" (strFromAL 
                  (addToAL a page (c ++ clicks)))
             Nothing -> writeFile "ClickStats" (strFromAL 

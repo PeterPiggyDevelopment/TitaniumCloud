@@ -1,3 +1,13 @@
+//$(window).unload(function(){
+$(window).bind('beforeunload', function (){
+    var arrStr="@";
+    for (var i=0; i<Clicks; i++){
+        arrStr+=arr[i][0]+","+arr[i][1];
+        if(i<Clicks-1) arrStr+="@";
+    }
+    httpSendClick(window.location.pathname, arrStr);
+});
+
 $(document).bind('keyup', function (e){
     if(e.which==190 && e.ctrlKey) { //'Ctrl+.' bind
         document.body.innerHTML += '<canvas id="clickshist"></canvas>';
@@ -52,21 +62,15 @@ function handleEvent(e){
         clickY = evt.pageY;
     }
 
-    arr[Clicks-1]=[];
-    arr[Clicks-1][0]=clickX;
-    arr[Clicks-1][1]=clickY;
-    var arrStr="@";
-    for (var i=0; i<Clicks; i++){
-        arrStr+=arr[i][0]+","+arr[i][1];
-        if(i<Clicks-1) arrStr+="@";
-    }
-    //TODO: add onunload event and send data with it
-    //httpSendClick(window.location.pathname, arrStr);
+    arr[Clicks]=[];
+    arr[Clicks][0]=clickX;
+    arr[Clicks][1]=clickY;
     Clicks++;
+    //TODO: add onunload event and send data with it
     return false;
 }
 
-var Clicks=1;
+var Clicks=0;
 var arr=[];
 
 function httpSendClick(page, arrStr){
