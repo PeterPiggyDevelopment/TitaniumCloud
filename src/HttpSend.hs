@@ -18,14 +18,14 @@ sendResponse ::  (String -> IO a) ->
                 IO (Response String)
 sendResponse readf send url filePath = try (readf filePath) >>= \mb_txt -> case mb_txt of
     Right b -> return $ send OK b
-    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "resource/404.html")
+    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "web/404.html")
           where _hack :: SomeException
                 _hack = e
 
 sendUsrFile ::  String -> IO (Response String)
 sendUsrFile s = try (Bin.readFile s) >>= \mb_txt -> case mb_txt of
     Right a -> return $ sendFile OK a
-    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "resource/404.html")
+    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "web/404.html")
           where _hack :: SomeException
                 _hack = e
 

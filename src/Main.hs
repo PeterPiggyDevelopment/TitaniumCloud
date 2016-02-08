@@ -37,12 +37,12 @@ main = do
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request ->
      case rqMethod request of 
         GET -> case url_path url of 
-         "resource/register" -> return $ sendHtml BadRequest $ toHtml 
+         "web/register" -> return $ sendHtml BadRequest $ toHtml 
              "You registering with GET request, but you should to register with POST"
-         "resource/" -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
-         "resource" -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
+         "web/" -> sendResponse Prelude.readFile
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
+         "web" -> sendResponse Prelude.readFile
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
          "" -> case length (url_params url) of
             1 -> case head (url_params url) of
                 ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
@@ -109,7 +109,7 @@ main = do
                         " params nu: " ++ show (length (url_params url)) ++ 
                         " fst param: " ++ p ++ ", " ++ a
             0 -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
          _ -> let ext = takeExtension (url_path url) in 
               case ext of
@@ -121,7 +121,7 @@ main = do
                         putMVar statmvar "+disauthed"
                         sendResponse Prelude.readFile
                             (\stat str -> sendHtml stat (primHtml str)) url 
-                                "resource/authredirect.html"
+                                "web/authredirect.html"
                     else putMVar statmvar "+disauthed" >> 
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
@@ -135,7 +135,7 @@ main = do
                 _ -> sendResponse Bin.readFile sendFile url (url_path url)
 
         POST -> case url_path url of 
-            "resource/register" -> 
+            "web/register" -> 
                  case parse pQuery "" $ rqBody request of 
                      Left e -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
@@ -145,7 +145,7 @@ main = do
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show a
-            "resource/signin" -> 
+            "web/signin" -> 
                  case parse pQuery "" $ rqBody request of 
                      Left e -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while signin " ++ 
@@ -155,7 +155,7 @@ main = do
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while signin " ++ 
                          "in request body!!! " ++ show a
-            "resource/files.html" -> (\filename path ->
+            "web/files.html" -> (\filename path ->
                          Bin.writeFile ("./" ++ path ++ "/" ++ filename) 
                          (pack (getFile (rqBody request))))
                          (getFileName (rqBody request)) 

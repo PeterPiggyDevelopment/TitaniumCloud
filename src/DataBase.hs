@@ -65,7 +65,7 @@ signinUser :: [(String, String)] -> IO (Response String)
 signinUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False >>=
         \user -> case user of 
             Just u -> if second u == snd (Prelude.last a) then
-                    try (Prelude.readFile "resource/filesredirect.html") 
+                    try (Prelude.readFile "web/filesredirect.html") 
                     >>= \mb_txt -> case mb_txt of
                          Right cont -> return $ sendAuth (first u, second u) (primHtml cont)
                          Left e -> return $ sendHtml NotFound (toHtml "OOOOPs")
@@ -80,7 +80,7 @@ registerUser :: [(String, String)] -> IO (Response String)
 registerUser a = findUserInDB (snd (Prelude.head a), snd (Prelude.last a)) False >>=
         \user -> case user of 
             Just u -> if second u == snd (Prelude.last a) then
-                    try (Prelude.readFile "resource/filesredirect.html") 
+                    try (Prelude.readFile "web/filesredirect.html") 
                     >>= \mb_txt -> case mb_txt of
                          Right cont -> return $ sendAuth (first u, second u) (primHtml cont)
                          Left e -> return $ sendHtml NotFound (toHtml "OOOOPs")

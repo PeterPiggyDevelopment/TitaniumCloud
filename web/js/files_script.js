@@ -30,28 +30,28 @@ function typeDocument(string) { //определяет тип документа
             }
 
             if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
-                src='image/image.png';
+                src='/resource/images/image.png';
             }
             else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
-                src='image/document.png';
+                src='/resource/images/document.png';
             }
             else if (type=='fb2' || type=='epub' || type=='mobi') {
-                src='image/book.png';
+                src='/resource/images/book.png';
             }
             else if (type=='exe') {
-                src='image/program.png';
+                src='/resource/images/program.png';
             }
             else if (type=='mp3' || type=='amr') {
-                src='image/music.png';
+                src='/resource/images/music.png';
             }
             else if(type=='mp4' || type=='3gp' || type=='avi') {
-                src='image/video.png';
+                src='/resource/images/video.png';
             }
             else if (string[length-1]=='/' && string[length-2]=='/') {
-            	src='image/folder.png';
+            	src='/resource/images/folder.png';
             }
             else {
-              src='image/other.png';
+              src='/resource/images/other.png';
             }
 return src;
 };
