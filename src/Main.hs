@@ -113,7 +113,7 @@ main = do
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
          _ -> let ext = takeExtension (url_path url) in 
               case ext of
-                ".html" -> ifM (isAuthenticated request)
+                ".html" ->ifM (isAuthenticated request)
                        (putMVar statmvar (fst (getAuthCookies request)) >>
                          sendResponse Prelude.readFile 
                         (\stat str -> (sendHtml stat (primHtml str))) url (url_path url))

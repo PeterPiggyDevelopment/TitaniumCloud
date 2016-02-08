@@ -3,7 +3,8 @@ import Codec.Binary.UTF8.String
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Control.Concurrent.MVar
-import Data.Lists(strToAL, strFromAL, hasKeyAL, addToAL)
+import Data.Lists(strToAL, strFromAL, hasKeyAL)
+import qualified Data.Lists(addToAL)
 import System.IO
 
 statisticsThread :: MVar String -> -- MVar for user names to write them to the statistics base
@@ -12,19 +13,24 @@ statisticsThread :: MVar String -> -- MVar for user names to write them to the s
 statisticsThread m store = do 
     name <- takeMVar m
     st <- readMVar store
-    case name of 
-        "+disauthed" -> swapMVar store 
-         (("+disauthed" , snd (head st) + 1)
-                            :tail st) 
-                >> statisticsThread m store
-        _ -> swapMVar store (incUsrStats st name) 
-            >> statisticsThread m store
+    swapMVar store (incUsrStats st name) 
+    statisticsThread m store
 
 incUsrStats :: [(String, Int)] -> String -> [(String, Int)]
-incUsrStats usrs name = if hasKeyAL name usrs then
-    addToAL usrs name (snd (head 
-    (filter (\(n, s) -> n == name) usrs)) + 1)
-    else addToAL usrs name 1
+incUsrStats usrs name = if hasKeyAL name usrs
+                        then addToAL usrs name 1
+                        else Data.Lists.addToAL usrs name 1
+
+addToAL :: [(String, Int)] -> String -> Int -> [(String, Int)]
+addToAL ls key val = foldl (replaceInAL key val) [("", 0)] ls
+
+replaceInAL :: String -> Int -> [(String, Int)] -> (String, Int) -> [(String, Int)]
+replaceInAL key val [("", 0)] (k, v) = if key == k 
+                                       then [(k,v + val)] 
+                                       else [(k, v)]
+replaceInAL key val ls (k, v) = if key == k 
+                                then (k, v + val):ls
+                                else (k, v):ls
 
 writeClickStats :: String -> String -> IO ()
 writeClickStats page clicks =
@@ -34,9 +40,9 @@ writeClickStats page clicks =
         "\n" -> writeFile "ClickStats" (strFromAL [(page, clicks)])
         _ -> (\a -> case findPage a page of
             Just (p, c) -> writeFile "ClickStats" (strFromAL 
-                 (addToAL a page (c ++ clicks)))
+                 (Data.Lists.addToAL a page (c ++ clicks)))
             Nothing -> writeFile "ClickStats" (strFromAL 
-                          (addToAL a page clicks))) (strToAL db)
+                          (Data.Lists.addToAL a page clicks))) (strToAL db)
 
 clicksReadPage :: String -> IO String
 clicksReadPage page = 

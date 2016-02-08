@@ -1,4 +1,7 @@
-//$(window).unload(function(){
+var Clicks=0;
+var arr=[];
+var InClicksMode=false;
+
 $(window).bind('beforeunload', function (){
     var arrStr="@";
     for (var i=0; i<Clicks; i++){
@@ -9,7 +12,8 @@ $(window).bind('beforeunload', function (){
 });
 
 $(document).bind('keyup', function (e){
-    if(e.which==190 && e.ctrlKey) { //'Ctrl+.' bind
+    var a = document.getElementById('clickshist');
+    if(e.which==190 && e.ctrlKey && a==null && !InClicksMode) { //'Ctrl+.' bind
         document.body.innerHTML += '<canvas id="clickshist"></canvas>';
         var can = document.getElementById("clickshist");
         can.width = window.innerWidth-15;
@@ -30,8 +34,27 @@ $(document).bind('keyup', function (e){
             ctx.fill();
             ctx.stroke();
         }
+        InClicksMode=true;
+    } else if (e.which==190 && a!=null && InClicksMode){
+        a.remove();
+        InClicksMode=false;
+    } else if (e.which==27 && a!=null && InClicksMode){
+        a.remove();
+        InClicksMode=false;
     }
+        
 });
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
+}
 
 function httpGetPageClicks(){
     var xhttp = new XMLHttpRequest();
@@ -69,9 +92,6 @@ function handleEvent(e){
     //TODO: add onunload event and send data with it
     return false;
 }
-
-var Clicks=0;
-var arr=[];
 
 function httpSendClick(page, arrStr){
     var xhttp = new XMLHttpRequest();

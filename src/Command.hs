@@ -5,6 +5,7 @@ import System.Exit(ExitCode(ExitSuccess))
 import System.Posix.Process(exitImmediately)
 import Data.Lists(strFromAL)
 import Data.List(isPrefixOf)
+import Debug.Trace(trace)
 import DataBase
 
 
@@ -42,8 +43,8 @@ procesCommands store = Prelude.getLine >>=
              "lsdb" -> Prelude.readFile "DataBase" >>=
                  \db -> Prelude.putStrLn $ "Data Base: " ++ db
              "pst" -> readMVar store >>=
-                 \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
-                    strFromAL st)
+                 \st -> putStrLn ("Statistics since server has been started:" ++ 
+                    alToStr st)
              "stst" -> readMVar store >>=
                  \st -> Prelude.putStrLn ("Statistics since server has been started:\n" ++ 
                     "Authenticated users: " ++ show (fst (genShortStats st)) ++ "\n" ++
@@ -56,3 +57,9 @@ procesCommands store = Prelude.getLine >>=
                              else  putStrLn "False"
                          Nothing -> putStrLn "False"
                | otherwise -> Prelude.putStrLn "Invalid Invalidovich"
+
+alToStr :: [(String, Int)] -> String
+alToStr = foldl strCollect ""
+
+strCollect :: String -> (String, Int) -> String
+strCollect str (name, num) = str ++ "\n" ++ name ++ ": " ++ show num

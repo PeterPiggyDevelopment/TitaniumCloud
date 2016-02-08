@@ -3,6 +3,26 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                top: 0;
+                left: 0;
+            }
+
+            #clickshist {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index:100;
+                background-color:rgba(255,255,255, 0.5);
+            }
+        </style>
   </head>
   <body>
     <!-- Вход -->
@@ -13,5 +33,6 @@
         <input type='submit' value='Register'>
     </form>
   </body>
-  <script src='js/additional_functionality.js'></script>
+    <script src='js/jquery.js'></script>
+    <script src='js/additional_functionality.js'></script>
 </html>

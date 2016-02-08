@@ -57,34 +57,40 @@ return src;
 };
 
 function draw(li) { //отрисовка полосочек
-
-     var trash=$('.parent');
-     for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
-
-   var length=li.length,
-       listFile=$('#listFile');
-
-     if (li[0].length!=' ') {
-         for (var i=0; i<length; i++) {
-             listFile.prepend('<p class="listFileText"></p>');
-         }
-
-         for (var i=0; i<length; i++) {
-             $('.listFileText').eq(i).text(li[i]);
-             $('.listFileText').eq(i).wrap('<div class="child"></div');
-             $('.child').eq(i).wrap('<div class="parent"></div>');
-             $('.child').eq(i).before('<img class="child_img">');
-             var src=typeDocument(li[i]);
-             $('.child_img').eq(i).attr('src', src);
-         }
-
-         $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-
-     }
-     else {
-       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
-     }
+    var trash=$('.parent');
+    for (var i=0; i<trash.length; i++) 
+        trash.eq(i).detach(); //удалили всё, что было
+    var length=li.length, listFile=$('#listFile');
+    if (li[0].length!=' ') {
+        for (var i=0; i<length; i++)
+            listFile.prepend('<p class="listFileText"></p>');
+        for (var i=0; i<length; i++) {
+            $('.listFileText').eq(i).text(li[i]);
+            $('.listFileText').eq(i).wrap('<div class="child"></div');
+            $('.child').eq(i).wrap('<div class="parent"></div>');
+            $('.child').eq(i).before('<img class="child_img">');
+            var src=typeDocument(li[i]);
+            $('.child_img').eq(i).attr('src', src);
+        }
+        $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+        var cl = document.getElementById('clear');
+        if (cl!=null) cl.remove();
+    }
+    else {
+    listFile.prepend('<p id="clear">Нет файлов, дружище</p>');
+    }
 };
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
+}
 
 function createShare() {
     $('.parent').on('mouseover', function(event) {

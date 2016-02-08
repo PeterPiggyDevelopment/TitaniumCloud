@@ -4,16 +4,32 @@
     <meta charset="utf-8">
     <title></title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         html, body {
             height: 100%;
             width:100%;
         }
             
         body {
+            top: 0;
+            left: 0;
             margin: 0;
             padding: 0;
             display: table;
             text-align:center;
+        }
+
+        #clickshist {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index:100;
+            background-color:rgba(255,255,255, 0.5);
         }
         
         #container {
@@ -35,5 +51,6 @@
         <a href="/resource/register.html">Register</a>
     </div>
   </body>
+  <script src='js/jquery.js'></script>
   <script src='js/additional_functionality.js'></script>
 </html>

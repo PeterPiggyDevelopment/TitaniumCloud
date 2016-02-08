@@ -30,7 +30,7 @@ body {
     position: absolute;
     top: 0;
     left: 0;
-    z-index:10;
+    z-index:100;
     background-color:rgba(255,255,255, 0.5);
 }
 
@@ -50,7 +50,7 @@ body {
 
 ul {
     position: fixed;
-    z-index: 999;
+    z-index: 99;
     width: 100%;
     word-spacing: 3em;
     padding: 1% 0% 1% 1%;
