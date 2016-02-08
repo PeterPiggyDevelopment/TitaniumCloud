@@ -1,5 +1,6 @@
 import Network.HTTP.Server.HtmlForm()
-import Data.ByteString as Bin (readFile)
+import Data.ByteString as Bin (readFile, writeFile)
+import Data.ByteString.Char8 (pack)
 import Network.HTTP.Server
 import Network.URL as URL
 import Text.XHtml
@@ -17,7 +18,7 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
 import Data.List(isInfixOf)
-import Data.Lists(replace, strToAL, strFromAL)
+import Data.Lists(replace, strToAL, strFromAL, splitOn)
 import Data.List.Split(splitOneOf)
 import Numeric(readHex)
 import Command
@@ -32,7 +33,7 @@ main = do
   statstore <- newMVar [("+disauthed", 0)]
   forkIO (commandLoop statstore)
   forkIO (statisticsThread statmv statstore)
-  serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request -> 
+  serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request ->
      case rqMethod request of 
         GET -> case url_path url of 
          "resource/register" -> return $ sendHtml BadRequest $ toHtml 
@@ -45,8 +46,8 @@ main = do
             1 -> case head (url_params url) of
                 ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                         \files -> case unlines files of
-                         [] -> return $ httpSendText OK ""
-                         str -> return (httpSendText OK (init str))
+                         [] -> return (httpSendText OK "")
+                         str ->return (httpSendText OK (init str))
                 (p, a) -> do 
                     putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -56,10 +57,12 @@ main = do
             2 -> case head (url_params url) of
                 ("file", f) -> sendUsrFile ("./" ++
                     replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
+                ("pageclicked", f) -> print (url_params url)
+                            >> return (respond OK :: Response String)
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
-                ("create", file) ->writeFile ("./" ++ 
+                ("create", file) -> Prelude.writeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file) ""
                     >> return (respond OK :: Response String)
                 ("dircreate", file) -> createDirectory ("./" ++ 
@@ -106,7 +109,7 @@ main = do
             0 -> sendResponse Prelude.readFile
                 (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
-         _ ->  let ext = takeExtension (url_path url) in 
+         _ -> let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" -> ifM (isAuthenticated request) 
                        (putMVar statmvar (fst (getAuthCookies request)) >> 
@@ -133,14 +136,24 @@ main = do
                  case parse pQuery "" $ rqBody request of 
                      Left e -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show e
+                         "in request body!!! " ++ show e
                      Right a -> case length a of 
                         2 -> registerUser a
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
-                            "in request body!!! " ++ show a
+                         "in request body!!! " ++ show a
+            "resource/files.html" -> (\filename path ->
+                         Bin.writeFile ("./" ++ path ++ "/" ++ filename) 
+                         (pack (getFile (rqBody request))))
+                         (getFileName (rqBody request)) 
+                         (getNameAttr (rqBody request))
+                  >> return (respond OK :: Response String)
+                   where 
+                    getFileName body = head (splitOn "\"" (last (splitOn "filename=\"" body)))
+                    getNameAttr body = splitOn "\""  body !! 1
+                    getFile body = head (splitOn "\r\n------WebKitFormBoundary" (splitOn "\r\n\r\n"  body !! 1))
             n -> return $ sendHtml BadRequest $ toHtml 
-                $ "Error on HTTP addres while registering in request body!!! " ++ show n
+                $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
     ) statmv)
 
