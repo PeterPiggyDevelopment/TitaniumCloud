@@ -7,6 +7,7 @@ import Network.URL as URL
 import Text.XHtml
 import Codec.Binary.UTF8.String
 import Control.Exception(try,SomeException)
+import Control.Monad (liftM)
 import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
 import Text.JSON.Types
 
@@ -16,29 +17,15 @@ sendResponse ::  (String -> IO a) ->
                 String ->
                 IO (Response String)
 sendResponse readf send url filePath = try (readf filePath) >>= \mb_txt -> case mb_txt of
-    Right a -> return $ send OK a
-    Left e -> return $ sendHtml NotFound $
-        thehtml $ concatHtml
-          [ thead noHtml, body $ concatHtml
-             [ toHtml "I could not find " , toHtml $ exportURL url { url_type = HostRelative }
-             , toHtml ", so I made this with XHTML combinators. "
-             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-             ]
-          ]
+    Right b -> return $ send OK b
+    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "web/404.html")
           where _hack :: SomeException
                 _hack = e
 
 sendUsrFile ::  String -> IO (Response String)
 sendUsrFile s = try (Bin.readFile s) >>= \mb_txt -> case mb_txt of
     Right a -> return $ sendFile OK a
-    Left e -> return $ sendHtml NotFound $
-        thehtml $ concatHtml
-          [ thead noHtml, body $ concatHtml
-             [ toHtml "I could not find " , toHtml s
-             , toHtml ", so I made this with XHTML combinators. "
-             , toHtml $ hotlink "/resource/index.html" (toHtml "Try this instead.")
-             ]
-          ]
+    Left e -> liftM (sendHtml NotFound . primHtml) (Prelude.readFile "web/404.html")
           where _hack :: SomeException
                 _hack = e
 
@@ -50,6 +37,9 @@ sendCss s v    = insertHeader HdrContentType "text/css" $ httpSendText s (render
 
 sendScript     :: StatusCode -> String -> Response String
 sendScript s v  = insertHeader HdrContentType "application/x-javascript" $ httpSendText s v
+
+sendSvg     :: StatusCode -> String -> Response String
+sendSvg s v  = insertHeader HdrContentType "image/svg+xml" $ httpSendText s v
 
 sendJson       :: StatusCode -> JSValue -> Response String
 sendJson s v    = insertHeader HdrContentType "application/json"

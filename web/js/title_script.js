@@ -42,3 +42,20 @@ function showMenu(ul, position) {
         }
     }
 }
+
+function getNameCookie(){
+    var co = document.cookie;
+    co = co.slice(co.indexOf("=")+1, co.indexOf(";"));
+    return co;
+}
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
+}

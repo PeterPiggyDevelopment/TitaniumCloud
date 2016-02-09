@@ -1,0 +1,67 @@
+<!DOCTYPE HTML>
+<html onclick='handleEvent(event)'>
+    <head>
+        <title> Titanium </title>
+        <meta charset="UTF-8">
+        <style media="screen">
+            #clickshist {
+                position: absolute;
+                top: 0;
+                left: 0;
+                z-index:999;
+                background-color:rgba(255,255,255, 0.5);
+                box-sizing:content-box;
+            }
+
+             * { box-sizing: border-box; } </style>
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One|Open+Sans"></link>
+        <link media="screen" rel="stylesheet" type="text/css" href="css/title_style.css"/></link>
+        <link rel="icon" type="image/ico" href="/resource/favicon.ico"></link>
+    <head>
+    <body>
+    <section id='first'>
+      <div class="main">
+        <div class="top">
+          <p id='title'>Titanium Cloud</p>
+          <p id='text'>Titanium is a great mobile safe for your files.
+            Use it if you need to get your files anywhere or protect them from malicious users.
+            With Titanium you can open and change your files and documents anywhere.</p>
+        </div>
+
+        <div class="bottom">
+          <a href='https://github.com/PeterPiggyDevelopment/TitaniumCloud' class='links'>Repository on GitHub</a>
+          <a href='https://vk.com/deadwolfst' class='links'>Сontact the developers</a>
+        </div>
+      </div>
+
+      <div id='form' class="two">
+        <form id='input_form' action='register' name='input_name_form' method='post'>
+          <div id='green-elephant'>New to Titanium? Sign up!</div>
+          <div id='wrap-form'>
+            <input name='name_input' type='text' placeholder='login' class='name'><br>
+            <input name='pass_input' type='password' placeholder='password' class='name'><br>
+            <input name='mail_input' type='text' placeholder='mail' class='name'><br>
+            <input name='register' type='submit' value='Sign up' id='b-register'>
+            <input name='have' type='submit' value='I have account' id='b-have'>
+          </div>
+        </form>
+      </div>
+    </section>
+    </body>
+    <script src="js/title_script.js" type="text/javascript"></script>
+    <script src='js/jquery.js'></script>
+    <script src='js/additional_functionality.js'></script>
+    <script type="text/javascript">
+        showMenu($('ul').eq(0), 30);
+        $(window).on('load', function() { //делаем, чтобы форма регистрации удалялась, если мы зареганы
+            if (getNameCookie()!="") {
+                document.getElementById('input_form').remove();
+                var a = document.createElement('a');
+                a.setAttribute('href', 'files.html');
+                a.setAttribute('class', 'files_link');
+                a.innerText='Files';
+                document.getElementById('form').appendChild(a);
+            }
+        })
+    </script>
+</html>

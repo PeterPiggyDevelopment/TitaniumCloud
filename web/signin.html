@@ -4,16 +4,32 @@
     <meta charset="utf-8">
     <title></title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         html, body {
             height: 100%;
             width:100%;
         }
             
         body {
+            top: 0;
+            left: 0;
             margin: 0;
             padding: 0;
             display: table;
             text-align:center;
+        }
+
+        #clickshist {
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index:100;
+            background-color:rgba(255,255,255, 0.5);
         }
         
         #container {
@@ -27,13 +43,14 @@
   </head>
   <body>
     <div id='container'>
-        <form id='input_form' action='register' name='input_name_form' method='post'>
+        <form id='input_form' action='signin' name='input_name_form' method='post'>
             <input name='name_input' type='text' placeholder='login'>
             <input name='pass_input' type='password' placeholder='password'>
             <input type='submit' value='Войти'>
         </form>
-        <a href="/resource/register.html">Register</a>
+        <a href="register.html">Register</a>
     </div>
   </body>
+  <script src='js/jquery.js'></script>
   <script src='js/additional_functionality.js'></script>
 </html>
