@@ -78,9 +78,9 @@ registerUser a = findUserInDB (snd (head a), snd (last a)) False >>=
                     "User with the same login is allready exists"
             Nothing -> do
                 cont <- readFile "DataBase"
-                writeFile "DataBase" (take (length cont - 2) cont ++
+                writeFile ".DataBase.tmp" (take (length cont - 2) cont ++
                     "\n" ++ snd (head a) ++ ":" ++ snd (a !! 1) ++ ":" ++ snd (a !! 2) ++ ":")
-                --renameFile ".DataBase.tmp" "DataBase"
+                renameFile ".DataBase.tmp" "DataBase"
                 createDirectory (snd (head a))
                 liftM (sendAuth (snd (head a), snd (a !! 1)) . primHtml) (readFile "web/filesredirect.html")
 
