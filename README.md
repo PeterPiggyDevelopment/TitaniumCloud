@@ -2,6 +2,8 @@
 ##Introduction
 It's a cloud of titanium.
 
+![Screenshot](resource/images/screenshot.png)
+
 ##Description
 It is a cloud and a web client, which allow you to locate files on the server. It has a test account named 'namename' with password 'passpass' with test files to provide less effort test.
 
