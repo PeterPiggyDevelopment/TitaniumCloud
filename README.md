@@ -1,9 +1,9 @@
 # TitaniumCloud
 ##Introduction
-It's a cloud of titanium
+It's a cloud of titanium.
 
 ##Description
-It is a cloud and a web client, which allow us to locate files on the server. It has a test account named 'namename' with password 'passpass' with test files to provide less effort to test it.
+It is a cloud and a web client, which allow you to locate files on the server. It has a test account named 'namename' with password 'passpass' with test files to provide less effort test.
 
 This is my list of wishes, which came to my mind when I have just thought about realization.
 
