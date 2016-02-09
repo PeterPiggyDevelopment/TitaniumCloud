@@ -12,6 +12,7 @@ import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Data.Lists(strFromAL, strToAL, replace, splitOn, hasKeyAL, addToAL)
 import Control.Exception(try,SomeException)
+import Control.Monad(liftM)
 import HttpSend
 
 pDB :: CharParser () [(String, String, String)]
@@ -19,15 +20,9 @@ pDB = pDBThree `sepBy` char '\n'
 
 pDBThree :: CharParser () (String, String, String)
 pDBThree = many1 pDBChar >>= 
-        \name -> optionMaybe (char ':' >> many pDBChar) >>=
-        \pass -> optionMaybe (char ':' >> many pDBChar) >>=
-        \value -> case pass of 
-            Just p -> case value of 
-                Just a -> return (name, p, a)
-                Nothing -> return (name, p, "")
-            Nothing -> case value of 
-                Just a -> return (name, "", a)
-                Nothing -> return (name, "" , "")
+        \name -> char ':' >> many pDBChar >>=
+        \pass -> char ':' >> many pDBChar >>=
+        \value -> return (name, pass, value)
 
 pDBChar :: CharParser () Char
 pDBChar = oneOf baseAllowedChars
@@ -43,14 +38,14 @@ findUserInDB (name, pass) f =
         [] -> return Nothing
         "\n" -> return Nothing
         _ -> case parse pDB "" (tail db) of
-         Left e -> return Nothing
-         Right a -> return $ 
+         Left e -> print e >> return Nothing
+         Right a -> return ( 
              (\strs -> if not (null strs)
                  then Just (head strs)
                  else Nothing)
                $ filter (\(n, p, e) -> if f 
                     then name == n && pass == p
-                    else name == n) a
+                    else name == n) a)
 
 first :: (a, b, c) -> a
 first (a, _, _) = a
@@ -82,11 +77,12 @@ registerUser a = findUserInDB (snd (head a), snd (last a)) False >>=
             Just u -> return $ sendHtml NotAcceptable $ toHtml
                     "User with the same login is allready exists"
             Nothing -> do
-                print user
-                appendFile "./DataBase" $ "\n" ++ snd (head a) ++ ":" ++ snd (a !! 1) ++ ":" ++ snd (a !! 2)
+                cont <- readFile "DataBase"
+                writeFile "DataBase" (take (length cont - 2) cont ++
+                    "\n" ++ snd (head a) ++ ":" ++ snd (a !! 1) ++ ":" ++ snd (a !! 2) ++ ":")
+                --renameFile ".DataBase.tmp" "DataBase"
                 createDirectory (snd (head a))
-                readFile "web/filesredirect.html" >>= 
-                    (\cont -> print cont >> return (sendAuth (snd (head a), snd (a !! 1)) (primHtml cont)))
+                liftM (sendAuth (snd (head a), snd (a !! 1)) . primHtml) (readFile "web/filesredirect.html")
 
 getAuthCookies :: Request String -> (String, String)
 getAuthCookies rq = (first, second)

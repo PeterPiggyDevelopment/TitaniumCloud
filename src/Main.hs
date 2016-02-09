@@ -34,6 +34,7 @@ main = do
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request ->
      case rqMethod request of 
         GET -> case url_path url of 
+         "web/unlogin" -> liftM (sendAuth ("", "") . primHtml) (Prelude.readFile "web/indexredirect.html")
          "web/register" -> return $ sendHtml BadRequest $ toHtml 
              "You registering with GET request, but you should to register with POST"
          "web/" -> sendResponse Prelude.readFile
@@ -111,14 +112,14 @@ main = do
          _ -> let ext = takeExtension (url_path url) in 
               case ext of
                 ".html" ->ifM (isAuthenticated request)
-                       (putMVar statmvar (fst (getAuthCookies request)) >>
+                       (tryPutMVar statmvar (fst (getAuthCookies request)) >>
                          sendResponse Prelude.readFile 
                         (\stat str -> (sendHtml stat (primHtml str))) url (url_path url))
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
-                        putMVar statmvar "+disauthed"
+                        tryPutMVar statmvar "+disauthed"
                         sendResponse Prelude.readFile
                             (\stat str -> sendHtml stat (primHtml str)) url "web/authredirect.html"
-                    else putMVar statmvar "+disauthed" >> 
+                    else tryPutMVar statmvar "+disauthed" >> 
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
                 ".js" -> sendResponse Prelude.readFile sendScript url (url_path url)
@@ -166,7 +167,7 @@ main = do
                     getNameAttr body = splitOn "\""  body !! 1
                     getFile body = head (splitOn "\r\n------WebKitFormBoundary" (splitOn "\r\n\r\n"  body !! 1))
             n -> return $ sendHtml BadRequest $ toHtml 
-                $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
+                $ "Error on HTTP addres while getting POST in request url path!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
     ) statmv)
 
