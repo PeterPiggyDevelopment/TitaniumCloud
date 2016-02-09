@@ -7,7 +7,7 @@ It is a cloud and a web client, which allow us to locate files on the server. It
 
 This is my list of wishes, which came to my mind when I have just thought about realization.
 
-| |*HASKELL SERVER*|
+|Realized|*HASKELL SERVER*|
 |----|----|
 |\|/ |registration and authentication form|
 |\|/ |create command "find <username>" for server|
@@ -21,7 +21,7 @@ This is my list of wishes, which came to my mind when I have just thought about 
 |FAILED |increase requests processing speed|
 |FAILED |prevent from hacker attacks|
 
-| |*HTML/JAVASCRIPT*|
+|Realized|*HTML/JAVASCRIPT*|
 |----|----|
 |\|/ |files download|
 |\|/ |files upload|
