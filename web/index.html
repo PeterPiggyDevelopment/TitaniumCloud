@@ -61,6 +61,11 @@
                 a.setAttribute('class', 'files_link');
                 a.innerText='Files';
                 document.getElementById('form').appendChild(a);
+                var unlog = document.createElement('a');
+                unlog.setAttribute('href', 'unlogin');
+                unlog.setAttribute('class', 'files_link');
+                unlog.innerText='Unlogin';
+                document.getElementById('form').appendChild(unlog);
             }
         })
     </script>
