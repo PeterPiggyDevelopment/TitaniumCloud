@@ -4,10 +4,10 @@ var upperBorder=400/AC;
 var lowerBorder=0;
 var Length=4;
 var IsGaming=true;
-var Apple=[AC*8, AC*5];
-var AppleRad=AC-5;
+var Mouse=[AC*8, AC*5];
+var MouseRad=AC-5;
 var Snake=[[AC, AC], [AC, AC*2], [AC*2, AC*2], [AC*2, AC*3]];
-var SnakeHead=AppleRad;
+var SnakeHead=MouseRad;
 function drawSnake(){
     var svgDoc = document.getElementById('snakeArea').contentDocument;
     var svggr =  svgDoc.getElementById('svggr');
@@ -15,25 +15,32 @@ function drawSnake(){
             svggr.removeChild(svggr.firstChild);
     }
     var circle = svgDoc.createElementNS("http://www.w3.org/2000/svg",'circle');
-    circle.setAttribute('cx', Apple[0]);
-    circle.setAttribute('cy', Apple[1]);
-    circle.setAttribute('r', AppleRad);
-    circle.setAttribute('fill', 'green');
+    circle.setAttribute('cx', Mouse[0]);
+    circle.setAttribute('cy', Mouse[1]);
+    circle.setAttribute('r', MouseRad);
+    circle.setAttribute('fill', 'grey');
     svggr.appendChild(circle);
+    var isGray=true;
     for (var i=0; i<Length-1; i++){
         var line = svgDoc.createElementNS("http://www.w3.org/2000/svg",'line');
         line.setAttribute('x1', Snake[i][0]);
         line.setAttribute('y1', Snake[i][1]);
         line.setAttribute('x2', Snake[i+1][0]);
         line.setAttribute('y2', Snake[i+1][1]);
+        if (isGray){
         line.setAttribute('style', 
-                "stroke:rgb(255,0,0);stroke-width:"+(AC-5)+";stroke-linecap:round;");
+                "stroke:darkcyan;stroke-width:"+(AC-5)+";stroke-linecap:round;");
+        } else {
+        line.setAttribute('style', 
+                "stroke:brown;stroke-width:"+(AC-5)+";stroke-linecap:round;");
+        }
+        isGray=!isGray;
         svggr.appendChild(line);
     }
     var head = svgDoc.createElementNS("http://www.w3.org/2000/svg",'circle');
     head.setAttribute('cx', Snake[Length-1][0]);
     head.setAttribute('cy',Snake[Length-1][1]);
-    head.setAttribute('r', AppleRad);
+    head.setAttribute('r', MouseRad);
     head.setAttribute('fill', 'yellow');
     svggr.appendChild(head);
 }
@@ -43,14 +50,14 @@ $(document).bind('keypress', function (e){
         if(e.which== 104){//h-left
             if(!(Snake[Length-2][0]==Snake[Length-1][0]-AC
                     && Snake[Length-2][1]==Snake[Length-1][1])){
-                if(!headEquals(Apple[0], Apple[1])){
+                if(!headEquals(Mouse[0], Mouse[1])){
                     Snake=rolLeft(Snake);
                     Snake[Length-1]=[];
                     Snake[Length-1][0]=Snake[Length-2][0]-AC;
                     Snake[Length-1][1]=Snake[Length-2][1];
                     drawSnake();
                 } else {
-                    genNewApple();
+                    genNewMouse();
                     drawSnake();
                     Length++;
                     Snake[Length-1]=[];
@@ -62,14 +69,14 @@ $(document).bind('keypress', function (e){
         } else if(e.which== 106){//j-down
             if(!(Snake[Length-2][0]==Snake[Length-1][0]
                     && Snake[Length-2][1]==Snake[Length-1][1]+AC)){
-                if(!headEquals(Apple[0], Apple[1])){
+                if(!headEquals(Mouse[0], Mouse[1])){
                     Snake=rolLeft(Snake);
                     Snake[Length-1]=[];
                     Snake[Length-1][0]=Snake[Length-2][0];
                     Snake[Length-1][1]=Snake[Length-2][1]+AC;
                     drawSnake();
                 } else {
-                    genNewApple();
+                    genNewMouse();
                     drawSnake();
                     Length++;
                     Snake[Length-1]=[];
@@ -81,14 +88,14 @@ $(document).bind('keypress', function (e){
         } else if(e.which== 107){//k-up
             if(!(Snake[Length-2][0]==Snake[Length-1][0]
                     && Snake[Length-2][1]==Snake[Length-1][1]-AC)){
-                if(!headEquals(Apple[0], Apple[1])){
+                if(!headEquals(Mouse[0], Mouse[1])){
                     Snake=rolLeft(Snake);
                     Snake[Length-1]=[];
                     Snake[Length-1][0]=Snake[Length-2][0];
                     Snake[Length-1][1]=Snake[Length-2][1]-AC;
                     drawSnake();
                 } else {
-                    genNewApple();
+                    genNewMouse();
                     drawSnake();
                     Length++;
                     Snake[Length-1]=[];
@@ -100,14 +107,14 @@ $(document).bind('keypress', function (e){
         } else if(e.which== 108){//l-right
             if(!(Snake[Length-2][0]==Snake[Length-1][0]+AC
                     && Snake[Length-2][1]==Snake[Length-1][1])){
-                if(!headEquals(Apple[0], Apple[1])){
+                if(!headEquals(Mouse[0], Mouse[1])){
                     Snake=rolLeft(Snake);
                     Snake[Length-1]=[];
                     Snake[Length-1][0]=Snake[Length-2][0]+AC;
                     Snake[Length-1][1]=Snake[Length-2][1];
                     drawSnake();
                 } else {
-                    genNewApple();
+                    genNewMouse();
                     drawSnake();
                     Length++;
                     Snake[Length-1]=[];
@@ -155,12 +162,12 @@ function isOnTail(x, y){
     return false;
 }
 
-function genNewApple(){
+function genNewMouse(){
     var x=0, y=0;
     do {
         x=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*AC;
         y=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*AC;
     } while(isOnTail(x,y))
-    Apple[0]=x;
-    Apple[1]=y;
+    Mouse[0]=x;
+    Mouse[1]=y;
 }

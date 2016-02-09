@@ -1,13 +1,47 @@
 <!DOCTYPE HTML>
 <html>
     <head>
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One|Open+Sans"></link>
+        <style>
+            body {
+                text-align:center;
+            }
+            #controls_parent {
+                width:10em;
+                height:15em;
+                padding:50px;
+                display:inline;
+                font-size:2em;
+                font-family: 'Poiret One';
+            }
+            #snakeArea {
+                border:10px solid yellowgreen;
+                display:inline;
+            }
+            # controls{
+            }
+        </style>
         <title>404 -- Not Found</title>
         <h1 align='center'>404 -- Not Found<br/><br/>But A Snake Found!</h1>
     </head>
     <body>
-        <object style="border:2px solid #000000;" 
-            id='snakeArea' width="400" height="400" 
+        <object id='snakeArea' width="400" height="400" 
             type="image/svg+xml" data="/web/snake.svg"></object>
+        <div id='controls_parent'>
+            <div>
+                <span id='controls'>
+                    Controls:<br/>
+                    Left: H<br/>
+                    Down: J<br/>
+                    Up: K<br/>
+                    Right: L<br/>
+                    Rules:<br/>
+                    Yellow circle is a head of snake.<br/>
+                    Eat the grey mouses and grow.<br/>
+                    Do not cross your tail or borders of the map!<br/>
+                </span>
+            </div>
+        </div>
     </body>
     <script src='/web/js/jquery.js'></script>
     <script src='/web/js/snake.js'></script>
