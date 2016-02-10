@@ -18,7 +18,6 @@ This is my list of wishes, which came to my mind when I have just thought about 
 |\|/ |visitor statistics by names of registered users and by requests of not registeredusers|
 |\|/ |cookies support|
 |\|/ |create database for users|
-|\|/ |DataBase for users: remove crutch 'init'|
 |\|/ |prevent from '/.' and '..' queries|
 |FAILED |increase requests processing speed|
 |FAILED |prevent from hacker attacks|
