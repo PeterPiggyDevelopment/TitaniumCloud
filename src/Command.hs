@@ -26,7 +26,7 @@ genShortStats :: [(String, Int)] -> (Int, Int)
 genShortStats usrs = (first, second)
         where 
           first = Prelude.length (Prelude.tail usrs)
-          second = snd $ Prelude.last usrs
+          second = foldl (\n (name, count) -> if name == "+disauthed" then count else n) 0 usrs
 
 commandLoop :: MVar [(String, Int)] ->  IO ()
 commandLoop store = do

@@ -23,8 +23,61 @@
     </head>
     <body>
         <object id='snakeArea' width="400" height="400" 
-            type="image/svg+xml" data="/web/snake.svg"></object>
+            type="image/svg+xml" data="/resource/svgs/snake.svg"></object>
         <div id='controls_parent'>
+            <button type='button' onclick='startGame()'>Start</button>
+            <div>
+                <span id='controls'>
+                    Set dificulty:
+                </span>
+            </div>
+            <form>
+                <input
+                    type="radio"
+                    name="dificulty"
+                    value="Hard"
+                    id="d_hard">
+                Hard<br>
+                <input
+                    type="radio"
+                    name="dificulty"
+                    value="Middle"
+                    id="d_middle"
+                    checked>
+                Middle<br>
+                <input
+                    type="radio"
+                    name="dificulty" 
+                    value="Ligth"
+                    id="d_ligth" >
+                Ligth<br>
+            </form>
+            <div>
+                <span id='controls'>
+                    Set dimenstion:
+                </span>
+            </div>
+            <form name='dim_form'>
+                <input
+                    type="radio"
+                    name="dimension"
+                    value="Low"
+                    id='dim_low'>
+                Low<br>
+                <input
+                    type="radio"
+                    name="dimension"
+                    value="Middle"
+                    id='dim_middle'
+                    checked>
+                Middle<br>
+                <input
+                    type="radio"
+                    name="dimension"
+                    value="High"
+                    id='dim_high'>
+                High<br>
+            </form>
             <div>
                 <span id='controls'>
                     Controls:<br/>
@@ -43,5 +96,4 @@
     </body>
     <script src='/web/js/jquery.js'></script>
     <script src='/web/js/snake.js'></script>
-    </script>
 </html>
