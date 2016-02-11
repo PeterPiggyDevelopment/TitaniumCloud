@@ -4,6 +4,8 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <!-- <script type="text/javascript" src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="//yastatic.net/share2/share.js" charset="utf-8"></script> -->
     <title></title>
     <style media="screen">
     * {
@@ -19,8 +21,9 @@
       background-image: url('wal.jpg');
       background-size: cover;
       display: flex;
+      flex-wrap: nowrap;
       align-items: center;
-      padding: 0 5%;
+      padding: 0 8%;
     }
 
     html, body {
@@ -29,12 +32,13 @@
 
     .main {
       height: 60%;
-      width: 60%;
+      width: 50%;
+      /*background-color: black;*/
       position: relative;
     }
 
     .top {
-      width: 80%;
+      width: 100%;
       text-align: justify;
     }
 
@@ -69,8 +73,12 @@
     }
 
     .two {
+      flex-wrap: nowrap;
       height: 60%;
-      width: 40%;
+      width: 50%;
+      /*background-color: white;*/
+      display: flex;
+      justify-content: center;
     }
 
     .name {
@@ -80,15 +88,15 @@
       width: 100%;
       font-size: 1em;
       border: 1px solid #c0c0c0;
-      padding-left: 3px;
+      padding-left: 6px;
       font-family: 'Open Sans';
     }
 
     #b-register {
       border: 1px solid rgb(94, 143, 207);
-      width: 30%;
+      width: 100%;
       height: 32px;
-      /*padding: 4% 4%;*/
+      color: white;
       font-size: 0.95em;
       border-radius: 5px;
       background-color: rgb(126, 176, 242);
@@ -115,9 +123,9 @@
     }
 
     .name:focus {
-      -moz-box-shadow:0 0 10px rgb(160, 208, 238);
-      -webkit-box-shadow:0 0 10px rgb(160, 208, 238);
-      box-shadow:0 0 10px rgb(160, 208, 238);
+      -moz-box-shadow:0 0 15px rgb(160, 208, 238);
+      -webkit-box-shadow:0 0 15px rgb(160, 208, 238);
+      box-shadow:0 0 15px rgb(160, 208, 238);
       outline: none;
     }
 
@@ -129,23 +137,111 @@
 
 
     #wrap-form {
-      width: 290px;
-      background-color: #ffffff;
+      width: 260px;
+      background-color: rgba(255, 255, 255, 0.3);
       padding: 5px 5px;
-      border-bottom-left-radius: 7px;
-      border-bottom-right-radius: 7px;
+      border-radius: 7px;
     }
 
     #green-elephant {
       padding: 5px 0px;
       padding-left: 5px;
-      border-top-left-radius: 7px;
-      border-top-right-radius: 7px;
-      background-color: white;
-      border-bottom: 1px solid rgba(191, 200, 203, 1);
-      width: 290px;
+      color: white;
       font-size: 1.2em;
     }
+
+    #have {
+      width: 100%;
+      text-align: center;
+      color: rgb(49, 160, 185);
+      margin-top: 4px;
+      margin-bottom: 2px;
+      font-size: 0.9em;
+    }
+
+    #text-have {
+      border-bottom: 1px solid rgb(49, 160, 185);
+    }
+
+    #text-have:hover {
+      cursor: pointer;
+      color: rgb(95, 41, 172);
+      border-bottom: 1px solid rgb(95, 41, 172);
+    }
+
+    .container {
+  		width: 100%;
+  		margin: 0 auto;
+      height: 100%;
+      display: flex;
+      align-items: center;
+  	}
+
+  	.container .cols {
+  		float: left;
+  		margin: 0 0 1em 0;
+  		padding: 0 1em;
+  		text-align: center;
+  	}
+
+    /*Grid*/
+  	.container .cols.col-1 {width: 8.3333%;}
+  	.container .cols.col-2 {width: 16.6666%;}
+  	.container .cols.col-3 {width: 25%;}
+  	.container .cols.col-4 {width: 33.3333%;}
+  	.container .cols.col-5 {width: 41.6666%;}
+  	.container .cols.col-6 {width: 50%;}
+  	.container .cols.col-7 {width: 58.33333%;}
+  	.container .cols.col-8 {width: 66.66667%;}
+  	.container .cols.col-9 {width: 75%;}
+  	.container .cols.col-10 {width: 83.33333%;}
+  	.container .cols.col-11 {width: 91.6666666%;}
+  	.container .cols.col-12 {width: 100%;}
+
+  	.container:before,
+  	.container:after,
+  	.row:after,
+  	.row:before,
+  	.clear:before,
+  	.clear:after {
+  		content: " ";
+  		display: table;
+  	}
+
+  	.container:after,
+  	.row:after,
+  	.clear:after {
+  		clear: both;
+  	}
+
+    .circle {
+    width: 250px;
+    height: 250px;
+    background: #cc0000;
+    -moz-border-radius: 1000px;
+    -webkit-border-radius: 1000px;
+    border-radius: 1000px;
+    position: relative;
+    margin: 0 auto;
+
+    margin-bottom: 0.5em;
+
+    }
+
+    .why-text {
+      color: gray;
+      font-size: 1.5em;
+    }
+
+    .why-zagolovok {
+      color: gray;
+      font-size: 1.7em;
+    }
+
+    /*#border {
+      border-left: 1px solid black;
+      border-right: 1px solid black;
+    }*/
 
     </style>
   </head>
@@ -169,21 +265,63 @@
         <form id='input_form' action='register' name='input_name_form' method='post'>
           <div id='green-elephant'>New to Titanium? Sign up!</div>
           <div id='wrap-form'>
-            <input name='name_input' type='text' placeholder='login' class='name'><br>
-            <input name='mail_input' type='text' placeholder='mail' class='name'><br>
-            <input name='pass_input' type='password' placeholder='password' class='name'><br>
+            <input name='name_input' type='text' placeholder='Login' class='name'><br>
+            <input name='mail_input' type='text' placeholder='E-mail' class='name'><br>
+            <input name='pass_input' type='password' placeholder='Password' class='name'><br>
             <input type='submit' value='Sign up' id='b-register'>
-            <input type='submit' value='I have account' id='b-have'>
+            <div id='have'><span id='text-have'>I have account</span></div>
           </div>
+
+
 
       </form>
       </div>
 
+    </section>
+
+    <section class='container'>
+      <div class="row">
+        <div class="cols col-4">
+          <div class="circle">
+
+          </div>
 
 
+          <div class="why-zagolovok">
+            Free
+          </div>
+          <div class="why-text">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          </div>
+        </div>
+        <div class="cols col-4" id='border'>
+          <div class="circle">
 
+
+          </div>
+          <div class="why-zagolovok">
+            Secure
+          </div>
+          <div class="why-text">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          </div>
+        </div>
+        <div class="cols col-4">
+          <div class="circle">
+
+
+          </div>
+          <div class="why-zagolovok">
+            Conveniently
+          </div>
+          <div class="why-text">
+            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+          </div>
+        </div>
+      </div>
 
 
     </section>
+
   </body>
 </html>

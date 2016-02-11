@@ -64,10 +64,11 @@ function typeDocument(string) { //определяет тип документа
 return src;
 };
 
-function draw(li) { //отрисовка полосочек
+function draw(li, name) { //отрисовка полосочек
 
      var trash=$('.parent');
      for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
+     $('#name-user').detach();
 
    var length=li.length,
        listFile=$('#listFile');
@@ -85,6 +86,22 @@ function draw(li) { //отрисовка полосочек
              var src=typeDocument(li[i]);
              $('.child_img').eq(i).attr('src', src);
          }
+
+         $('.parent').eq(0).before('<div id="name-user"></div>');
+         $('#name-user').prepend('<img class="child_img" src="image/user.png" id="person" align="right">');
+         $('#person').after('<p id="user-text"></p>');
+         $('#user-text').text(name);
+
+         $('#name-user').before('<div id="main-menu"></div>');
+         $('#main-menu').prepend('<div id="main-menu-left"></div>');
+         $('#main-menu-left').after('<div id="main-menu-right"></div>')
+         $('#main-menu-left').prepend('<img src="image/addfolder.png" class="hint--top hint--bounce child_img" data-hint="Bounce" id="qwerty">');
+         $('#qwerty').after('<img src="image/addfile.png" class="hint--left hint--bounce child_img" data-hint="Bounce" id="qwerty2">')
+
+         $('.parent').eq(length-1).css({
+           'border-bottom-right-radius': '5px',
+           'border-bottom-left-radius' : '5px'
+         });
 
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
 
@@ -484,7 +501,7 @@ function httpLoadDir(dir) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             folder=sort(xhttp.responseText), //массив, с которого будем рисовать
             count=countFolders(folder); //количетво папок
-            draw(folder); //отрисовали структуру
+            draw(folder, getNameCookie()); //отрисовали структуру
             renameFolders(); //переименовали папки
             openAndDownloadFile();
             createShare(); //создание кнопки "Поделиться"
