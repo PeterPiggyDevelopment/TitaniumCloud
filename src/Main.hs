@@ -12,8 +12,6 @@ import Control.Conditional(ifM)
 import System.FilePath(takeExtension)
 import System.Directory
 import Path (copyDir)
-import Text.JSON(readJSValue, toJSObject, toJSString, showJSValue)
-import Text.JSON.Types
 import Text.Parsec hiding (try)
 import Text.ParserCombinators.Parsec.Char
 import Text.JSON.String(runGetJSON)
@@ -36,18 +34,20 @@ main = do
   serverWith defaultConfig {srvPort = 8888} ((\statmvar _ url request ->
      case rqMethod request of 
         GET -> case url_path url of 
-         "resource/register" -> return $ sendHtml BadRequest $ toHtml 
+         "web/unlogin" -> liftM (sendAuth ("", "") . primHtml) (Prelude.readFile "web/indexredirect.html")
+         "web/register" -> return $ sendHtml BadRequest $ toHtml 
              "You registering with GET request, but you should to register with POST"
-         "resource/" -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
-         "resource" -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
+         "web/" -> sendResponse Prelude.readFile
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
+         "web" -> sendResponse Prelude.readFile
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
          "" -> case length (url_params url) of
             1 -> case head (url_params url) of
                 ("dir", dir) -> getFiles (replace ".." "" ("./" ++ dir)) True >>=
                         \files -> case unlines files of
                          [] -> return (httpSendText OK "")
                          str ->return (httpSendText OK (init str))
+                ("getclicks", f) -> liftM (httpSendText OK) (clicksReadPage f)
                 (p, a) -> do 
                     putStrLn $ 
                         ":ALERT: Invalid params in url " ++ url_path url ++ 
@@ -57,8 +57,8 @@ main = do
             2 -> case head (url_params url) of
                 ("file", f) -> sendUsrFile ("./" ++
                     replace ".." "" (snd (url_params url !! 1)) ++ "/" ++ f)
-                ("pageclicked", f) -> print (url_params url)
-                            >> return (respond OK :: Response String)
+                ("pageclicked", f) -> writeClickStats f (snd (last (url_params url))) 
+                    >>= (\foo -> return (respond OK :: Response String))
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
@@ -107,23 +107,23 @@ main = do
                         " params nu: " ++ show (length (url_params url)) ++ 
                         " fst param: " ++ p ++ ", " ++ a
             0 -> sendResponse Prelude.readFile
-                (\stat str -> sendHtml stat (primHtml str)) url "resource/redirect.html"
+                (\stat str -> sendHtml stat (primHtml str)) url "web/indexredirect.html"
             n -> return $ sendHtml BadRequest $ toHtml $ "Sorry, Bad GET Request, " ++ show n ++ "params"
          _ -> let ext = takeExtension (url_path url) in 
               case ext of
-                ".html" -> ifM (isAuthenticated request) 
-                       (putMVar statmvar (fst (getAuthCookies request)) >> 
+                ".html" ->ifM (isAuthenticated request)
+                       (tryPutMVar statmvar (fst (getAuthCookies request)) >>
                          sendResponse Prelude.readFile 
-                        (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
+                        (\stat str -> (sendHtml stat (primHtml str))) url (url_path url))
                     (if "files.html" `Data.List.isInfixOf` url_path url then do
-                        putMVar statmvar "+disauthed"
+                        tryPutMVar statmvar "+disauthed"
                         sendResponse Prelude.readFile
-                            (\stat str -> sendHtml stat (primHtml str)) url 
-                                "resource/authredirect.html"
-                    else putMVar statmvar "+disauthed" >> 
+                            (\stat str -> sendHtml stat (primHtml str)) url "web/authredirect.html"
+                    else tryPutMVar statmvar "+disauthed" >> 
                         sendResponse Prelude.readFile
                         (\stat str -> sendHtml stat (primHtml str)) url (url_path url))
                 ".js" -> sendResponse Prelude.readFile sendScript url (url_path url)
+                ".svg" -> sendResponse Prelude.readFile sendSvg url (url_path url)
                 ".css" -> sendResponse Prelude.readFile sendCss url (url_path url)
                 ".png" -> sendResponse Bin.readFile sendPng url (url_path url)
                 ".jpg" -> sendResponse Bin.readFile sendJpg url (url_path url)
@@ -132,17 +132,31 @@ main = do
                 _ -> sendResponse Bin.readFile sendFile url (url_path url)
 
         POST -> case url_path url of 
-            "resource/register" -> 
+            "web/register" -> 
                  case parse pQuery "" $ rqBody request of 
                      Left e -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show e
                      Right a -> case length a of 
-                        2 -> registerUser a
+                        4 -> if fst (last a) == "register"
+                             then registerUser (init a)
+                             else sendResponse Prelude.readFile
+                                 (\stat str -> sendHtml stat 
+                                 (primHtml str)) url "web/authredirect.html"
                         _ -> return $ sendHtml OK 
                          $ toHtml $ "Error on HTTP Line while registering " ++ 
                          "in request body!!! " ++ show a
-            "resource/files.html" -> (\filename path ->
+            "web/signin" -> 
+                 case parse pQuery "" $ rqBody request of 
+                     Left e -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while signin " ++ 
+                         "in request body!!! " ++ show e
+                     Right a -> case length a of 
+                        2 -> signinUser a
+                        _ -> return $ sendHtml OK 
+                         $ toHtml $ "Error on HTTP Line while signin " ++ 
+                         "in request body!!! " ++ show a
+            "web/files.html" -> (\filename path ->
                          Bin.writeFile ("./" ++ path ++ "/" ++ filename) 
                          (pack (getFile (rqBody request))))
                          (getFileName (rqBody request)) 
@@ -153,7 +167,7 @@ main = do
                     getNameAttr body = splitOn "\""  body !! 1
                     getFile body = head (splitOn "\r\n------WebKitFormBoundary" (splitOn "\r\n\r\n"  body !! 1))
             n -> return $ sendHtml BadRequest $ toHtml 
-                $ "Error on HTTP addres while getting POST in request url!!! " ++ show n
+                $ "Error on HTTP addres while getting POST in request url path!!! " ++ show n
         _ -> return $ sendHtml BadRequest $ toHtml "Sorry, BadRequest!!"
     ) statmv)
 

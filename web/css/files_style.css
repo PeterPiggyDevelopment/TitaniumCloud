@@ -1,0 +1,140 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    top: 0;
+    left: 0;
+}
+
+section {
+    width: 50%;
+    position: relative;
+    margin: 0 auto;
+    border-top: 1px solid #87CEEB;
+}
+
+.listFileText {
+    font-family: 'Open Sans Light';
+    font-size: 1em;
+}
+
+.parent {
+    width: 100%;
+    height: 30px;
+    border-bottom: 1px solid #87CEEB;
+    display: flex;
+    justify-content: left;
+    align-items: center;
+}
+
+.child {
+    width: 100%;
+    display:flex;
+    justify-content: space-between;
+}
+
+.child_img {
+    width: 2.5%;
+    display:flex;
+    justify-content: flex-start;
+    margin-right: 1%;
+}
+
+.parent:hover {
+    background-color: #F0FFF0;
+    cursor: pointer;
+}
+
+.download {
+    font-family: 'Open Sans Light';
+    font-size: 0.8em;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.download:link {
+    zoom: 0.7;
+}
+
+.share_text {
+    border: 1px solid #4682B4;
+    border-radius: 7px;
+    padding-left: 5px;
+    padding-right: 5px;
+    background-color: #B0E0E6;
+}
+
+.functions-menu {
+    color: #000000;
+    background-color: #FFFFFF;
+    z-index: 99;
+    list-style-type: none;
+    border: 1px solid #D3D3D3;
+    border-radius: 5px;
+    padding: 0.5%;
+}
+
+.functions-menu-buttons {
+    color: #000000;
+    font-family: 'Open Sans Light';
+    font-size: 0.9em;
+}
+
+.functions-menu-buttons:hover {
+    color: #1E90FF;
+    cursor: pointer;
+}
+
+#clickshist {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:100;
+    background-color:rgba(255,255,255, 0.5);
+}
+
+#inputNewName {
+    font-family: 'Open Sans Light';
+}
+
+#alert-text {
+    font-family: 'Open Sans Light';
+    color: #FF0000;
+    font-size: 1em;
+    background-color: #FFA07A;
+    padding: 0.5% 1% 0.5% 1%;
+    border-radius: 5px;
+}
+
+#alert-wrap {
+    display: flex;
+    justify-content: center;
+    padding: 0.5%;
+    z-index: 9999;
+}
+
+#paste {
+    display: none;
+}
+
+#globalDirectory {
+    margin: 1vw;
+    font-size: 3vw;
+}
+
+#back_button {
+    margin: auto;
+    width: 15vw;
+    height: 5vw;
+    font-size: 2vw;
+}
+
+#add_dir_button {
+    margin: auto;
+    width: 15vw;
+    height: 5vw;
+    font-size: 2vw;
+}

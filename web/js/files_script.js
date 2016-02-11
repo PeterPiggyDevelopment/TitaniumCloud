@@ -1,13 +1,5 @@
 var CurrentDirectory = '';
 
-window.onbeforeunload=function() {
-  alert('Петух!');
-}
-
-$(window).on('click', function() {
-  console.log('QWERTYUIO');
-})
-
 function getCurrentDirectory(){
     return '/'+getNameCookie()+'/'+CurrentDirectory;
 }
@@ -38,32 +30,33 @@ function typeDocument(string) { //определяет тип документа
             }
 
             if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
-                src='image/image.png';
+                src='/resource/images/image.png';
             }
             else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
-                src='image/document.png';
+                src='/resource/images/document.png';
             }
             else if (type=='fb2' || type=='epub' || type=='mobi') {
-                src='image/book.png';
+                src='/resource/images/book.png';
             }
             else if (type=='exe') {
-                src='image/program.png';
+                src='/resource/images/program.png';
             }
             else if (type=='mp3' || type=='amr') {
-                src='image/music.png';
+                src='/resource/images/music.png';
             }
             else if(type=='mp4' || type=='3gp' || type=='avi') {
-                src='image/video.png';
+                src='/resource/images/video.png';
             }
             else if (string[length-1]=='/' && string[length-2]=='/') {
-            	src='image/folder.png';
+            	src='/resource/images/folder.png';
             }
             else {
-              src='image/other.png';
+              src='/resource/images/other.png';
             }
 return src;
 };
 
+<<<<<<< HEAD:resource/js/functions.js
 function draw(li, name) { //отрисовка полосочек
 
      var trash=$('.parent');
@@ -110,7 +103,43 @@ function draw(li, name) { //отрисовка полосочек
        $('.clear').detach();
        listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
      }
+=======
+function draw(li) { //отрисовка полосочек
+    var trash=$('.parent');
+    for (var i=0; i<trash.length; i++) 
+        trash.eq(i).detach(); //удалили всё, что было
+    var length=li.length, listFile=$('#listFile');
+    if (li[0].length!=' ') {
+        for (var i=0; i<length; i++)
+            listFile.prepend('<p class="listFileText"></p>');
+        for (var i=0; i<length; i++) {
+            $('.listFileText').eq(i).text(li[i]);
+            $('.listFileText').eq(i).wrap('<div class="child"></div');
+            $('.child').eq(i).wrap('<div class="parent"></div>');
+            $('.child').eq(i).before('<img class="child_img">');
+            var src=typeDocument(li[i]);
+            $('.child_img').eq(i).attr('src', src);
+        }
+        $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+        var cl = document.getElementById('clear');
+        if (cl!=null) cl.remove();
+    }
+    else {
+    listFile.prepend('<p id="clear">Нет файлов, дружище</p>');
+    }
+>>>>>>> b67d8a642fdc54dd97085a78c4ef7242c109fa26:web/js/files_script.js
 };
+
+Element.prototype.remove = function() {
+    this.parentElement.removeChild(this);
+}
+NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
+    for(var i = this.length - 1; i >= 0; i--) {
+        if(this[i] && this[i].parentElement) {
+            this[i].parentElement.removeChild(this[i]);
+        }
+    }
+}
 
 function createShare() {
     $('.parent').on('mouseover', function(event) {
@@ -605,20 +634,7 @@ function openAndDownloadFile() {
                 var name = element.children().eq(1).text();
                 name = name.slice(0, name.length-10);
                 window.location.href=getCurrentDirectory()+'/'+name;
-                //httpGetFile(getCurrentDirectory(), name);
             }
         }
     })
 };
-
-// function mapClick() {
-//   // $(window).unload(function() {
-//   //   alert('Петух!');
-//   // });
-//   console.log(1);
-//   window.onbeforeunload=function() {
-//     alert('Петух!');
-//   }
-// }
-
-//mapClick();
