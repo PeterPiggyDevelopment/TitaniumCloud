@@ -2,6 +2,8 @@
 ##Introduction
 It's a cloud of titanium.
 
+![Screenshot](resource/images/screenshot.png)
+
 ##Description
 It is a cloud and a web client, which allow you to locate files on the server. It has a test account named 'namename' with password 'passpass' with test files to provide less effort test.
 
@@ -16,7 +18,6 @@ This is my list of wishes, which came to my mind when I have just thought about 
 |\|/ |visitor statistics by names of registered users and by requests of not registeredusers|
 |\|/ |cookies support|
 |\|/ |create database for users|
-|\|/ |DataBase for users: remove crutch 'init'|
 |\|/ |prevent from '/.' and '..' queries|
 |FAILED |increase requests processing speed|
 |FAILED |prevent from hacker attacks|
