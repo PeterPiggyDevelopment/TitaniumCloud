@@ -197,6 +197,7 @@ function isMouseOnTail(x, y, left, up){
 }
 
 function genNewMouse(left, up){
+    if (Length<(upperBorder-1)*(upperBorder-1)-1){
         var x=0, y=0;
         Mouse=[];
         do {
@@ -205,6 +206,11 @@ function genNewMouse(left, up){
         } while(isMouseOnTail(x, y, left, up))
         Mouse[0]=x;
         Mouse[1]=y;
+    } else {
+        Mouse=[];
+        Mouse[0]=-1000;
+        Mouse[1]=-1000;
+    }
 }
 
 function setDimension(){
@@ -215,9 +221,9 @@ function setDimension(){
 }
 
 function getVictoryConv(){
-    if(document.getElementById('d_hard').checked) return (2*(upperBorder*upperBorder)/3);
-    if(document.getElementById('d_middle').checked) return ((upperBorder*upperBorder)/2);
-    if(document.getElementById('d_ligth').checked) return ((upperBorder*upperBorder)/3);
+    if(document.getElementById('d_hard').checked) return (upperBorder-1)*(upperBorder-1);
+    if(document.getElementById('d_middle').checked) return 2*(((upperBorder-1)*(upperBorder-1))/3);
+    if(document.getElementById('d_ligth').checked) return (((upperBorder-1)*(upperBorder-1))/2);
 }
 
 function startGame(){
