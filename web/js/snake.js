@@ -2,9 +2,10 @@ window.onload=drawSnake;
 const lowerBorder=0;
 const MouseRad=500;
 const SnakeHeadRad=400;
+const imageHeight=400;
 var dimension;
 setDimension();
-var upperBorder=400/dimension;
+var upperBorder=imageHeight/dimension;
 var WinCountBorder=getVictoryConv();
 var Snake=[[dimension, dimension], [dimension, dimension*2], [dimension*2, dimension*2], [dimension*2, dimension*3]];
 var Mouse;
@@ -217,7 +218,7 @@ function setDimension(){
     if(document.getElementById('dim_low').checked) dimension=20;
     if(document.getElementById('dim_middle').checked) dimension=40;
     if(document.getElementById('dim_high').checked) dimension= 80;
-    upperBorder=400/dimension;
+    upperBorder=imageHeight/dimension;
 }
 
 function getVictoryConv(){

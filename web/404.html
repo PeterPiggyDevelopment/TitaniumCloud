@@ -2,18 +2,37 @@
 <html>
     <head>
         <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One|Open+Sans"></link>
+        <link rel='stylesheet' type='text/css' href='bulma.css'></link>
         <style>
-            body {
-                text-align:center;
+            html, body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                border: 0;
             }
-            #controls_parent {
-                display:inline;
-                font-size:2em;
+
+            #startButton {
+                font-size:2.5em;
                 font-family: 'Poiret One';
+                width:4em;
+                height:4em;
             }
+
+            #text {
+                color: black;
+                width:25em;
+                font-size:1.5em;
+                font-family: 'Poiret One';
+                border:10px solid yellowgreen;
+            }
+            #snakeColumn {
+                margin-left:25em;
+            }
+
             #snakeArea {
                 border:10px solid yellowgreen;
-                display:inline;
+                margin: 0;
+                padding: 0;
             }
             # controls{
             }
@@ -22,75 +41,35 @@
         <h1 align='center'>404 -- Not Found<br/><br/>But A Snake Found!</h1>
     </head>
     <body>
-        <object id='snakeArea' width="400" height="400" 
-            type="image/svg+xml" data="/resource/svgs/snake.svg"></object>
-        <div id='controls_parent'>
-            <button type='button' onclick='startGame()'>Start</button>
-            <div>
-                <span id='controls'>
-                    Set dificulty:
-                </span>
+        <div class="columns">
+            <div class="column" id='snakeColumn'> 
+                        <object id='snakeArea' width="410" height="410"
+                            type="image/svg+xml" data="/resource/svgs/snake.svg"></object>
             </div>
-            <form>
-                <input
-                    type="radio"
-                    name="dificulty"
-                    value="Hard"
-                    id="d_hard">
-                Hard<br>
-                <input
-                    type="radio"
-                    name="dificulty"
-                    value="Middle"
-                    id="d_middle"
-                    checked>
-                Middle<br>
-                <input
-                    type="radio"
-                    name="dificulty" 
-                    value="Ligth"
-                    id="d_ligth" >
-                Ligth<br>
-            </form>
-            <div>
-                <span id='controls'>
-                    Set dimenstion:
-                </span>
-            </div>
-            <form name='dim_form'>
-                <input
-                    type="radio"
-                    name="dimension"
-                    value="Low"
-                    id='dim_low'>
-                Low<br>
-                <input
-                    type="radio"
-                    name="dimension"
-                    value="Middle"
-                    id='dim_middle'
-                    checked>
-                Middle<br>
-                <input
-                    type="radio"
-                    name="dimension"
-                    value="High"
-                    id='dim_high'>
-                High<br>
-            </form>
-            <div>
-                <span id='controls'>
-                    Controls:<br/>
-                    Left: H<br/>
-                    Down: J<br/>
-                    Up: K<br/>
-                    Right: L<br/>
-                    Rules:<br/>
-                    Yellow circle is a head of snake.<br/>
-                    Eat the grey mouses and grow.<br/>
-                    Do not cross your tail or borders of the map!<br/>
-                    You win, if you have filled 1/3 of the map<br/>
-                </span>
+            <div class="column is-centered">
+                    <div id='text'>
+                        <button id='startButton' type='button' onclick='startGame()'>Start</button>
+                        <div> <span id='controls'> Set dificulty: </span> </div>
+                        <form>
+                            <input type="radio" name="dificulty" value="Hard" id="d_hard"> Hard<br>
+                            <input type="radio" name="dificulty" value="Middle" id="d_middle" checked> Middle<br>
+                            <input type="radio" name="dificulty" value="Ligth" id="d_ligth" > Ligth<br>
+                        </form>
+                        <div> <span id='controls'> Set dimenstion: </span> </div>
+                        <form name='dim_form'>
+                            <input type="radio" name="dimension" value="Low" id='dim_low'> Low<br>
+                            <input type="radio" name="dimension" value="Middle" id='dim_middle' checked> Middle<br>
+                            <input type="radio" name="dimension" value="High" id='dim_high'> High<br>
+                        </form>
+                        <div>
+                            <span id='controls'>
+                                Controls:<br/> Left: H<br/> Down: J<br/> Up: K<br/> Right: L<br/> Rules:<br/>
+                                Yellow circle is a head of snake.<br/>
+                                Eat the grey mouses and grow.<br/>
+                                Do not cross your tail or borders of the map!<br/>
+                            </span>
+                        </div>
+                    </div>
             </div>
         </div>
     </body>
