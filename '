@@ -250,11 +250,9 @@ function startGame(){
         f=false;
     }
     if (!IsGaming && winFail && f){
-        document.getElementById('startButton').innerText='Stop';
         setDimension();
         WinCountBorder=getVictoryConv();
         IsGaming=true;
-        winFail=false;
         Length=4;
         Snake=[[dimension, dimension], [dimension, dimension*2], [dimension*2, dimension*2], [dimension*2, dimension*3]]; 
         genNewMouse();
