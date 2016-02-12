@@ -56,7 +56,6 @@ function typeDocument(string) { //определяет тип документа
 return src;
 };
 
-<<<<<<< HEAD:resource/js/functions.js
 function draw(li, name) { //отрисовка полосочек
 
      var trash=$('.parent');
@@ -81,15 +80,26 @@ function draw(li, name) { //отрисовка полосочек
          }
 
          $('.parent').eq(0).before('<div id="name-user"></div>');
-         $('#name-user').prepend('<img class="child_img" src="image/user.png" id="person" align="right">');
+         $('#name-user').prepend('<img class="child_img" src="/resource/images/user.png" id="person" align="right">');
          $('#person').after('<p id="user-text"></p>');
          $('#user-text').text(name);
 
          $('#name-user').before('<div id="main-menu"></div>');
-         $('#main-menu').prepend('<div id="main-menu-left"></div>');
-         $('#main-menu-left').after('<div id="main-menu-right"></div>')
-         $('#main-menu-left').prepend('<img src="image/addfolder.png" class="hint--top hint--bounce child_img" data-hint="Bounce" id="qwerty">');
-         $('#qwerty').after('<img src="image/addfile.png" class="hint--left hint--bounce child_img" data-hint="Bounce" id="qwerty2">')
+         $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
+         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
+         $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
+         $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
+         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
+         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
+
+         buttons();
+         //$('#main-menu').prepend('<div id="main-menu-right"></div>');
+        //  $('#main-menu').prepend('<img src="/resource/images/addfolder.png" class="hint--top hint--bounce child_img" data-hint="Bounce" id="qwerty">');
+        //  $('#qwerty').before('<img src="/resource/images/back.png" class="child_img" id="back_button">');
+        // //  $('#main-menu-left').after('<div id="main-menu-right"></div>')
+        //  $('#main-menu-right').prepend('<img src="/resource/images/addfolder.png" id="qwerty">');
+        // //  $('#qwerty').wrap('<div class="hint--top hint--bounce child_img" data-hint="Bounce" id="wrap-img"></div>');
+        //  $('#qwerty').after('<img src="/resource/images/addfile.png" class="hint--left hint--bounce child_img" data-hint="Bounce" id="qwerty2">');
 
          $('.parent').eq(length-1).css({
            'border-bottom-right-radius': '5px',
@@ -103,31 +113,6 @@ function draw(li, name) { //отрисовка полосочек
        $('.clear').detach();
        listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
      }
-=======
-function draw(li) { //отрисовка полосочек
-    var trash=$('.parent');
-    for (var i=0; i<trash.length; i++) 
-        trash.eq(i).detach(); //удалили всё, что было
-    var length=li.length, listFile=$('#listFile');
-    if (li[0].length!=' ') {
-        for (var i=0; i<length; i++)
-            listFile.prepend('<p class="listFileText"></p>');
-        for (var i=0; i<length; i++) {
-            $('.listFileText').eq(i).text(li[i]);
-            $('.listFileText').eq(i).wrap('<div class="child"></div');
-            $('.child').eq(i).wrap('<div class="parent"></div>');
-            $('.child').eq(i).before('<img class="child_img">');
-            var src=typeDocument(li[i]);
-            $('.child_img').eq(i).attr('src', src);
-        }
-        $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-        var cl = document.getElementById('clear');
-        if (cl!=null) cl.remove();
-    }
-    else {
-    listFile.prepend('<p id="clear">Нет файлов, дружище</p>');
-    }
->>>>>>> b67d8a642fdc54dd97085a78c4ef7242c109fa26:web/js/files_script.js
 };
 
 Element.prototype.remove = function() {
@@ -637,4 +622,14 @@ function openAndDownloadFile() {
             }
         }
     })
+};
+
+function buttons() {
+$('#back-button').on('click', function() {
+  back();
+});
+
+$('#add_dir_button').on('click', function() {
+  addNewDirectory();
+});
 };

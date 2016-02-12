@@ -1,26 +1,39 @@
 window.onload=drawSnake;
-const dimention=40;
-const upperBorder=400/dimention;
 const lowerBorder=0;
-const MouseRad=dimention-5;
-const SnakeHead=MouseRad;
-const WinCountBorder=((upperBorder*upperBorder)/3);
-var Snake=[[dimention, dimention], [dimention, dimention*2], [dimention*2, dimention*2], [dimention*2, dimention*3]];
-var Mouse=[dimention*8, dimention*5];
-var IsGaming=true;
+const MouseRad=500;
+const SnakeHeadRad=400;
+const imageHeight=400;
+var dimension;
+setDimension();
+var upperBorder=imageHeight/dimension;
+var WinCountBorder=getVictoryConv();
+var Snake=[[dimension, dimension], [dimension, dimension*2], [dimension*2, dimension*2], [dimension*2, dimension*3]];
+var Mouse;
+var IsGaming=false;
 var Length=4;
+var greater=false;
+var winFail=false;
+genNewMouse();
 function drawSnake(){
     var svgDoc = document.getElementById('snakeArea').contentDocument;
     var svggr =  svgDoc.getElementById('svggr');
     while (svggr.firstChild) {
             svggr.removeChild(svggr.firstChild);
     }
-    var circle = svgDoc.createElementNS("http://www.w3.org/2000/svg",'circle');
-    circle.setAttribute('cx', Mouse[0]);
-    circle.setAttribute('cy', Mouse[1]);
-    circle.setAttribute('r', MouseRad);
-    circle.setAttribute('fill', 'grey');
-    svggr.appendChild(circle);
+    if (!winFail && !IsGaming){
+        var line = svgDoc.createElementNS("http://www.w3.org/2000/svg",'text');
+        line.setAttribute('x', dimension*(upperBorder/3));
+        line.setAttribute('y', dimension*(upperBorder/3));
+        line.setAttribute('fill', 'red');
+        line.setAttribute('transform', 'rotate(30 20,40)');
+        line.setAttribute('style', 'font-size:'+(upperBorder+30)+';');
+        line.textContent='Select game mode';
+        svggr.appendChild(line);
+    }
+    svgDoc.getElementById('mouse').setAttribute('viewBox', 
+            (-(Mouse[0]*(320/(dimension))-(MouseRad/2)))+' '+
+            (-(Mouse[1]*(320/(dimension))-(MouseRad/2)))+' '+
+            (MouseRad*(320/(dimension)))+' '+(MouseRad*(320/(dimension))));
     var isGray=true;
     for (var i=0; i<Length-1; i++){
         var line = svgDoc.createElementNS("http://www.w3.org/2000/svg",'line');
@@ -30,128 +43,128 @@ function drawSnake(){
         line.setAttribute('y2', Snake[i+1][1]);
         if (isGray){
         line.setAttribute('style', 
-                "stroke:darkcyan;stroke-width:"+(dimention-5)+";stroke-linecap:round;");
+                "stroke:darkcyan;stroke-width:"+(dimension-5)+";stroke-linecap:round;");
         } else {
         line.setAttribute('style', 
-                "stroke:brown;stroke-width:"+(dimention-5)+";stroke-linecap:round;");
+                "stroke:brown;stroke-width:"+(dimension-5)+";stroke-linecap:round;");
         }
         isGray=!isGray;
         svggr.appendChild(line);
     }
-    var head = svgDoc.createElementNS("http://www.w3.org/2000/svg",'circle');
-    head.setAttribute('cx', Snake[Length-1][0]);
-    head.setAttribute('cy',Snake[Length-1][1]);
-    head.setAttribute('r', MouseRad);
-    head.setAttribute('fill', 'yellow');
-    svggr.appendChild(head);
+    svgDoc.getElementById('head').setAttribute('viewBox', 
+            (-(Snake[Length-1][0]*(8/(dimension/10))-(80)))+' '+
+            (-(Snake[Length-1][1]*(8/(dimension/10))-(80)))+' '+
+            SnakeHeadRad/(dimension/80)+' '+SnakeHeadRad/(dimension/80));
 }
 
 $(document).bind('keypress', function (e){
     if(IsGaming){
         if(e.which== 104){//h-left
-            if(!(Snake[Length-2][0]==Snake[Length-1][0]-dimention
+            if(!(Snake[Length-2][0]==Snake[Length-1][0]-dimension
                     && Snake[Length-2][1]==Snake[Length-1][1])){
-                if(!headEquals(Mouse[0], Mouse[1])){
+                if(!headEquals(Mouse[0], Mouse[1]) && !greater){
                     Snake=rolLeft(Snake);
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0]-dimention;
-                    Snake[Length-1][1]=Snake[Length-2][1];
-                    drawSnake();
-                } else {
-                    genNewMouse();
-                    drawSnake();
-                    Length++;
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0]-dimention;
-                    Snake[Length-1][1]=Snake[Length-2][1];
-                    drawSnake();
                 }
+                if (greater) {
+                    Length++;
+                    greater=false;
+                }
+                Snake[Length-1]=[];
+                Snake[Length-1][0]=Snake[Length-2][0]-dimension;
+                Snake[Length-1][1]=Snake[Length-2][1];
+                if(headEquals(Mouse[0], Mouse[1])){
+                    genNewMouse(true, false);
+                    greater=true;
+                }
+                drawSnake();
             }
         } else if(e.which== 106){//j-down
             if(!(Snake[Length-2][0]==Snake[Length-1][0]
-                    && Snake[Length-2][1]==Snake[Length-1][1]+dimention)){
-                if(!headEquals(Mouse[0], Mouse[1])){
+                    && Snake[Length-2][1]==Snake[Length-1][1]+dimension)){
+                if(!headEquals(Mouse[0], Mouse[1]) && !greater){
                     Snake=rolLeft(Snake);
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0];
-                    Snake[Length-1][1]=Snake[Length-2][1]+dimention;
-                    drawSnake();
-                } else {
-                    genNewMouse();
-                    drawSnake();
+                } 
+                if (greater) {
                     Length++;
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0];
-                    Snake[Length-1][1]=Snake[Length-2][1]+dimention;
-                    drawSnake();
+                    greater=false;
                 }
+                Snake[Length-1]=[];
+                Snake[Length-1][0]=Snake[Length-2][0];
+                Snake[Length-1][1]=Snake[Length-2][1]+dimension;
+                if(headEquals(Mouse[0], Mouse[1])){
+                    genNewMouse(true, true);
+                    greater=true;
+                }
+                drawSnake();
             }
         } else if(e.which== 107){//k-up
             if(!(Snake[Length-2][0]==Snake[Length-1][0]
-                    && Snake[Length-2][1]==Snake[Length-1][1]-dimention)){
-                if(!headEquals(Mouse[0], Mouse[1])){
+                    && Snake[Length-2][1]==Snake[Length-1][1]-dimension)){
+                if(!headEquals(Mouse[0], Mouse[1]) && !greater){
                     Snake=rolLeft(Snake);
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0];
-                    Snake[Length-1][1]=Snake[Length-2][1]-dimention;
-                    drawSnake();
-                } else {
-                    genNewMouse();
-                    drawSnake();
+                } 
+                if (greater) {
                     Length++;
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0];
-                    Snake[Length-1][1]=Snake[Length-2][1]-dimention;
-                    drawSnake();
+                    greater=false;
                 }
+                Snake[Length-1]=[];
+                Snake[Length-1][0]=Snake[Length-2][0];
+                Snake[Length-1][1]=Snake[Length-2][1]-dimension;
+                if(headEquals(Mouse[0], Mouse[1])){
+                    genNewMouse(false, true);
+                    greater=true;
+                }
+                drawSnake();
             }
         } else if(e.which== 108){//l-right
-            if(!(Snake[Length-2][0]==Snake[Length-1][0]+dimention
+            if(!(Snake[Length-2][0]==Snake[Length-1][0]+dimension
                     && Snake[Length-2][1]==Snake[Length-1][1])){
-                if(!headEquals(Mouse[0], Mouse[1])){
+                if(!headEquals(Mouse[0], Mouse[1]) && !greater){
                     Snake=rolLeft(Snake);
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0]+dimention;
-                    Snake[Length-1][1]=Snake[Length-2][1];
-                    drawSnake();
-                } else {
-                    genNewMouse();
-                    drawSnake();
+                } 
+                if (greater) {
                     Length++;
-                    Snake[Length-1]=[];
-                    Snake[Length-1][0]=Snake[Length-2][0]+dimention;
-                    Snake[Length-1][1]=Snake[Length-2][1];
-                    drawSnake();
+                    greater=false;
                 }
+                Snake[Length-1]=[];
+                Snake[Length-1][0]=Snake[Length-2][0]+dimension;
+                Snake[Length-1][1]=Snake[Length-2][1];
+                if(headEquals(Mouse[0], Mouse[1])){
+                    genNewMouse(false, false);
+                    greater=true;
+                }
+                drawSnake();
             }
         }
-        if(((Snake[Length-1][0]<=lowerBorder) || (Snake[Length-1][0]>=dimention*upperBorder))
-            || (Snake[Length-1][1]>=dimention*upperBorder || Snake[Length-1][1]<=lowerBorder)
-            ||isOnTail(Snake[Length-1][0], Snake[Length-1][1])){
+        if(((Snake[Length-1][0]<=lowerBorder) || (Snake[Length-1][0]>=dimension*upperBorder))
+            || (Snake[Length-1][1]>=dimension*upperBorder || Snake[Length-1][1]<=lowerBorder)
+            ||isHeadOnTail(Snake[Length-1][0], Snake[Length-1][1])){
             var svgDoc = document.getElementById('snakeArea').contentDocument;
             var svggr =  svgDoc.getElementById('svggr');
             var line = svgDoc.createElementNS("http://www.w3.org/2000/svg",'text');
-            line.setAttribute('x', dimention*(upperBorder/3));
-            line.setAttribute('y', dimention*(upperBorder/3));
+            line.setAttribute('x', dimension*(upperBorder/3));
+            line.setAttribute('y', dimension*(upperBorder/3));
             line.setAttribute('fill', 'red');
             line.setAttribute('transform', 'rotate(30 20,40)');
             line.setAttribute('style', 'font-size:'+(upperBorder+30)+';');
             line.textContent='GAME OVER';
             svggr.appendChild(line);
             IsGaming=false;
+            winFail=true;
         }
-        if(Length>=WinCountBorder){
+        if(Length>=WinCountBorder && IsGaming){
             var svgDoc = document.getElementById('snakeArea').contentDocument;
             var svggr =  svgDoc.getElementById('svggr');
             var line = svgDoc.createElementNS("http://www.w3.org/2000/svg",'text');
-            line.setAttribute('x', dimention*(upperBorder/25));
-            line.setAttribute('y', dimention*(upperBorder/10));
+            line.setAttribute('x', dimension*(upperBorder/25));
+            line.setAttribute('y', dimension*(upperBorder/10));
             line.setAttribute('fill', 'red');
             line.setAttribute('transform', 'rotate(45 45,40)');
             line.setAttribute('style', 'font-size:'+(upperBorder+30)+';');
             line.textContent='XD !1!1!YOU WIN!1!1! XD';
             svggr.appendChild(line);
             IsGaming=false;
+            winFail=true;
         }
     }
 });
@@ -168,20 +181,68 @@ function rolLeft(list){
     return newlist;
 }
 
-function isOnTail(x, y){
+function isHeadOnTail(x, y){
     var c=0;
-    for(var i=0; i<Length-2;i++)
+    for(var i=0; i<Length-1;i++)
         if (Snake[i][0]==x && Snake[i][1]==y) c++;
     if (c!=0) return true;
     return false;
 }
 
-function genNewMouse(){
-    var x=0, y=0;
-    do {
-        x=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*dimention;
-        y=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*dimention;
-    } while(isOnTail(x,y))
-    Mouse[0]=x;
-    Mouse[1]=y;
+function isMouseOnTail(x, y, left, up){
+        var c=0;
+        for(var i=0; i<Length;i++)
+            if (Snake[i][0]==x && Snake[i][1]==y) c++;
+        if (c!=0) return true;
+        return false;
 }
+
+function genNewMouse(left, up){
+    if (Length<(upperBorder-1)*(upperBorder-1)-1){
+        var x=0, y=0;
+        Mouse=[];
+        do {
+            x=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*dimension;
+            y=(Math.floor((Math.random() * (upperBorder-1)) + (lowerBorder+1)))*dimension;
+        } while(isMouseOnTail(x, y, left, up))
+        Mouse[0]=x;
+        Mouse[1]=y;
+    } else {
+        Mouse=[];
+        Mouse[0]=-1000;
+        Mouse[1]=-1000;
+    }
+}
+
+function setDimension(){
+    if(document.getElementById('dim_low').checked) dimension=20;
+    if(document.getElementById('dim_middle').checked) dimension=40;
+    if(document.getElementById('dim_high').checked) dimension= 80;
+    upperBorder=imageHeight/dimension;
+}
+
+function getVictoryConv(){
+    if(document.getElementById('d_hard').checked) return (upperBorder-1)*(upperBorder-1);
+    if(document.getElementById('d_middle').checked) return 2*(((upperBorder-1)*(upperBorder-1))/3);
+    if(document.getElementById('d_ligth').checked) return (((upperBorder-1)*(upperBorder-1))/2);
+}
+
+function startGame(){
+    if (!IsGaming && !winFail){
+        setDimension();
+        WinCountBorder=getVictoryConv();
+        IsGaming=true;
+        drawSnake();
+    }
+}
+
+var rad = document.dim_form.dimension;
+for(var i = 0; i < rad.length; i++) 
+    rad[i].onclick = function() { 
+        if (!IsGaming){
+            setDimension();
+            Snake=[[dimension, dimension], [dimension, dimension*2], [dimension*2, dimension*2], [dimension*2, dimension*3]]; 
+            genNewMouse();
+            drawSnake();
+        }
+    };
