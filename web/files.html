@@ -4,6 +4,7 @@
         <title> Your Files </title>
         <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" type="text/css" href="css/files_style.css"/>
+        <link rel="stylesheet" href="css/hint.min.css">
         <meta charset="UTF-8">
         <head>
     <body onload='httpLoadDir(getCurrentDirectory())'>
@@ -15,6 +16,8 @@
         </form>
         <div id='globalDirectory'>Current directory: /</div>
         <section id='listFile'></section>
+
+        <a class="hint--right hint--bounce" data-hint="Bounce">Adding a <code>hint--bounce</code> class gives you that...</a>
     </body>
     <script src='js/jquery.js'></script>
     <script src='js/files_script.js'></script>
