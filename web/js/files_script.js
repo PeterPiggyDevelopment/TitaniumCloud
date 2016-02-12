@@ -61,6 +61,9 @@ function draw(li, name) { //отрисовка полосочек
      var trash=$('.parent');
      for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
      $('#name-user').detach();
+     $('#add_dir_button').detach();
+     $('#back_button').detach();
+
 
    var length=li.length,
        listFile=$('#listFile');
@@ -86,20 +89,13 @@ function draw(li, name) { //отрисовка полосочек
 
          $('#name-user').before('<div id="main-menu"></div>');
          $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
-         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
+         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2" type="file">')
          $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
          $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
          $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
 
          buttons();
-         //$('#main-menu').prepend('<div id="main-menu-right"></div>');
-        //  $('#main-menu').prepend('<img src="/resource/images/addfolder.png" class="hint--top hint--bounce child_img" data-hint="Bounce" id="qwerty">');
-        //  $('#qwerty').before('<img src="/resource/images/back.png" class="child_img" id="back_button">');
-        // //  $('#main-menu-left').after('<div id="main-menu-right"></div>')
-        //  $('#main-menu-right').prepend('<img src="/resource/images/addfolder.png" id="qwerty">');
-        // //  $('#qwerty').wrap('<div class="hint--top hint--bounce child_img" data-hint="Bounce" id="wrap-img"></div>');
-        //  $('#qwerty').after('<img src="/resource/images/addfile.png" class="hint--left hint--bounce child_img" data-hint="Bounce" id="qwerty2">');
 
          $('.parent').eq(length-1).css({
            'border-bottom-right-radius': '5px',
@@ -470,11 +466,11 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-(function addNewDirectory() { //создание новой папки
+function addNewDirectory() { //создание новой папки
   $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
-        $('section').prepend('<img class="child_img" src="image/folder.png" id="new">');
+        $('#name-user').after('<img class="child_img" src="/resource/images/folder.png" id="new">');
         var greenElephant=$('#new');
         greenElephant.wrap('<div class="parent folders" id="last"></div>');
         $('#new').after('<input type="text" id="inputNewName">');
@@ -483,19 +479,21 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
         inputNewName.focus();
         greenElephant.removeAttr('id');
         inputNewName.blur(function() {
+          if (inputNewName.val!='')
             endCreateNewDirectory(inputNewName)
         });
 
         inputNewName.keydown(function(event) {
           if (event.which==13) {
-            endCreateNewDirectory(inputNewName)
+           if (inputNewName.val!='')
+             endCreateNewDirectory(inputNewName)
           }
         });
 
 
 });
 
-})();
+};
 
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
@@ -629,7 +627,46 @@ $('#back-button').on('click', function() {
   back();
 });
 
+$('#qwerty2').on('click', function() {
+  
+});
+
 $('#add_dir_button').on('click', function() {
   addNewDirectory();
 });
 };
+
+window.downloadFile = function (sUrl) {
+    //iOS devices do not support downloading. We have to inform user about this.
+    if (/(iP)/g.test(navigator.userAgent)) {
+        alert('Your device does not support files downloading. Please try again in desktop browser.');
+        return false;
+    }
+
+    //If in Chrome or Safari - download via virtual link click
+    if (window.downloadFile.isChrome || window.downloadFile.isSafari) {
+        //Creating new link node.
+        var link = document.createElement('a');
+        link.href = sUrl;
+
+        if (link.download !== undefined) {
+            //Set HTML5 download attribute. This will prevent file from opening if supported.
+            var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
+            link.download = fileName;
+        }
+
+        //Dispatching click event.
+        if (document.createEvent) {
+            var e = document.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            link.dispatchEvent(e);
+            return true;
+        }
+    }
+
+    window.open(sUrl, '_self');
+    return true;
+}
+
+window.downloadFile.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+window.downloadFile.isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;

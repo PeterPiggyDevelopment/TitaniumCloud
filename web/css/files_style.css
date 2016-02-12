@@ -51,6 +51,7 @@ font-family: 'Open Sans Light';
 font-size: 0.8em;
 display: flex;
 justify-content: flex-end;
+align-items: center;
 }
 
 .download:link {
@@ -60,8 +61,10 @@ zoom: 0.7;
 .share_text {
 border: 1px solid #4682B4;
 border-radius: 7px;
-padding-left: 5px;
-padding-right: 5px;
+padding-left: 3px;
+padding-right: 3px;
+/*padding-top: 1px;
+padding-bottom: 1px;*/
 background-color: #B0E0E6;
 margin-right: 4px;
 }
@@ -89,6 +92,7 @@ cursor: pointer;
 
 #inputNewName {
 font-family: 'Open Sans Light';
+height: 14px;
 }
 
 #alert-text {
@@ -116,20 +120,6 @@ margin: 1vw;
 font-size: 3vw;
 
 }
-
-/*#back_button {
-margin: auto;
-width: 15vw;
-height: 5vw;
-font-size: 2vw;
-}*/
-
-/*#add_dir_button {
-margin: auto;
-width: 15vw;
-height: 5vw;
-font-size: 2vw;
-}*/
 
 #name-user {
 width: 100%;
@@ -171,6 +161,10 @@ margin-top: 6px;
 
 #add_dir_button:hover, #qwerty2:hover {
 cursor: pointer;
+}
+
+#add_dir_button:active {
+  width: 17px;
 }
 
 #qwerty2{
