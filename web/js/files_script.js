@@ -89,11 +89,14 @@ function draw(li, name) { //отрисовка полосочек
 
          $('#name-user').before('<div id="main-menu"></div>');
          $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
-         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2" type="file">')
+         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
          $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
          $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
          $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
+         $('#qwerty2').wrap('<label></label>');
+         $('#qwerty2').wrap('<form method="post", enctype="multipart/form-data">')
+         $('#qwerty2').after('<input id="test" type="file" hidden>');
 
          buttons();
 
@@ -628,7 +631,8 @@ $('#back-button').on('click', function() {
 });
 
 $('#qwerty2').on('click', function() {
-  
+  var path=$('#test').val(); //путь файла
+
 });
 
 $('#add_dir_button').on('click', function() {
