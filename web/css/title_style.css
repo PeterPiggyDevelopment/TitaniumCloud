@@ -381,6 +381,8 @@ html, body {
 }
 
 #b-register {
+  justify-content:center;
+  text-align:center;
   border: 1px solid rgb(94, 143, 207);
   width: 100%;
   height: 32px;
@@ -391,17 +393,19 @@ html, body {
 }
 
 #b-have {
-  border: 1px solid rgb(138, 68, 180);
+  color:blue;
+  text-decoration: underline;
+  border: 1px solid rgba(138, 68, 180, 0);
   width: 68%;
   height: 32px;
   font-size: 0.95em;
   border-radius: 5px;
-  background-color: rgb(171, 110, 208);
+  background-color: rgba(171, 110, 208, 0);
 }
 
 #b-have:hover {
   cursor: pointer;
-  opacity: 0.8;
+  opacity: 0.7;
 }
 
 
