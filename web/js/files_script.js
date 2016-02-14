@@ -56,30 +56,73 @@ function typeDocument(string) { //определяет тип документа
 return src;
 };
 
-function draw(li) { //отрисовка полосочек
-    var trash=$('.parent');
-    for (var i=0; i<trash.length; i++) 
-        trash.eq(i).detach(); //удалили всё, что было
-    var length=li.length, listFile=$('#listFile');
-    if (li[0].length!=' ') {
-        for (var i=0; i<length; i++)
-            listFile.prepend('<p class="listFileText"></p>');
-        for (var i=0; i<length; i++) {
-            $('.listFileText').eq(i).text(li[i]);
-            $('.listFileText').eq(i).wrap('<div class="child"></div');
-            $('.child').eq(i).wrap('<div class="parent"></div>');
-            $('.child').eq(i).before('<img class="child_img">');
-            var src=typeDocument(li[i]);
-            $('.child_img').eq(i).attr('src', src);
-        }
-        $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-        var cl = document.getElementById('clear');
-        if (cl!=null) cl.remove();
-    }
-    else {
-    listFile.prepend('<p id="clear">Нет файлов, дружище</p>');
-    }
+function draw(li, name) { //отрисовка полосочек
+
+     var trash=$('.parent');
+     for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
+     $('#name-user').detach();
+     $('#add_dir_button').detach();
+     $('#back_button').detach();
+
+
+   var length=li.length,
+       listFile=$('#listFile');
+
+     if (li[0].length!=' ') {
+         for (var i=0; i<length; i++) {
+             listFile.prepend('<p class="listFileText"></p>');
+         }
+
+         for (var i=0; i<length; i++) {
+             $('.listFileText').eq(i).text(li[i]);
+             $('.listFileText').eq(i).wrap('<div class="child"></div');
+             $('.child').eq(i).wrap('<div class="parent"></div>');
+             $('.child').eq(i).before('<img class="child_img">');
+             var src=typeDocument(li[i]);
+             $('.child_img').eq(i).attr('src', src);
+         }
+
+         $('.parent').eq(0).before('<div id="name-user"></div>');
+         $('#name-user').prepend('<img class="child_img" src="/resource/images/user.png" id="person" align="right">');
+         $('#person').after('<p id="user-text"></p>');
+         $('#user-text').text(name);
+
+         $('#name-user').before('<div id="main-menu"></div>');
+         $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
+         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
+         $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
+         $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
+         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
+         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
+         $('#qwerty2').wrap('<label></label>');
+         $('#qwerty2').after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
+         $('#qwerty2').wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
+         $('#qwerty2').after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
+
+         buttons();
+
+         $('.parent').eq(length-1).css({
+           'border-bottom-right-radius': '5px',
+           'border-bottom-left-radius' : '5px'
+         });
+
+         $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
+
+     }
+     else {
+       $('.clear').detach();
+       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
+     }
 };
+
+function changeInpName(elem){
+    elem.name = getCurrentDirectory();
+    elem.form.submit();
+}
+
+function handleResponse(){
+    alert('Hooray! File downloaded!');
+}
 
 Element.prototype.remove = function() {
     this.parentElement.removeChild(this);
@@ -436,11 +479,11 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-(function addNewDirectory() { //создание новой папки
+function addNewDirectory() { //создание новой папки
   $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
-        $('section').prepend('<img class="child_img" src="image/folder.png" id="new">');
+        $('#name-user').after('<img class="child_img" src="/resource/images/folder.png" id="new">');
         var greenElephant=$('#new');
         greenElephant.wrap('<div class="parent folders" id="last"></div>');
         $('#new').after('<input type="text" id="inputNewName">');
@@ -449,19 +492,21 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
         inputNewName.focus();
         greenElephant.removeAttr('id');
         inputNewName.blur(function() {
+          if (inputNewName.val!='')
             endCreateNewDirectory(inputNewName)
         });
 
         inputNewName.keydown(function(event) {
           if (event.which==13) {
-            endCreateNewDirectory(inputNewName)
+           if (inputNewName.val!='')
+             endCreateNewDirectory(inputNewName)
           }
         });
 
 
 });
 
-})();
+};
 
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
@@ -481,13 +526,12 @@ function httpLoadDir(dir) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             folder=sort(xhttp.responseText), //массив, с которого будем рисовать
             count=countFolders(folder); //количетво папок
-            draw(folder); //отрисовали структуру
+            draw(folder, getNameCookie()); //отрисовали структуру
             renameFolders(); //переименовали папки
             openAndDownloadFile();
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
             document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
-            document.getElementById('uploadfileinp').name = getCurrentDirectory();
         }
     };
     xhttp.send();
@@ -589,3 +633,53 @@ function openAndDownloadFile() {
         }
     })
 };
+
+function buttons() {
+$('#back-button').on('click', function() {
+  back();
+});
+
+$('#qwerty2').on('click', function() {
+  var path=$('#test').val(); //путь файла
+
+});
+
+$('#add_dir_button').on('click', function() {
+  addNewDirectory();
+});
+};
+
+window.downloadFile = function (sUrl) {
+    //iOS devices do not support downloading. We have to inform user about this.
+    if (/(iP)/g.test(navigator.userAgent)) {
+        alert('Your device does not support files downloading. Please try again in desktop browser.');
+        return false;
+    }
+
+    //If in Chrome or Safari - download via virtual link click
+    if (window.downloadFile.isChrome || window.downloadFile.isSafari) {
+        //Creating new link node.
+        var link = document.createElement('a');
+        link.href = sUrl;
+
+        if (link.download !== undefined) {
+            //Set HTML5 download attribute. This will prevent file from opening if supported.
+            var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
+            link.download = fileName;
+        }
+
+        //Dispatching click event.
+        if (document.createEvent) {
+            var e = document.createEvent('MouseEvents');
+            e.initEvent('click', true, true);
+            link.dispatchEvent(e);
+            return true;
+        }
+    }
+
+    window.open(sUrl, '_self');
+    return true;
+}
+
+window.downloadFile.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
+window.downloadFile.isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;

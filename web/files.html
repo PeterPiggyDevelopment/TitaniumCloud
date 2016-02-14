@@ -4,17 +4,32 @@
         <title> Your Files </title>
         <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
         <link rel="stylesheet" type="text/css" href="css/files_style.css"/>
+        <link rel="stylesheet" href="css/hint.min.css">
         <meta charset="UTF-8">
+
+        <style media="screen">
+        #s:before,
+        #s:after,
+        .clear:before,
+        .clear:after {
+          content: " ";
+          display: table;
+        }
+        </style>
         <head>
     <body onload='httpLoadDir(getCurrentDirectory())'>
-        <button id= 'back_button' type='button' onclick='back()'>BACK</button>
-        <button id= 'add_dir_button' type='button' onclick='addNewDirectory()'>Add directory</button>
+        <!-- <button id= 'back_button' type='button' onclick='back()'>BACK</button> -->
+        <!-- <button id= 'add_dir_button' type='button' onclick='addNewDirectory()'>Add directory</button> -->
         <form method='post', enctype='multipart/form-data'>
             <input id='uploadfileinp' type='file' name='uname'>
             <input type='submit' name='uploadfile' value='Upload'>
         </form>
         <div id='globalDirectory'>Current directory: /</div>
         <section id='listFile'></section>
+        <!-- <label>
+            <img src="/resource/images/addfile.png">
+            <input id='test' type="file" hidden>
+        </label> -->
     </body>
     <script src='js/jquery.js'></script>
     <script src='js/files_script.js'></script>

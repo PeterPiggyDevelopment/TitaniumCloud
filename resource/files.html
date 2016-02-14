@@ -1,0 +1,223 @@
+<!DOCTYPE HTML>
+<html onclick='handleEvent(event)'>
+    <head>
+        <title> Your Files </title>
+        <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="css/hint.min.css">
+        <meta charset="UTF-8">
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            section {
+                width: 50%;
+                position: relative;
+                margin: 0 auto;
+                /*border-top: 1px solid #87CEEB;*/
+            }
+
+            .listFileText {
+                font-family: 'Open Sans Light';
+                font-size: 1em;
+            }
+
+            .parent {
+                width: 100%;
+                height: 27px;
+                border-right: 1px solid #87CEEB;
+                border-left: 1px solid #87CEEB;
+                border-top: 1px solid #87CEEB;
+                display: flex;
+                justify-content: left;
+                align-items: center;
+            }
+
+            .child {
+                width: 100%;
+                display:flex;
+                justify-content: space-between;
+            }
+
+            .child_img {
+                width: 2.5%;
+                display:flex;
+                justify-content: flex-start;
+                margin-right: 1%;
+                margin-left: 0.5em;
+            }
+
+            .parent:hover {
+                background-color: #F0FFF0;
+                cursor: pointer;
+            }
+
+            .download {
+                font-family: 'Open Sans Light';
+                font-size: 0.8em;
+                display: flex;
+                justify-content: flex-end;
+            }
+
+            .download:link {
+                zoom: 0.7;
+            }
+
+            .share_text {
+                border: 1px solid #4682B4;
+                border-radius: 7px;
+                padding-left: 5px;
+                padding-right: 5px;
+                background-color: #B0E0E6;
+                margin-right: 4px;
+            }
+
+            .functions-menu {
+                color: #000000;
+                background-color: #FFFFFF;
+                z-index: 99;
+                list-style-type: none;
+                border: 1px solid #D3D3D3;
+                border-radius: 5px;
+                padding: 0.5%;
+            }
+
+            .functions-menu-buttons {
+                color: #000000;
+                font-family: 'Open Sans Light';
+                font-size: 0.9em;
+            }
+
+            .functions-menu-buttons:hover {
+                color: #1E90FF;
+                cursor: pointer;
+            }
+
+            #inputNewName {
+                font-family: 'Open Sans Light';
+            }
+
+            #alert-text {
+                font-family: 'Open Sans Light';
+                color: #FF0000;
+                font-size: 1em;
+                background-color: #FFA07A;
+                padding: 0.5% 1% 0.5% 1%;
+                border-radius: 5px;
+            }
+
+            #alert-wrap {
+                display: flex;
+                justify-content: center;
+                padding: 0.5%;
+                z-index: 9999;
+            }
+
+            #paste {
+                display: none;
+            }
+
+            #globalDirectory {
+                margin: 1vw;
+                font-size: 3vw;
+
+            }
+
+            #back_button {
+                margin: auto;
+                width: 15vw;
+                height: 5vw;
+                font-size: 2vw;
+            }
+
+            #add_dir_button {
+                margin: auto;
+                width: 15vw;
+                height: 5vw;
+                font-size: 2vw;
+            }
+
+            #name-user {
+              height: 27px;
+              background-color: rgba(215, 234, 238, 0.65);
+              border-right: 1px solid #87CEEB;
+              border-left: 1px solid #87CEEB;
+              border-top: 1px solid #87CEEB;
+              border-top-left-radius: 5px;
+              border-top-right-radius: 5px;
+              display: flex;
+              align-items: center;
+              flex-wrap: nowrap;
+            }
+
+            #user-text {
+              font-family: 'Open Sans Light';
+              font-weight: bold;
+              font-size: 0.9em;
+            }
+
+            #main-menu {
+              width: 100%;
+              height: 27px;
+              display: flex;
+              flex-wrap: nowrap;
+              align-items: center;
+              justify-content: flex-end;
+              margin-bottom: -5px;
+            }
+
+            #main-menu-left {
+              width: 100%;
+              height: 27px;
+            }
+
+            #main-menu-right {
+              /*height: 27px;
+              width: 90%;*/
+            }
+
+            #qwerty, #qwerty2 {
+              display: inline;
+            }
+
+            #qwerty:hover, #qwerty2:hover {
+              cursor: pointer;
+            }
+
+            #qwerty:active, #qwerty2:active {
+              width: 2.3%;
+            }
+
+            #qwerty2{
+              margin-left: 0px;
+            }
+
+        </style>
+        <head>
+    <body onload='httpLoadDir(getCurrentDirectory())'>
+        <button id= 'back_button' type='button' onclick='back()'>BACK</button>
+        <button id= 'add_dir_button' type='button' onclick='addNewDirectory()'>Add directory</button>
+        <form method='post', enctype='multipart/form-data'>
+            <input id='uploadfileinp' type='file' name='uname'>
+            <input type='submit' name='uploadfile' value='Upload'>
+        </form>
+        <div id='globalDirectory'>Current directory: /</div>
+        <section id='listFile'></section>
+
+        <div class="hint--right hint--bounce" data-hint="Bounce">sbdvbsdsbv</div>
+        <a class="hint--right hint--bounce" data-hint="Bounce">Adding a <code>hint--bounce</code> class gives you that...</a>
+
+    </body>
+
+
+    <script src='js/jquery.js'></script>
+    <script src='js/functions.js'></script>
+    <script src='js/additional_functionality.js'></script>
+    <script type="text/javascript">
+            folder=sort("afadsfadsf"), //массив, с которого будем рисовать
+            count=countFolders(folder); //количетво пoпок
+    </script>
+
+</html>
