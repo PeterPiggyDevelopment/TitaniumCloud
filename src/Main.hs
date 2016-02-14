@@ -161,7 +161,9 @@ main = do
                          (pack (getFile (rqBody request))))
                          (getFileName (rqBody request)) 
                          (getNameAttr (rqBody request))
-                  >> return (respond OK :: Response String)
+                  >> return (sendHtml OK $ script $ primHtml
+                            "window.parent.handleResponse();window.parent.httpLoadDir(window.parent.getCurrentDirectory());"
+                         )
                    where 
                     getFileName body = head (splitOn "\"" (last (splitOn "filename=\"" body)))
                     getNameAttr body = splitOn "\""  body !! 1
