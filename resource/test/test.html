@@ -4,8 +4,7 @@
     <meta charset="utf-8">
     <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One">
     <link href='https://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-    <!-- <script type="text/javascript" src="//yastatic.net/es5-shims/0.0.2/es5-shims.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="//yastatic.net/share2/share.js" charset="utf-8"></script> -->
+    <script src="http://zeptojs.com/zepto.min.js" charset="utf-8"></script>
     <title></title>
     <style media="screen">
     * {
@@ -33,7 +32,6 @@
     .main {
       height: 60%;
       width: 50%;
-      /*background-color: black;*/
       position: relative;
     }
 
@@ -76,7 +74,6 @@
       flex-wrap: nowrap;
       height: 60%;
       width: 50%;
-      /*background-color: white;*/
       display: flex;
       justify-content: center;
     }
@@ -92,7 +89,7 @@
       font-family: 'Open Sans';
     }
 
-    #b-register {
+    .b-register {
       border: 1px solid rgb(94, 143, 207);
       width: 100%;
       height: 32px;
@@ -117,7 +114,7 @@
     }
 
 
-    #b-register:hover {
+    .b-register:hover {
       cursor: pointer;
       opacity: 0.8;
     }
@@ -135,15 +132,14 @@
       width: 38%;
     }
 
-
-    #wrap-form {
+    .wrap-form {
       width: 260px;
       background-color: rgba(255, 255, 255, 0.3);
       padding: 5px 5px;
       border-radius: 7px;
     }
 
-    #green-elephant {
+    .green-elephant {
       padding: 5px 0px;
       padding-left: 5px;
       color: white;
@@ -159,11 +155,11 @@
       font-size: 0.9em;
     }
 
-    #text-have {
+    .text-have {
       border-bottom: 1px solid rgb(49, 160, 185);
     }
 
-    #text-have:hover {
+    .text-have:hover {
       cursor: pointer;
       color: rgb(95, 41, 172);
       border-bottom: 1px solid rgb(95, 41, 172);
@@ -173,8 +169,8 @@
   		width: 100%;
   		margin: 0 auto;
       height: 100%;
-      display: flex;
-      align-items: center;
+      position: relative;
+      background: linear-gradient(to top, rgba(240, 180, 222, 0.93), rgb(252, 252, 252));
   	}
 
   	.container .cols {
@@ -214,20 +210,6 @@
   		clear: both;
   	}
 
-    .circle {
-    width: 250px;
-    height: 250px;
-    background: #cc0000;
-    -moz-border-radius: 1000px;
-    -webkit-border-radius: 1000px;
-    border-radius: 1000px;
-    position: relative;
-    margin: 0 auto;
-
-    margin-bottom: 0.5em;
-
-    }
-
     .why-text {
       color: gray;
       font-size: 1.5em;
@@ -236,13 +218,35 @@
     .why-zagolovok {
       color: gray;
       font-size: 1.7em;
+      font-weight: bold;
     }
 
-    /*#border {
-      border-left: 1px solid black;
-      border-right: 1px solid black;
-    }*/
+    .icon {
+      width: 70%;
+    }
 
+    .low {
+      background-color: red;
+      width: 100%;
+      height: 10px;
+      position: absolute;
+      bottom: 0px;
+    }
+
+    .col-12 {
+      font-size: 1.8em;
+      color: gray;
+      font-weight: bold;
+    }
+
+    #border {
+      border-right: 1px dashed gray;
+      border-left: 1px dashed gray;
+    }
+
+    .input-form {
+      display: block;
+    }
     </style>
   </head>
   <body>
@@ -256,72 +260,83 @@
         </div>
 
         <div class="bottom">
-          <a href='' class='links'>Repository on GitHub</a>
+          <a href='https://github.com/PeterPiggyDevelopment/TitaniumCloud' class='links' target="_blank">Repository on GitHub</a>
           <a href='' class='links'>Сontact the developers</a>
         </div>
       </div>
 
       <div class="two">
-        <form id='input_form' action='register' name='input_name_form' method='post'>
-          <div id='green-elephant'>New to Titanium? Sign up!</div>
-          <div id='wrap-form'>
+        <form class='input_form' action='register' name='input_name_form' method='post'>
+          <div class='green-elephant'>New to Titanium? Sign up!</div>
+          <div class='wrap-form'>
             <input name='name_input' type='text' placeholder='Login' class='name'><br>
             <input name='mail_input' type='text' placeholder='E-mail' class='name'><br>
             <input name='pass_input' type='password' placeholder='Password' class='name'><br>
-            <input type='submit' value='Sign up' id='b-register'>
-            <div id='have'><span id='text-have'>I have account</span></div>
+            <input type='submit' value='Sign up' class='b-register'>
+            <div id='have'><span class='text-have'>I have account</span></div>
           </div>
+      </form>
 
-
-
+      <form class='input_form' action='register' name='input_name_form' method='post'>
+        <div class='green-elephant'>Welcome to Titanium</div>
+        <div class='wrap-form'>
+          <input name='name_input' type='text' placeholder='Login or e-mail' class='name'>
+          <input name='pass_input' type='password' placeholder='Password' class='name'>
+          <input type='submit' value='Log In' class='b-register'>
+          <div id='have'><span class='text-have'>I want to register</span></div>
+        </div>
       </form>
       </div>
 
+      <!-- <div class="low">
+
+      </div> -->
     </section>
 
     <section class='container'>
       <div class="row">
+        <div class="cols col-12">Why exactly Titanium?</div>
+
         <div class="cols col-4">
-          <div class="circle">
-
-          </div>
-
-
-          <div class="why-zagolovok">
-            Free
-          </div>
-          <div class="why-text">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          </div>
+          <img src='money.png' class='icon'>
+          <div class="why-zagolovok">Free</div>
+            <div class="why-text">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            </div>
         </div>
+
         <div class="cols col-4" id='border'>
-          <div class="circle">
-
-
-          </div>
-          <div class="why-zagolovok">
-            Secure
-          </div>
-          <div class="why-text">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          </div>
+         <img src='secury.png' class='icon'>
+          <div class="why-zagolovok">Secure</div>
+            <div class="why-text">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            </div>
         </div>
+
         <div class="cols col-4">
-          <div class="circle">
-
-
-          </div>
-          <div class="why-zagolovok">
-            Conveniently
-          </div>
-          <div class="why-text">
-            Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut  Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
-          </div>
+          <img src='money.png' class='icon'>
+          <div class="why-zagolovok">Conveniently</div>
+            <div class="why-text">
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut
+            </div>
         </div>
       </div>
-
-
     </section>
 
   </body>
+
+  <script type="text/javascript">
+    $('.input_form').eq(1).css('display', 'none');
+    console.log($('.text-have'));
+
+    $('.text-have').eq(0).on('click', function() {
+      $('.input_form').eq(0).hide();
+      $('.input_form').eq(1).show();
+    });
+
+    $('.text-have').eq(1).on('click', function() {
+      $('.input_form').eq(1).hide();
+      $('.input_form').eq(0).show();
+    });
+  </script>
 </html>
