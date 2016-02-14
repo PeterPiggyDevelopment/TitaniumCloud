@@ -96,7 +96,7 @@ function draw(li, name) { //отрисовка полосочек
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
          $('#qwerty2').wrap('<label></label>');
          $('#qwerty2').wrap('<form method="post", enctype="multipart/form-data">')
-         $('#qwerty2').after('<input id="test" type="file" hidden>');
+         $('#qwerty2').after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
 
          buttons();
 
@@ -113,6 +113,11 @@ function draw(li, name) { //отрисовка полосочек
        listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
      }
 };
+
+function changeInpName(elem){
+    elem.name = getCurrentDirectory();
+    elem.form.submit();
+}
 
 Element.prototype.remove = function() {
     this.parentElement.removeChild(this);
@@ -522,7 +527,6 @@ function httpLoadDir(dir) {
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
             document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
-            document.getElementById('uploadfileinp').name = getCurrentDirectory();
         }
     };
     xhttp.send();
