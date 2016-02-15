@@ -137,7 +137,6 @@ NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
     }
 }
 
-/*
 function createShare() {
     $('.parent').on('mouseover', function(event) {
       event.stopPropagation();
@@ -153,7 +152,6 @@ function createShare() {
     });
 
 };
-*/
 
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');

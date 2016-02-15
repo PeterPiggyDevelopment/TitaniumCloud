@@ -3,6 +3,15 @@
     padding: 0;
     box-sizing: border-box;
 }
+#clickshist {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index:999;
+    background-color:rgba(255,255,255, 0.5);
+    box-sizing:content-box;
+}
+
 
 html, body {
     color:black;
@@ -11,8 +20,8 @@ html, body {
 body {
   height: 101%;
   width: 100%;
+  background-size: 100% 100%;
   background-image: url('/resource/images/wal.jpg');
-  background-size: cover;
   flex-wrap: nowrap;
 }
 
@@ -62,7 +71,8 @@ cursor: pointer;
 .download {
 font-family: 'Open Sans Light';
 font-size: 0.8em;
-display: flex;
+/*display: flex;*/
+display: none;
 justify-content: flex-end;
 align-items: center;
 }
