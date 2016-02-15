@@ -33,6 +33,8 @@ This is my list of wishes, which came to my mind when I have just thought about 
 |\|/ |add dynamically loaded files browsing for site|
 |\|/ |snake game on 404 (Not Found) page|
 
+As you can see, a bit of plans are failed. It is because of technical limitations. For example, if you wish to protect your server of hacker's attack, you should buy some hardware for this purpose.
+
 ##Make and launch
 If you want to launch server, you should make the project. 
 To make it you should install **Glassgow Haskell Compiler**, **Cabal** and **Make**. Then '**cd**' to your clone directory, install all cabal project dependencies and run '**make**'. Server will be made and run.
