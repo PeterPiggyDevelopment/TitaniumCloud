@@ -182,11 +182,11 @@ function drawFunctions() {
         isCopy=copyFile(element, menu);
         isCut=cutFile(element, menu);
 
-    return false; //чтобы не всплывало стандартное меню
+    return false;
     });
 };
 
-function sort(string) { //сначала идут папки!
+function sort(string) {
     var arr=string.split('\n'),
         length=arr.length,
         count=0;
@@ -514,28 +514,27 @@ function addNewDirectory() {
 };
 
 function endCreateNewDirectory(inputNewName) {
-  var name=document.getElementById('inputNewName').value; //имя новой папки
+  var name=document.getElementById('inputNewName').value;
   inputNewName.replaceWith('<p class="listFileText" id="newName"></p>');
   var newName=$('#newName');
-  newName.text(name); //переименовали
+  newName.text(name);
   newName.removeAttr('id');
   newName.removeAttr('id');
   httpCreateDir(getCurrentDirectory(), name);
 };
 
-//Функции для взаимодействия с сервером
 function httpLoadDir(dir) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/?dir="+dir, true);
     xhttp.onreadystatechange = function() {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
-            folder=sort(xhttp.responseText), //массив, с которого будем рисовать
-            count=countFolders(folder); //количетво папок
-            draw(folder, getNameCookie()); //отрисовали структуру
-            renameFolders(); //переименовали папки
+            folder=sort(xhttp.responseText),
+            count=countFolders(folder);
+            draw(folder, getNameCookie());
+            renameFolders();
             openAndDownloadFile();
-            createShare(); //создание кнопки "Поделиться"
-            drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
+            createShare();
+            drawFunctions(dir);
             document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
         }
     };
@@ -627,7 +626,7 @@ function openAndDownloadFile() {
     $('.parent').on('click', function() {
         var element=$(this);
         if (element.hasClass('functions-menu') == false){
-            if(element.hasClass('folders')==true) { //если папка
+            if(element.hasClass('folders')==true) {
                 var dirname = element.children().eq(1).text();
                 dirname = dirname.slice(0, dirname.length-10);
                 if (getCurrentDirectory().lastIndexOf('/')==getCurrentDirectory().length-1){
@@ -636,7 +635,7 @@ function openAndDownloadFile() {
                     CurrentDirectory += "/"+dirname;
                 }
                 httpLoadDir(getCurrentDirectory());
-            } else { //если файл
+            } else {
                 var name = element.children().eq(1).text();
                 name = name.slice(0, name.length-10);
                 window.location.href=getCurrentDirectory()+'/'+name;
@@ -651,7 +650,7 @@ $('#back-button').on('click', function() {
 });
 
 $('#qwerty2').on('click', function() {
-  var path=$('#test').val(); //путь файла
+  var path=$('#test').val();
 
 });
 
@@ -661,25 +660,17 @@ $('#add_dir_button').on('click', function() {
 };
 
 window.downloadFile = function (sUrl) {
-    //iOS devices do not support downloading. We have to inform user about this.
     if (/(iP)/g.test(navigator.userAgent)) {
         alert('Your device does not support files downloading. Please try again in desktop browser.');
         return false;
     }
-
-    //If in Chrome or Safari - download via virtual link click
     if (window.downloadFile.isChrome || window.downloadFile.isSafari) {
-        //Creating new link node.
         var link = document.createElement('a');
         link.href = sUrl;
-
         if (link.download !== undefined) {
-            //Set HTML5 download attribute. This will prevent file from opening if supported.
             var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
             link.download = fileName;
         }
-
-        //Dispatching click event.
         if (document.createEvent) {
             var e = document.createEvent('MouseEvents');
             e.initEvent('click', true, true);
@@ -687,10 +678,8 @@ window.downloadFile = function (sUrl) {
             return true;
         }
     }
-
     window.open(sUrl, '_self');
     return true;
 }
-
 window.downloadFile.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
 window.downloadFile.isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
