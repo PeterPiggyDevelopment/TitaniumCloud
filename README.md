@@ -26,7 +26,7 @@ This is my list of wishes, which came to my mind when I have just thought about 
 |----|----|
 |\|/ |files download|
 |\|/ |files upload|
-|\|/ |files delete, rename and remove|
+|\|/ |files delete, rename and move in the element's right click drop-down menu|
 |\|/ |registration and authentication form|
 |\|/ |add ajax support for site|
 |\|/ |add click statistic map on "CTRL+." press on each page|
