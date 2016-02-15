@@ -16,11 +16,11 @@ function back(){
     httpLoadDir(getCurrentDirectory());
 }
 
-function typeDocument(string) { //определяет тип документа
-            var pos=string.lastIndexOf('.'), //последнее вхождение точки
+function typeDocument(string) {
+            var pos=string.lastIndexOf('.'),
                 length=string.length,
-                type, //расширение файла
-                src; //src иконки
+                type,
+                src;
 
             if (pos!=-1) {
               type=string.slice(pos+1, string.length);
@@ -56,10 +56,10 @@ function typeDocument(string) { //определяет тип документа
 return src;
 };
 
-function draw(li, name) { //отрисовка полосочек
+function draw(li, name) {
 
      var trash=$('.parent');
-     for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
+     for (var i=0; i<trash.length; i++) trash.eq(i).detach();
      $('#name-user').detach();
      $('#add_dir_button').detach();
      $('#back_button').detach();
@@ -153,7 +153,7 @@ function createShare() {
 
 };
 
-function drawFunctions() { //создание всплывающего меню
+function drawFunctions() {
   $('.parent').off('contextmenu');
     $('.parent').on('contextmenu', function(e) {
         e.preventDefault();
@@ -177,7 +177,6 @@ function drawFunctions() { //создание всплывающего меню
             'left': left
         });
 
-        //функции всплывающего меню
         deleteFile(element, menu);
         renameFile(element, menu);
         isCopy=copyFile(element, menu);
@@ -222,9 +221,9 @@ function countFolders(arr) {
 return count;
 };
 
-function renameFolders() { //удаление '//' из названия
+function renameFolders() {
         for (var i=0; i<count; i++) {
-        $('.parent').eq(i).addClass('folders'); //идентифицировали папки
+        $('.parent').eq(i).addClass('folders');
         var ch=$('.parent').eq(i).children().eq(1),
             children=ch.children().eq(0),
             text=children.text();
@@ -233,7 +232,7 @@ function renameFolders() { //удаление '//' из названия
     }
 };
 
-var isCopy=false, isCut=false; //нажимал ли пользователь на "копировать" или "вырезать"
+var isCopy=false, isCut=false;
 var OldName="";
 var OldDir="";
 
@@ -245,7 +244,7 @@ function copyPasteFile(element, menu) {
   .on('click', 'li#paste', function(){
         var k=identicalName(OldName);
         var name = OldName;
-    if (element.hasClass('folders')==false) { //файл
+    if (element.hasClass('folders')==false) {
         if (k!='-1' && k!='0') {
             name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
         }
@@ -273,7 +272,7 @@ function cutPasteFile(element, menu) {
   .on('click', 'li#paste', function(){
         var k=identicalName(OldName);
         var name = OldName;
-    if (element.hasClass('folders')==false) { //файл
+    if (element.hasClass('folders')==false) {
             if (k!='-1' && k!='0') {
                 name=OldName.slice(0, OldName.lastIndexOf('.')) + ' (' + k+ ')'+OldName.slice(OldName.lastIndexOf('.'), OldName.length);
             }
@@ -326,7 +325,7 @@ function cutFile(element, menu) {
   return isCut;
 }
 
-function deleteFile(element, menu) { //удаление
+function deleteFile(element, menu) {
   $(document).one('click', function(){
       menu.detach();
   })
@@ -334,7 +333,7 @@ function deleteFile(element, menu) { //удаление
   .on('click', 'li#delete', function(){
     element.detach();
     var filename = element.children().eq(1).text();
-    if (element.hasClass('folders')==false) { //файл
+    if (element.hasClass('folders')==false) {
       httpDeleteFile(getCurrentDirectory(), filename);
     } else {
       httpDeleteDir(getCurrentDirectory(), filename);
@@ -343,22 +342,22 @@ function deleteFile(element, menu) { //удаление
   });
 };
 
-function renameFile(element, menu) { //переименование
-  $('#inputNewName').detach(); //удаляем старые поля
+function renameFile(element, menu) {
+  $('#inputNewName').detach();
   var d=$(document);
     $(document).off('click', 'li#rename');
     $(document).on('click', 'li#rename', function(event) {
               var zamena=element.children().eq(1),
                   text=zamena.text();
-              text=text.slice(0, text.length-10); //<--ДЖОН, ВОТ СТАРОЕ ИМЯ ФАЙЛА
-              var first=text.lastIndexOf(' ('), //последнее вхождение " ("
-                  pos=text.lastIndexOf('.'), //последнее вхождение точки
+              text=text.slice(0, text.length-10);
+              var first=text.lastIndexOf(' ('),
+                  pos=text.lastIndexOf('.'),
                   len=pos.length,
-                  type; //расширение файла
+                  type;
 
-                  if (text[first+2]%2!=NaN && text[first+3]==')' || text[first+2]%2!=NaN && text[first+3]%2!=NaN && text[first+4]==')') { //если файл имеет имя типа "name.type (number)"
-                    type=string.slice(0, first); //убрали (number)
-                    type=string.slice(pos+1, type.length); //обрезали всё, кроме расширения
+                  if (text[first+2]%2!=NaN && text[first+3]==')' || text[first+2]%2!=NaN && text[first+3]%2!=NaN && text[first+4]==')') {
+                    type=string.slice(0, first);
+                    type=string.slice(pos+1, type.length);
                   }
                   else if (first==-1){
                     type='';
@@ -367,17 +366,17 @@ function renameFile(element, menu) { //переименование
                     type=string.substring(pos+1, len);
                   }
                   event.preventDefault();
-              zamena.after('<input type="text" id="inputNewName">'); //вставили после текста поле ввода
+              zamena.after('<input type="text" id="inputNewName">');
               var inputNewName=$('#inputNewName');
-              inputNewName.focus(); //делаем фокусировку вручную, потому что autofocus может быть применён только для одного поля на странице
+              inputNewName.focus();
               inputNewName.attr('value', text);
-              inputNewName.select(); //выделение всего текста
-              zamena.hide(); //скрыли текст
-              inputNewName.blur(function() { //перестали вводить новое имя (исчезла фокусировка на поле ввода)
+              inputNewName.select();
+              zamena.hide();
+              inputNewName.blur(function() {
                 endRename(zamena, text, type, inputNewName, element);
               });
-              inputNewName.keydown(function(event) { //перестали вводить новое имя (нажали на Enter)
-                if (event.which==13) { //нажали именно Enter
+              inputNewName.keydown(function(event) {
+                if (event.which==13) {
                   endRename(zamena, text, type, inputNewName, element);
                 }
               })
@@ -385,15 +384,15 @@ function renameFile(element, menu) { //переименование
 };
 
 function endRename(zamena, text, type, inputNewName, element) {
-  var newName=document.getElementById('inputNewName').value; //новое имя
+  var newName=document.getElementById('inputNewName').value;
   inputNewName.detach();
   zamena.show();
   zamena.replaceWith('<p class="listFileText" id="last"></p>');
   var last=$('#last');
-  last.text(newName); //перезаписываем новое имя
-  newName=changeText(newName, text); //проверяем новое имя на правильность, уникальность и пр. <--ДЖОН, ВОТ НОВОЕ ИМЯ ФАЙЛА
-  var newSrc=changeSrc(newName, type); //проверяем, изменилось ли расширение
-  if (newSrc!=type && element.hasClass('folders')==false) { //если да, подбираем новую иконку
+  last.text(newName);
+  newName=changeText(newName, text);
+  var newSrc=changeSrc(newName, type);
+  if (newSrc!=type && element.hasClass('folders')==false) {
     element.children().eq(0).attr('src', newSrc);
   };
   last.text(newName);
@@ -402,17 +401,17 @@ function endRename(zamena, text, type, inputNewName, element) {
   httpRenameFile(getCurrentDirectory(), text, newName);
 }
 
-function identicalName(string) { //проверяет, нет ли таких же файлов
+function identicalName(string) {
     var allText=$('.listFileText'),
-        copy=[], //массив для копирования, так как мы не должны изменять имена других файлов
-        main=0; //количество повторений
+        copy=[],
+        main=0;
 
-    for (var i=0; i<allText.length; i++) { //скопировали всё в другой массив
+    for (var i=0; i<allText.length; i++) {
       copy[i]=allText.eq(i).text();
     }
 
     for (var i=0; i<copy.length; i++) {
-        var first=copy[i].lastIndexOf(')'), //последнее вхождение ")";
+        var first=copy[i].lastIndexOf(')'),
             pos=copy[i].lastIndexOf('.'),
             type1=string.slice(pos+1, string.length),
             type2;
@@ -435,13 +434,13 @@ function identicalName(string) { //проверяет, нет ли таких ж
     return main.toString();
 };
 
-function correctName(name) { //пытался сделать через поиск подстроки, но не получилось
+function correctName(name) {
     var string=['/', ':', '?', '*', '"', '|', '{', '}', '[', ']'],
-        main=true; //имя корректно
+        main=true;
     for (var i=0; i<name.length; i++) {
         for (var j=0; j<string.length; j++) {
             if (name[i]==string[j]) {
-                main=false; //имя не является корректным
+                main=false;
                 break;
             }
         }
@@ -452,7 +451,7 @@ function correctName(name) { //пытался сделать через поис
 
 function changeText(newName, oldName) {
   var q=identicalName(newName);
-  if (correctName(newName)==true && q!='0') { //имя корректное, но не уникальное
+  if (correctName(newName)==true && q!='0') {
     if (newName.lastIndexOf('.')!=-1) {
       newName=newName.slice(0, newName.lastIndexOf('.'))+' ('+ q+')'+newName.slice(newName.lastIndexOf('.'), newName.length);
     }
@@ -460,10 +459,10 @@ function changeText(newName, oldName) {
       newName=newName + ' ('+q+')';
     }
   }
-  else if(newName=='') { //новое имя пустое
+  else if(newName=='') {
     newName=oldName;
   }
-  else if(correctName(newName)==false) { //имя не является корректным
+  else if(correctName(newName)==false) {
     newName=oldName;
     $('body').prepend('<p id="alert-text">В имени файла не должны содержаться символы  &#"/:?*{}"|</p>');
     $('#alert-text').wrap('<div id="alert-wrap"></div>');
@@ -473,7 +472,7 @@ function changeText(newName, oldName) {
   return newName;
 };
 
-function changeSrc(newName, oldSrc) { //поменял ли пользователь расширение файла
+function changeSrc(newName, oldSrc) {
   var newSrc=newName.slice(newName.lastIndexOf('.')+1, newName.length);
   if (newSrc!=oldSrc) {
     newSrc=typeDocument(newName);
@@ -485,10 +484,10 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-function addNewDirectory() { //создание новой папки
+function addNewDirectory() {
   $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
-        count=folders.length; //количество папок
+        count=folders.length;
         $('#name-user').after('<img class="child_img" src="/resource/images/folder.png" id="new">');
         var greenElephant=$('#new');
         greenElephant.wrap('<div class="parent folders" id="last"></div>');
