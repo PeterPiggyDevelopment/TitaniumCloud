@@ -95,7 +95,8 @@ function draw(li, name) { //отрисовка полосочек
          $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
          $('#qwerty2').wrap('<label></label>');
-         $('#qwerty2').wrap('<form method="post", enctype="multipart/form-data">')
+         $('#qwerty2').after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
+         $('#qwerty2').wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
          $('#qwerty2').after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
 
          buttons();
@@ -117,6 +118,10 @@ function draw(li, name) { //отрисовка полосочек
 function changeInpName(elem){
     elem.name = getCurrentDirectory();
     elem.form.submit();
+}
+
+function handleResponse(){
+    alert('Hooray! File downloaded!');
 }
 
 Element.prototype.remove = function() {
