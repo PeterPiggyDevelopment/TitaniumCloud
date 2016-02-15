@@ -68,7 +68,10 @@ function draw(li, name) { //отрисовка полосочек
    var length=li.length,
        listFile=$('#listFile');
 
+
      if (li[0].length!=' ') {
+         $('.clear').detach();
+         $('#qwerty2').detach();
          for (var i=0; i<length; i++) {
              listFile.prepend('<p class="listFileText"></p>');
          }
@@ -81,6 +84,11 @@ function draw(li, name) { //отрисовка полосочек
              var src=typeDocument(li[i]);
              $('.child_img').eq(i).attr('src', src);
          }
+     } else {
+         $('.clear').detach();
+         $('#qwerty2').detach();
+         listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
+     }
 
          $('.parent').eq(0).before('<div id="name-user"></div>');
          $('#name-user').prepend('<img class="child_img" src="/resource/images/user.png" id="person" align="right">');
@@ -92,8 +100,8 @@ function draw(li, name) { //отрисовка полосочек
          $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
          $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
          $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
-         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
-         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
+         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button" onclick="back()">');
+         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back""></div>');
          $('#qwerty2').wrap('<label></label>');
          $('#qwerty2').after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
          $('#qwerty2').wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
@@ -107,12 +115,6 @@ function draw(li, name) { //отрисовка полосочек
          });
 
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
-
-     }
-     else {
-       $('.clear').detach();
-       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
-     }
 };
 
 function changeInpName(elem){
