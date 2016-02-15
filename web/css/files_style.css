@@ -4,6 +4,18 @@
     box-sizing: border-box;
 }
 
+html, body {
+    color:black;
+}
+
+body {
+  height: 101%;
+  width: 100%;
+  background-image: url('/resource/images/wal.jpg');
+  background-size: cover;
+  flex-wrap: nowrap;
+}
+
 section {
 width: 50%;
 position: relative;
@@ -25,6 +37,7 @@ border-top: 1px solid #87CEEB;
 display: flex;
 justify-content: left;
 align-items: center;
+background-color:rgba(255,255,255,0.3);
 }
 
 .child {
@@ -118,7 +131,8 @@ display: none;
 #globalDirectory {
 margin: 1vw;
 font-size: 3vw;
-
+font-family: 'Raleway';
+color:white;
 }
 
 #name-user {
@@ -156,6 +170,7 @@ background-color: red;
 #add_dir_button, #qwerty2 {
 float: right;
 width: 18px;
+height: 18px;
 margin-top: 6px;
 }
 
@@ -174,6 +189,7 @@ margin-right: -2px;
 
 #back_button {
 width: 18px;
+height: 18px;
 margin-top: 6px;
 }
 
@@ -189,4 +205,11 @@ margin-top: 6px;
   float: right;
   margin-left: 5px;
   margin-right: 0px;
+}
+
+#banner {
+    margin-left=30em;
+    font-size: 6em;
+    font-family: 'Poiret One';
+    color:white;
 }

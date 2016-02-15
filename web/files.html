@@ -2,9 +2,12 @@
 <html onclick='handleEvent(event)'>
     <head>
         <title> Your Files </title>
+        <link rel="icon" type="image/ico" href="/resource/favicon.ico"></link>
         <link href="http://allfont.ru/allfont.css?fonts=open-sans-light" rel="stylesheet" type="text/css" />
-        <link rel="stylesheet" type="text/css" href="css/files_style.css"/>
+        <link rel="stylesheet" type="text/css" href="http://fonts.googleapis.com/css?family=Raleway|Indie+Flower|Poiret+One|Open+Sans"></link>
         <link rel="stylesheet" href="css/hint.min.css">
+        <link rel="stylesheet" href="css/404.css">
+        <link rel="stylesheet" type="text/css" href="css/files_style.css"/>
         <meta charset="UTF-8">
 
         <style media="screen">
@@ -18,14 +21,20 @@
         </style>
         <head>
     <body onload='httpLoadDir(getCurrentDirectory())'>
-        <div id='globalDirectory'>Current directory: /</div>
+        <div class='columns is_centered'>
+            <div class='column'>
+                <div id='globalDirectory'>Current directory: /</div>
+            </div>
+            <div class='column'>
+                <a id='banner' href="index.html">
+                    <img src="/resource/favicon.ico" alt="Icon" style="width:128px;height:128px;">
+                    Titanium cloud 
+                </a>
+            </div>
+        </div>
         <section id='listFile'></section>
     </body>
     <script src='js/jquery.js'></script>
     <script src='js/files_script.js'></script>
     <script src='js/additional_functionality.js'></script>
-    <script type="text/javascript">
-        folder=sort("afadsfadsf"), //массив, с которого будем рисовать
-        count=countFolders(folder); //количетво пoпок
-    </script>
 </html>

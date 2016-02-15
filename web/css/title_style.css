@@ -347,6 +347,23 @@ html, body {
   color: white;
 }
 
+.files_link:link, .files_link:visited {
+    margin-top:5em;
+    font-size: 2em;
+    height:2.2em;
+    background-color: rgba(180,195,211, 0.8);
+    color: black;
+    padding: 14px 25px;
+    text-align: center; 
+    text-decoration: none;
+    display: inline-block;
+}
+
+
+.files_link:hover, .files_link:active {
+    background-color: rgba(204,215,225,0.4);
+}
+
 .links {
   font-size: 0.9em;
   color: white;
@@ -539,3 +556,4 @@ margin-bottom: 0.5em;
 .icon {
   width: 70%;
 }
+

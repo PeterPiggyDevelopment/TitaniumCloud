@@ -62,6 +62,9 @@ main = do
                 ("del", file) -> removeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
                     >> return (respond OK :: Response String)
+                ("dirdel", file) -> removeDirectory ("./" ++ 
+                    replace ".." "" (snd (last (url_params url))) ++ "/" ++ file)
+                    >> return (respond OK :: Response String)
                 ("create", file) -> Prelude.writeFile ("./" ++ 
                     replace ".." "" (snd (last (url_params url))) ++ "/" ++ file) ""
                     >> return (respond OK :: Response String)

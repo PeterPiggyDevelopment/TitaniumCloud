@@ -413,3 +413,38 @@ table th {
     margin-left: 0;
   }
 }
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+}
+
+#startButton {
+    font-size:2.5em;
+    font-family: 'Poiret One';
+    width:4em;
+    height:4em;
+}
+
+#text {
+    color: black;
+    width:25em;
+    font-size:1.5em;
+    font-family: 'Poiret One';
+    border:10px solid yellowgreen;
+}
+#snakeColumn {
+    margin-left:25em;
+}
+
+#snakeArea {
+    border:10px solid yellowgreen;
+    margin: 0;
+    padding: 0;
+}
+
+columns {
+    padding:0;
+    margin:0;
+}

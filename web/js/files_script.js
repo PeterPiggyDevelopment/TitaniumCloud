@@ -137,6 +137,7 @@ NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
     }
 }
 
+/*
 function createShare() {
     $('.parent').on('mouseover', function(event) {
       event.stopPropagation();
@@ -152,6 +153,7 @@ function createShare() {
     });
 
 };
+*/
 
 function drawFunctions() { //создание всплывающего меню
   $('.parent').off('contextmenu');
@@ -332,10 +334,14 @@ function deleteFile(element, menu) { //удаление
   })
   .off('click', 'li#delete')
   .on('click', 'li#delete', function(){
-      element.detach();
-      var filename = element.children().eq(1).text();
-      filename = filename.slice(0, filename.length-10);
+    element.detach();
+    var filename = element.children().eq(1).text();
+    if (element.hasClass('folders')==false) { //файл
       httpDeleteFile(getCurrentDirectory(), filename);
+    } else {
+      httpDeleteDir(getCurrentDirectory(), filename);
+    }
+    httpLoadDir(dir);
   });
 };
 
@@ -550,11 +556,17 @@ function httpLoadFile(dir, file) {
     xhttp.send();
 }
 
+function httpDeleteDir(dir, file) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.open("GET", "/?dirdel="+file+"&dir="+dir, true);
+    xhttp.send();
+    return xhttp.readyState;
+}
+
 function httpDeleteFile(dir, file) {
     var xhttp = new XMLHttpRequest();
     xhttp.open("GET", "/?del="+file+"&dir="+dir, true);
     xhttp.send();
-    httpLoadDir(dir);
     return xhttp.readyState;
 }
 
