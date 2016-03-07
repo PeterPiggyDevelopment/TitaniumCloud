@@ -1,0 +1,681 @@
+
+      @media screen and (min-width: 800px) {
+          * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Raleway;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      scroll-behavior: smooth;
+    }
+
+    a {
+      outline: none;
+    }
+
+    section {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+    }
+
+    #mobile {
+      display: none;
+    }
+
+    #first {
+      background-color: rgba(24,25,26,.50);
+      display: flex;
+      align-items: center;
+      padding: 0 8%;
+    }
+
+    .main {
+      height: 60%;
+      width: 50%;
+      position: relative;
+    }
+
+    .top {
+      width: 100%;
+      text-align: justify;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    #zagolovok {
+      font-size: 2.6em;
+      color: white;
+      margin-bottom: 3%;
+    }
+
+    #text {
+      font-size: 1.6em;
+      color: white;
+    }
+
+    .links {
+      font-size: 0.9em;
+      color: white;
+      text-decoration: none;
+      margin-right: 2%;
+      border-bottom: 1px dotted white;
+      display: inline;
+    }
+
+    .links:hover {
+      border-bottom: 1px dotted rgb(193, 98, 238);
+      color: rgb(193, 98, 238);
+    }
+
+    .two {
+      height: 60%;
+      width: 50%;
+      display: flex;
+      justify-content: center;
+    }
+
+    .name {
+      height: 32px;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-size: 1em;
+      border: 1px solid #c0c0c0;
+      padding-left: 6px;
+      font-family: 'Open Sans';
+    }
+
+    .b-register {
+      border: 1px solid rgb(94, 143, 207);
+      width: 100%;
+      height: 32px;
+      color: white;
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(126, 176, 242);
+    }
+
+    #b-have {
+      border: 1px solid rgb(138, 68, 180);
+      width: 68%;
+      height: 32px;
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(171, 110, 208);
+    }
+
+    #b-have:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+
+    .b-register:hover {
+      cursor: pointer;
+      opacity: 0.8;
+    }
+
+    .name:focus {
+      -moz-box-shadow:0 0 15px rgb(160, 208, 238);
+      -webkit-box-shadow:0 0 15px rgb(160, 208, 238);
+      box-shadow:0 0 15px rgb(160, 208, 238);
+      outline: none;
+    }
+
+    #test {
+      align-items: center;
+      display: flex;
+      width: 38%;
+    }
+
+    .wrap-form {
+      width: 260px;
+      background-color: rgba(255, 255, 255, 0.4);
+      padding: 5px 5px;
+      border-radius: 7px;
+    }
+
+    .green-elephant {
+      color: rgb(255, 255, 255);
+      padding: 5px 0px;
+      padding-left: 5px;
+      font-size: 1.2em;
+    }
+
+    #have {
+      width: 100%;
+      text-align: center;
+      color: rgb(19, 124, 149);
+      margin-top: 4px;
+      margin-bottom: 2px;
+      font-size: 0.9em;
+    }
+
+    .text-have {
+      border-bottom: 1px solid rgb(19, 124, 149);
+    }
+
+    .text-have:hover {
+      cursor: pointer;
+      color: rgb(203, 78, 145);
+      border-bottom: 1px solid rgb(203, 78, 145);
+    }
+
+    .input-form {
+      display: block;
+    }
+
+    footer {
+      align-items: center;
+      justify-content: space-between;
+      display: flex;
+      font-size: 0.8em;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    #copy {
+      text-align: right;
+      padding-right: 1.25em;
+    }
+
+    .test {
+      display: inline;
+      float: left;
+    }
+
+    .test1 {
+      display: inline;
+      float: left;
+      margin-right: 2em;
+    }
+
+    .developers {
+      position: absolute;
+      display: none;
+    }
+
+    .hide {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid white;
+      font-size: 0.8em;
+    }
+
+    .hide:hover {
+      cursor: pointer;
+      border-bottom: 1px solid rgb(193, 98, 238);
+      color: rgb(193, 98, 238);
+    }
+
+    #second {
+      background: url('../../resource/images/opacity.jpg');
+      background-size: cover;
+    }
+
+    #opacity-two {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(24,25,26,.70);
+      display: flex;
+      align-items: center;
+      padding-left: 8%;
+    }
+
+    .opacity-text {
+      color: white;
+      width: 40%;
+    }
+
+    .opacity-text-big {
+      font-size: 2.2em;
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+    }
+
+    .opacity-text-small {
+      font-size: 1.5em;
+    }
+
+    .icons {
+      width: 10%;
+    }
+
+    .opacity-register {
+      font-size: 1.2em;
+      margin-top: 0.5em;
+    }
+
+    .opacity-register-wrap {
+      border: 2px solid white;
+      width: 25%;
+      text-align: center;
+      margin-top: 1em;
+    }
+
+    .opacity-register {
+      margin: 0.25em 0;
+    }
+
+    .opacity-register-wrap:hover {
+      color: rgb(203, 78, 145);
+      border: 2px solid rgb(203, 78, 145);
+      cursor: pointer;
+    }
+
+    #third {
+      background: url('../../resource/images/opacity1.jpg');
+      background-size: cover;
+    }
+
+    #opacity-three {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(24,25,26,.70);
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      padding-right: 2%;
+    }
+
+    .opacity-text-right {
+      padding-left: 60%;
+      color: white;
+    }
+
+    #four {
+      background: url('../../resource/images/opacity3.jpg');
+      background-size: cover;
+    }
+
+    #opacity-four {
+      background-color: rgba(24,25,26,.70);
+      height: 100%;
+      display: flex;
+      flex-flow: column wrap;
+      padding-left: 8%;
+      justify-content: space-between;
+    }
+
+    #money {
+      margin-bottom: -1em;
+    }
+
+    .links:hover {
+      cursor: pointer;
+    }
+
+    #second-wrap {
+      width: 100%;
+      height: 100%;
+      background-image: url('../../resource/images/sunset.jpg');
+      background-size: cover;
+    }
+
+      }
+
+      @media screen and (max-width: 800px) {
+        * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Raleway;
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      scroll-behavior: smooth;
+    }
+
+    a {
+      outline: none;
+    }
+
+    section {
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+    }
+
+    #first {
+      background-color: rgba(24,25,26,.50);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .main {
+      height: 80%;
+      width: 80%;
+      position: relative;
+      display: none;
+      margin: 0 auto;
+    }
+
+    .top {
+      width: 100%;
+      text-align: justify;
+    }
+
+    .bottom {
+      position: absolute;
+      bottom: 0;
+      width: 100%;
+    }
+
+    #text {
+      font-size: 1.6em;
+      color: white;
+    }
+
+    @media screen and (min-width: 410px) {
+    .links {
+      font-size: 0.9em;
+      color: white;
+      text-decoration: none;
+      margin-right: 2%;
+      border-bottom: 1px dotted white;
+      display: inline;
+    }
+
+        #zagolovok {
+      font-size: 2.6em;
+      color: white;
+      margin-bottom: 3%;
+    }
+
+        #text {
+      font-size: 1.6em;
+      color: white;
+    }
+  }
+
+  @media screen and (max-width: 410px) {
+    .links {
+      font-size: 0.65em;
+      color: white;
+      text-decoration: none;
+      margin-right: 2%;
+      border-bottom: 1px dotted white;
+      display: inline;
+    }
+
+    #zagolovok {
+      font-size: 2em;
+      color: white;
+      margin-bottom: 3%;
+    }
+
+        #text {
+      font-size: 1.2em;
+      color: white;
+    }
+  }
+
+
+
+    .two {
+      width: 90%;
+      justify-content: center;
+      display: flex;
+    }
+
+    .name {
+      height: 32px;
+      border-radius: 3px;
+      margin-bottom: 10px;
+      width: 100%;
+      font-size: 1em;
+      border: 1px solid #c0c0c0;
+      padding-left: 6px;
+      font-family: 'Open Sans';
+    }
+
+    .b-register {
+      border: 1px solid rgb(94, 143, 207);
+      width: 100%;
+      height: 32px;
+      color: white;
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(126, 176, 242);
+    }
+
+    #b-have {
+      border: 1px solid rgb(138, 68, 180);
+      width: 40%;
+      height: 32px;
+      font-size: 0.95em;
+      border-radius: 5px;
+      background-color: rgb(171, 110, 208);
+    }
+
+    .name:focus {
+      -moz-box-shadow:0 0 15px rgb(160, 208, 238);
+      -webkit-box-shadow:0 0 15px rgb(160, 208, 238);
+      box-shadow:0 0 15px rgb(160, 208, 238);
+      outline: none;
+    }
+
+    #test {
+      align-items: center;
+      display: flex;
+      width: 90%;
+    }
+
+    .wrap-form {
+      width: 280px;
+      background-color: rgba(255, 255, 255, 0.4);
+      padding: 5px 5px;
+      border-radius: 7px;
+    }
+
+    .green-elephant {
+      color: rgb(255, 255, 255);
+      padding: 5px 0px;
+      padding-left: 5px;
+      font-size: 1.2em;
+    }
+
+    #have {
+      width: 100%;
+      text-align: center;
+      color: rgb(19, 124, 149);
+      margin-top: 4px;
+      margin-bottom: 2px;
+      font-size: 0.9em;
+    }
+
+    .text-have {
+      border-bottom: 1px solid rgb(19, 124, 149);
+    }
+
+    .input-form {
+      display: block;
+    }
+
+    footer {
+      align-items: center;
+      justify-content: space-between;
+      display: flex;
+      font-size: 0.8em;
+      color: white;
+      margin-bottom: 8px;
+    }
+
+    #copy {
+      text-align: right;
+      padding-right: 1.25em;
+    }
+
+    .test1 {
+      display: inline;
+      float: left;
+      margin-right: 2em;
+    }
+
+    .developers {
+      position: absolute;
+      display: none;
+    }
+
+    .hide {
+      color: white;
+      text-decoration: none;
+      border-bottom: 1px solid white;
+      font-size: 0.8em;
+    }
+
+    #second {
+      background: url('opacity.jpg');
+      background-size: cover;
+    }
+
+    #opacity-two {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(24,25,26,.70);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .opacity-text {
+      color: white;
+      width: 90%;
+    }
+
+
+
+    .icons {
+      width: 10%;
+    }
+
+    @media screen and (min-width: 350px) {
+    .opacity-register {
+      font-size: 1.1em;
+      margin-top: 0.5em;
+    }
+
+    .opacity-text-big {
+      font-size: 2.2em;
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+    }
+
+    .opacity-text-small {
+      font-size: 1.4em;
+    }
+  }
+
+    @media screen and (max-width: 350px) {
+      .opacity-register {
+      font-size: 1em;
+      margin-top: 0.5em;
+    }
+
+        .opacity-text-big {
+      font-size: 2em;
+      margin-bottom: 0.5em;
+      margin-top: 0.5em;
+    }
+
+    .opacity-text-small {
+      font-size: 1.2em;
+    }
+
+
+    }
+
+    .opacity-register-wrap {
+      border: 2px solid white;
+      width: 25%;
+      text-align: center;
+      margin-top: 1em;
+    }
+
+    .opacity-register {
+      margin: 0.25em 0;
+    }
+
+    #third {
+      background: url('opacity1.jpg');
+      background-size: cover;
+    }
+
+    #opacity-three {
+      width: 100%;
+      height: 100%;
+      background-color: rgba(24,25,26,.70);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .opacity-text-right {
+      color: white;
+      width: 90%;
+    }
+
+    #four {
+      background: url('opacity3.jpg');
+      background-size: cover;
+    }
+
+    #opacity-four {
+      background-color: rgba(24,25,26,.70);
+      height: 100%;
+      display: flex;
+      flex-flow: column wrap;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    #money {
+      margin-bottom: -1em;
+    }
+
+    #second-wrap {
+      width: 100%;
+      height: 100%;
+      background-image: url('sunset.jpg');
+      background-size: cover;
+    }
+
+    #mobile {
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .mobile-text {
+      border: 1px solid rgb(94, 143, 207);
+height: 32px;
+color: white;
+font-size: 0.95em;
+border-radius: 5px;
+background-color: rgb(126, 176, 242);
+display: flex;
+align-items: center;
+padding: 4px 4px;
+margin-top: 3px;
+    }
+
+
+      }
+    }

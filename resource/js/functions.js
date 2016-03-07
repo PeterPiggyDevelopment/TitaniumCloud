@@ -1,5 +1,13 @@
 var CurrentDirectory = '';
 
+window.onbeforeunload=function() {
+  alert('Петух!');
+}
+
+$(window).on('click', function() {
+  console.log('QWERTYUIO');
+})
+
 function getCurrentDirectory(){
     return '/'+getNameCookie()+'/'+CurrentDirectory;
 }
@@ -30,41 +38,37 @@ function typeDocument(string) { //определяет тип документа
             }
 
             if (type=='jpg' || type=='png' || type=='jpeg' || type=='gif' || type=='bmp' || type=='tif') {
-                src='/resource/images/image.png';
+                src='image/image.png';
             }
             else if (type=='pdf' || type=='txt' || type=='doc' || type=='xls' || type=='pptx' || type=='docx') {
-                src='/resource/images/document.png';
+                src='image/document.png';
             }
             else if (type=='fb2' || type=='epub' || type=='mobi') {
-                src='/resource/images/book.png';
+                src='image/book.png';
             }
             else if (type=='exe') {
-                src='/resource/images/program.png';
+                src='image/program.png';
             }
             else if (type=='mp3' || type=='amr') {
-                src='/resource/images/music.png';
+                src='image/music.png';
             }
             else if(type=='mp4' || type=='3gp' || type=='avi') {
-                src='/resource/images/video.png';
+                src='image/video.png';
             }
             else if (string[length-1]=='/' && string[length-2]=='/') {
-            	src='/resource/images/folder.png';
+            	src='image/folder.png';
             }
             else {
-              src='/resource/images/other.png';
+              src='image/other.png';
             }
 return src;
 };
 
 function draw(li, name) { //отрисовка полосочек
 
-     var trash=$('.parent');
-     for (var i=0; i<trash.length; i++) trash.eq(i).detach(); //удалили всё, что было
+     var parent=$('.parent');
+     for (var i=0; i<parent.length; i++) parent.eq(i).detach(); //удалили всё, что было
      $('#name-user').detach();
-     $('#add_dir_button').detach();
-     $('#back_button').detach();
-     $('#qwerty2').detach();
-
 
    var length=li.length,
        listFile=$('#listFile');
@@ -83,25 +87,16 @@ function draw(li, name) { //отрисовка полосочек
              $('.child_img').eq(i).attr('src', src);
          }
 
-         var parent=$('.parent');
          parent.eq(0).before('<div id="name-user"></div>');
-         $('#name-user').prepend('<img class="child_img" src="/resource/images/user.png" id="person" align="right">');
+         $('#name-user').prepend('<img class="child_img" src="image/user.png" id="person" align="right">');
          $('#person').after('<p id="user-text"></p>');
          $('#user-text').text(name);
-         $('#name-user').before('<div id="main-menu"></div>');
-         $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
-         $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
-         $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
-         $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
-         var qwerty=$('#qwerty2');
-         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
-         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
-         qwerty.wrap('<label></label>');
-         qwerty.after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
-         qwerty.wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
-         qwerty.after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
 
-         buttons();
+         $('#name-user').before('<div id="main-menu"></div>');
+         $('#main-menu').prepend('<div id="main-menu-left"></div>');
+         $('#main-menu-left').after('<div id="main-menu-right"></div>')
+         $('#main-menu-left').prepend('<img src="image/addfolder.png" class="hint--top hint--bounce child_img" data-hint="Bounce" id="qwerty">');
+         $('#qwerty').after('<img src="image/addfile.png" class="hint--left hint--bounce child_img" data-hint="Bounce" id="qwerty2">')
 
          parent.eq(length-1).css({
            'border-bottom-right-radius': '5px',
@@ -117,26 +112,6 @@ function draw(li, name) { //отрисовка полосочек
      }
 };
 
-function changeInpName(elem){
-    elem.name = getCurrentDirectory();
-    elem.form.submit();
-}
-
-function handleResponse(){
-    alert('Hooray! File downloaded!');
-}
-
-Element.prototype.remove = function() {
-    this.parentElement.removeChild(this);
-}
-NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
-    for(var i = this.length - 1; i >= 0; i--) {
-        if(this[i] && this[i].parentElement) {
-            this[i].parentElement.removeChild(this[i]);
-        }
-    }
-}
-
 function createShare() {
     $('.parent').on('mouseover', function(event) {
       event.stopPropagation();
@@ -149,10 +124,6 @@ function createShare() {
 
     $('.parent').on('mouseout', function() {
         $('.download').detach();
-    });
-
-    $('.download').on('mouseover', function() {
-        $('.child').unbind('mouseout');
     });
 
 };
@@ -485,10 +456,11 @@ function changeSrc(newName, oldSrc) { //поменял ли пользовате
   return newSrc;
 };
 
-function addNewDirectory() { //создание новой папки
+(function addNewDirectory() { //создание новой папки
+  $('#add_dir_button').on('click', function() {
     var folders=$('.folders'),
         count=folders.length; //количество папок
-        $('#name-user').after('<img class="child_img" src="/resource/images/folder.png" id="new">');
+        $('section').prepend('<img class="child_img" src="image/folder.png" id="new">');
         var greenElephant=$('#new');
         greenElephant.wrap('<div class="parent folders" id="last"></div>');
         $('#new').after('<input type="text" id="inputNewName">');
@@ -497,19 +469,19 @@ function addNewDirectory() { //создание новой папки
         inputNewName.focus();
         greenElephant.removeAttr('id');
         inputNewName.blur(function() {
-          if (inputNewName.val!='')
             endCreateNewDirectory(inputNewName)
         });
 
         inputNewName.keydown(function(event) {
           if (event.which==13) {
-           if (inputNewName.val!='')
-             endCreateNewDirectory(inputNewName)
+            endCreateNewDirectory(inputNewName)
           }
         });
 
 
-};
+});
+
+})();
 
 function endCreateNewDirectory(inputNewName) {
   var name=document.getElementById('inputNewName').value; //имя новой папки
@@ -535,6 +507,7 @@ function httpLoadDir(dir) {
             createShare(); //создание кнопки "Поделиться"
             drawFunctions(dir); //отрисовка всплывающего меню при нажатии правой кнопкой мыши
             document.getElementById('globalDirectory').innerHTML = 'Current directory: /' + CurrentDirectory;
+            document.getElementById('uploadfileinp').name = getCurrentDirectory();
         }
     };
     xhttp.send();
@@ -632,56 +605,20 @@ function openAndDownloadFile() {
                 var name = element.children().eq(1).text();
                 name = name.slice(0, name.length-10);
                 window.location.href=getCurrentDirectory()+'/'+name;
+                //httpGetFile(getCurrentDirectory(), name);
             }
         }
     })
 };
 
-function buttons() {
-    $('#back-button').on('click', function() {
-      back();
-    });
+// function mapClick() {
+//   // $(window).unload(function() {
+//   //   alert('Петух!');
+//   // });
+//   console.log(1);
+//   window.onbeforeunload=function() {
+//     alert('Петух!');
+//   }
+// }
 
-    $('#qwerty2').on('click', function() {
-      var path=$('#test').val(); //путь файла
-    });
-
-    $('#add_dir_button').on('click', function() {
-      addNewDirectory();
-    });
-};
-
-window.downloadFile = function (sUrl) {
-    //iOS devices do not support downloading. We have to inform user about this.
-    if (/(iP)/g.test(navigator.userAgent)) {
-        alert('Your device does not support files downloading. Please try again in desktop browser.');
-        return false;
-    }
-
-    //If in Chrome or Safari - download via virtual link click
-    if (window.downloadFile.isChrome || window.downloadFile.isSafari) {
-        //Creating new link node.
-        var link = document.createElement('a');
-        link.href = sUrl;
-
-        if (link.download !== undefined) {
-            //Set HTML5 download attribute. This will prevent file from opening if supported.
-            var fileName = sUrl.substring(sUrl.lastIndexOf('/') + 1, sUrl.length);
-            link.download = fileName;
-        }
-
-        //Dispatching click event.
-        if (document.createEvent) {
-            var e = document.createEvent('MouseEvents');
-            e.initEvent('click', true, true);
-            link.dispatchEvent(e);
-            return true;
-        }
-    }
-
-    window.open(sUrl, '_self');
-    return true;
-}
-
-window.downloadFile.isChrome = navigator.userAgent.toLowerCase().indexOf('chrome') > -1;
-window.downloadFile.isSafari = navigator.userAgent.toLowerCase().indexOf('safari') > -1;
+//mapClick();
