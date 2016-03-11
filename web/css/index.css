@@ -543,7 +543,7 @@
     }
 
     #second {
-      background: url('opacity.jpg');
+      background: url('../../resource/images/opacity.jpg');
       background-size: cover;
     }
 
@@ -615,7 +615,7 @@
     }
 
     #third {
-      background: url('opacity1.jpg');
+      background: url('../../resource/images/opacity1.jpg');
       background-size: cover;
     }
 
@@ -634,7 +634,7 @@
     }
 
     #four {
-      background: url('opacity3.jpg');
+      background: url('../../resource/images/opacity3.jpg');
       background-size: cover;
     }
 
@@ -654,7 +654,7 @@
     #second-wrap {
       width: 100%;
       height: 100%;
-      background-image: url('sunset.jpg');
+      background-image: url('../../resource/images/sunset.jpg');
       background-size: cover;
     }
 
