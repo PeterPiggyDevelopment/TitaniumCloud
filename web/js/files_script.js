@@ -100,8 +100,7 @@ function draw(li, name) { //отрисовка полосочек
          $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
          $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
          $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
-         $('#qwerty2').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Upload files"></div>');
-<<<<<<< HEAD
+
          var qwerty=$('#qwerty2');
          $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
@@ -109,14 +108,6 @@ function draw(li, name) { //отрисовка полосочек
          qwerty.after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
          qwerty.wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
          qwerty.after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
-=======
-         $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button" onclick="back()">');
-         $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back""></div>');
-         $('#qwerty2').wrap('<label></label>');
-         $('#qwerty2').after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
-         $('#qwerty2').wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
-         $('#qwerty2').after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
->>>>>>> 231fe5f191b1f6f7b995db42ea18cd29a501f643
 
          buttons();
 
@@ -125,17 +116,17 @@ function draw(li, name) { //отрисовка полосочек
            'border-bottom-left-radius' : '5px'
          });
 
-<<<<<<< HEAD
-         parent.eq(length-1).css('border-bottom', '1px solid #87CEEB');
+// <<<<<<< HEAD
+//          parent.eq(length-1).css('border-bottom', '1px solid #87CEEB');
 
-     }
-     else {
-       $('.clear').detach();
-       listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
-     }
-=======
+//      }
+//      else {
+//        $('.clear').detach();
+//        listFile.prepend('<p class="clear">Нет файлов, дружище</p>');
+//      }
+// =======
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
->>>>>>> 231fe5f191b1f6f7b995db42ea18cd29a501f643
+//>>>>>>> 231fe5f191b1f6f7b995db42ea18cd29a501f643
 };
 
 function changeInpName(elem){
