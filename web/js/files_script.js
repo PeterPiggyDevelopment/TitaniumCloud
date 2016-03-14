@@ -99,15 +99,18 @@ function draw(li, name) { //отрисовка полосочек
          $('#name-user').before('<div id="main-menu"></div>');
          $('#main-menu').prepend('<img src="/resource/images/addfolder.png" id="add_dir_button">');
          $('#add_dir_button').before('<img src="/resource/images/addfile.png" id="qwerty2">')
-         $('#add_dir_button').wrap('<div class="hint--top hint--bounce child_img asdfg right" data-hint="Add new folder"></div>');
+         $('#add_dir_button').wrap('<div class="hint--top child_img asdfg right" data-hint="Add new folder"></div>');
 
          var qwerty=$('#qwerty2');
          $('#main-menu').prepend('<img src="/resource/images/back.png" id="back_button">');
          $('#back_button').wrap('<div class="hint--top hint--bounce child_img" data-hint="Back"></div>');
          qwerty.wrap('<label></label>');
+         $('label').wrap('<div class="vvv"></div>')
          qwerty.after('<iframe id="text_upload_container" name="hidden_frame" style="width:0px; height:0px; border:0px;">');
-         qwerty.wrap('<form id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
+         qwerty.wrap('<form class="hint--top" data-hint="Upload files" id="send_file_form" method="post", enctype="multipart/form-data" target="hidden_frame">')
          qwerty.after('<input id="uploadfileinp" name="uname" type="file"  onchange="changeInpName(this);" hidden>');
+         $('#add_dir_button').detach();
+         $('label').after('<div class="hint--top" data-hint="Add folder"><img src="/resource/images/addfolder.png" id="add_dir_button"></div>');
 
          buttons();
 
@@ -128,6 +131,8 @@ function draw(li, name) { //отрисовка полосочек
          $('.parent').eq(length-1).css('border-bottom', '1px solid #87CEEB');
 //>>>>>>> 231fe5f191b1f6f7b995db42ea18cd29a501f643
 };
+
+
 
 function changeInpName(elem){
     elem.name = getCurrentDirectory();
@@ -150,23 +155,18 @@ NodeList.prototype.remove = HTMLCollection.prototype.remove = function() {
 }
 
 function createShare() {
-    $('.parent').on('mouseover', function(event) {
+    $('.parent').on('mouseenter', function(event) {
       event.stopPropagation();
       event.preventDefault();
     $('.download').detach();
     var child=$(this).children().eq(1),
         text=child.children().eq(0);
-    text.after('<p class="download"><span class="share_text">Поделиться</span></p>');
+    text.after('<p class="download"><span class="share_text hint--right hint--error" data-hint="Эта функция пока не работает">Поделиться</span></p>');
     });
 
-    $('.parent').on('mouseout', function() {
+    $('.parent').on('mouseleave', function() {
         $('.download').detach();
     });
-
-    $('.download').on('mouseover', function() {
-        $('.child').unbind('mouseout');
-    });
-
 };
 
 function drawFunctions() { //создание всплывающего меню
@@ -541,6 +541,10 @@ function httpLoadDir(dir) {
         if (xhttp.readyState == 4 && xhttp.status == 200) {
             folder=sort(xhttp.responseText), //массив, с которого будем рисовать
             count=countFolders(folder); //количетво папок
+            $('#name-user').detach();
+     $('#add_dir_button').detach();
+     $('#back_button').detach();
+     $('#qwerty2').detach();
             draw(folder, getNameCookie()); //отрисовали структуру
             renameFolders(); //переименовали папки
             openAndDownloadFile();
