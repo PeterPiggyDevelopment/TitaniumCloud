@@ -33,7 +33,7 @@ sendHtml       :: StatusCode -> Html -> Response String
 sendHtml s v    = insertHeader HdrContentType "text/html" $ httpSendText s (renderHtml v)
 
 sendCss       :: StatusCode -> String -> Response String
-sendCss s v    = insertHeader HdrContentType "text/css" $ httpSendText s v
+sendCss s v    = insertHeader HdrContentType "text/css" $ httpSendText s (renderHtml v)
 
 sendScript     :: StatusCode -> String -> Response String
 sendScript s v  = insertHeader HdrContentType "application/x-javascript" $ httpSendText s v
