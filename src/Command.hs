@@ -19,7 +19,7 @@ help = "If you want to print this help, type \"help\"\n" ++
     "If want to delete DataBase of users, type \"rmdb\"\n" ++
     "If you want to list the Data Base, type \"lsdb\"\n" ++
     "If you want to find user \"namename\" in Data Base, type \"fnusr\"\n" ++
-    "If you want to print statistics about users, type \"pst\"" ++
+    "If you want to print statistics about users, type \"pst\"\n" ++
     "If you want to print short statistics about users, type \"stst\""
 
 genShortStats :: [(String, Int)] -> (Int, Int)
